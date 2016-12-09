@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{83040F8E-89F2-4F12-8C4C-9ADFCA30EF73}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Gware.Common</RootNamespace>
+    <AssemblyName>Gware.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Application\ApplicationBase.cs" />
+    <Compile Include="Database\DatabaseConnection.cs" />
+    <Compile Include="Database\StoredProcedure.cs" />
+    <Compile Include="DataStructures\Circularbuffer.cs" />
+    <Compile Include="DataStructures\ListExtensionMethods.cs" />
+    <Compile Include="Data\BufferReader.cs" />
+    <Compile Include="Data\BufferWriter.cs" />
+    <Compile Include="Data\DataBuffer.cs" />
+    <Compile Include="Data\ExtensionMethods.cs" />
+    <Compile Include="Data\GenerateCRC.cs" />
+    <Compile Include="Data\SafeConvert.cs" />
+    <Compile Include="Delegates\EventDelegates.cs" />
+    <Compile Include="Delegates\ListDelegates.cs" />
+    <Compile Include="Delegates\LoginResult.cs" />
+    <Compile Include="Encryption\AutoEncryptDecrypt.cs" />
+    <Compile Include="Encryption\EncryptDecrypt.cs" />
+    <Compile Include="Encryption\EncryptDecryptBase.cs" />
+    <Compile Include="Encryption\HashDeriveBytes.cs" />
+    <Compile Include="Encryption\HashProviderBase.cs" />
+    <Compile Include="Encryption\MD5Hash.cs" />
+    <Compile Include="Encryption\SimpleAES.cs" />
+    <Compile Include="Encryption\SimpleEncryptDecrypt.cs" />
+    <Compile Include="Encryption\SystemKeyData.cs" />
+    <Compile Include="Encryption\SystemKeyId.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Filter\Filter.cs" />
+    <Compile Include="Filter\IFilter.cs" />
+    <Compile Include="Filter\RangeFilter.cs" />
+    <Compile Include="Filter\SingleFilter.cs" />
+    <Compile Include="Filter\WithinFilter.cs" />
+    <Compile Include="HelperMethods.cs" />
+    <Compile Include="Logging\ExceptionLogger.cs" />
+    <Compile Include="Networking\AuthenticatedConnection\AuthenticatedClient.cs" />
+    <Compile Include="Networking\AuthenticatedConnection\AuthenticatedCommand.cs" />
+    <Compile Include="Networking\AuthenticatedConnection\AuthenticationServer.cs" />
+    <Compile Include="Networking\Connection\ExtensionMethods.cs" />
+    <Compile Include="Networking\Connection\IDataReceiver.cs" />
+    <Compile Include="Networking\Connection\INetClient.cs" />
+    <Compile Include="Networking\Connection\INetServer.cs" />
+    <Compile Include="Networking\Connection\TcpNetClient.cs" />
+    <Compile Include="Networking\Connection\TcpNetServer.cs" />
+    <Compile Include="Networking\Connection\UdpNetClient.cs" />
+    <Compile Include="Networking\FramedConnection\ConnectionFramer.cs" />
+    <Compile Include="Networking\FramedConnection\FramedClient.cs" />
+    <Compile Include="Networking\FramedConnection\FramedServer.cs" />
+    <Compile Include="Networking\FramedConnection\TransferPacketFramer.cs" />
+    <Compile Include="Networking\Packet\TransferDataPacket.cs" />
+    <Compile Include="Networking\Packet\TransferDataPacketHeader.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="DataStructures\Range.cs" />
+    <Compile Include="Reflection\ExtensionMethods.cs" />
+    <Compile Include="Serialisation\BinarySerialisation.cs" />
+    <Compile Include="Threading\ActionThread.cs" />
+    <Compile Include="Threading\IExecuteable.cs" />
+    <Compile Include="Threading\ResetEventGroup.cs" />
+    <Compile Include="Threading\ThreadBase.cs" />
+    <Compile Include="Threading\ThreadController.cs" />
+    <Compile Include="Threading\TimerThread.cs" />
+    <Compile Include="XML\ExtensionMethods.cs" />
+    <Compile Include="XML\XmlResultSet.cs" />
+    <Compile Include="XML\XmlRowDetail.cs" />
+    <Compile Include="XML\XmlRowSet.cs" />
+    <Compile Include="XML\XmlRowSetRow.cs" />
+    <Compile Include="XML\XmlRowSetRowBase.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
