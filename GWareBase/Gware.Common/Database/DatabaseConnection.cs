@@ -14,13 +14,6 @@ namespace Gware.Common.Database
 {
     public class DatabaseConnection
     {
-        public static DatabaseConnection AuthenticationServer
-        {
-            get
-            {
-                return new DatabaseConnection("Authentication", "⸴樒竛꿚空캱䬅㯜塴貎ガ膏屌瓬", "驗訿钬ꖤ숀⮆倨ࡣ큌三뇹뗽ϗ߽", "呤嗯༤ꘆ䣈褠㷈ࡳ", "闯鷞ꆧః퉍ㄞㅂ᭧",true);
-            }
-        }
         private string m_connectionName;
         private string m_databaseName;
         private string m_password;

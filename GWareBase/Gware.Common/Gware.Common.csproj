@@ -45,7 +45,7 @@
     <Compile Include="Database\DatabaseConnection.cs" />
     <Compile Include="Database\StoredProcedure.cs" />
     <Compile Include="DataStructures\Circularbuffer.cs" />
-    <Compile Include="DataStructures\ListExtensionMethods.cs" />
+    <Compile Include="DataStructures\CollectionExtensionMethods.cs" />
     <Compile Include="Data\BufferReader.cs" />
     <Compile Include="Data\BufferWriter.cs" />
     <Compile Include="Data\DataBuffer.cs" />
@@ -54,7 +54,7 @@
     <Compile Include="Data\SafeConvert.cs" />
     <Compile Include="Delegates\EventDelegates.cs" />
     <Compile Include="Delegates\ListDelegates.cs" />
-    <Compile Include="Delegates\LoginResult.cs" />
+    <Compile Include="DataStructures\LoginResult.cs" />
     <Compile Include="Encryption\AutoEncryptDecrypt.cs" />
     <Compile Include="Encryption\EncryptDecrypt.cs" />
     <Compile Include="Encryption\EncryptDecryptBase.cs" />
@@ -65,7 +65,6 @@
     <Compile Include="Encryption\SimpleEncryptDecrypt.cs" />
     <Compile Include="Encryption\SystemKeyData.cs" />
     <Compile Include="Encryption\SystemKeyId.cs" />
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Filter\Filter.cs" />
     <Compile Include="Filter\IFilter.cs" />
     <Compile Include="Filter\RangeFilter.cs" />
