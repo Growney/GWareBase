@@ -95,7 +95,6 @@
     <Compile Include="Delegates\ListDelegates.cs" />
     <Compile Include="Delegates\LoginResult.cs" />
     <Compile Include="Encryption\MD5Hash.cs" />
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Filter\Filter.cs" />
     <Compile Include="Filter\IFilter.cs" />
     <Compile Include="Filter\RangeFilter.cs" />
