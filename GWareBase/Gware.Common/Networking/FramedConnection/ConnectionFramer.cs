@@ -14,22 +14,26 @@ namespace Gware.Common.Networking.FramedConnection
 {
     public class ConnectionFramer
     {
+        private bool m_useNetworkOrder;
         private Dictionary<IPEndPoint, TransferPacketFramer> m_framers = new Dictionary<IPEndPoint, TransferPacketFramer>();
         private Dictionary<IPEndPoint, TransferDataPacket[]> m_receviedPackets = new Dictionary<IPEndPoint, TransferDataPacket[]>();
 
         public event SingleResult<IPEndPoint, byte[]> OnDataCompleted;
 
-        public ConnectionFramer(IDataReceiver receiver)
+        public ConnectionFramer(IDataReceiver receiver,bool useNetworkOrder)
         {
             receiver.OnDataRecevied += receiver_OnDataRecevied;
+            m_useNetworkOrder = useNetworkOrder;
         }
-        public ConnectionFramer(INetClient receiver)
+        public ConnectionFramer(INetClient receiver, bool useNetworkOrder)
         {
             receiver.OnDataRecevied += receiver_OnDataRecevied;
+            m_useNetworkOrder = useNetworkOrder;
         }
-        public ConnectionFramer(INetServer receiver)
+        public ConnectionFramer(INetServer receiver, bool useNetworkOrder)
         {
             receiver.OnDataRecevied += receiver_OnDataRecevied;
+            m_useNetworkOrder = useNetworkOrder;
         }
 
         private void receiver_OnDataRecevied(System.Net.IPEndPoint sender, byte[] result)
@@ -64,7 +68,7 @@ namespace Gware.Common.Networking.FramedConnection
 
                     if (m_packetBuffer.ArrayFull())
                     {
-                        completedData = TransferDataPacket.GetData(m_packetBuffer);
+                        completedData = TransferDataPacket.GetData(m_packetBuffer,m_useNetworkOrder);
                     }
                 }
                 if(completedData != null)

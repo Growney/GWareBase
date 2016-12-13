@@ -11,8 +11,7 @@ namespace Gware.Common.API
 {
     public class UserAuthenticationKey
     {
-        private static readonly TimeSpan c_keyExpiry = TimeSpan.FromHours(1);
-
+        private readonly TimeSpan m_keyExpiry;
         private int m_userID;
         private string m_key;
         private DateTime m_creationDate;
@@ -67,15 +66,15 @@ namespace Gware.Common.API
 
         public UserAuthenticationKey()
         {
-
+            m_keyExpiry = TimeSpan.FromMinutes(1);
         }
 
-        public static UserAuthenticationKey CreateKey(int userID)
+        public static UserAuthenticationKey CreateKey(int userID,TimeSpan expiry,Encoding encoding,Random random, int size = 64)
         {
             DateTime creationDate = DateTime.UtcNow;
-            DateTime expiryDate = creationDate + c_keyExpiry;
+            DateTime expiryDate = creationDate + expiry;
 
-            string key = ApplicationBase.GenerateAuthenticationToken();
+            string key = GenerateAuthenticationToken(encoding,random,size);
 
             return new UserAuthenticationKey()
             {
@@ -84,6 +83,14 @@ namespace Gware.Common.API
                 CreationDate = creationDate,
                 ExpirationDate = expiryDate
             };
+        }
+
+        public static string GenerateAuthenticationToken(Encoding encoding, Random random,int size)
+        {
+            byte[] tokenBytes = new byte[size];
+            random.NextBytes(tokenBytes);
+
+            return encoding.GetString(tokenBytes);
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Gware.Common.Networking.Packet
         public static readonly int DataLengthLocation = sizeof(ushort);
         public static readonly int HeaderLengthLocation = 0;
 
+        private bool m_useNetworkOrder;
         private ushort m_headerLength;
         private ushort m_packetNumber;
         private ushort m_packetTotal;
@@ -73,10 +74,14 @@ namespace Gware.Common.Networking.Packet
             get { return m_headerLength; }
             set { m_headerLength = value; }
         }
-
         public TransferDataPacketHeader()
+            :this(false)
         {
 
+        }
+        public TransferDataPacketHeader(bool useNetworkOrder)
+        {
+            m_useNetworkOrder = useNetworkOrder;
         }
 
         public void FromBytes(byte[] bytes)
@@ -97,7 +102,7 @@ namespace Gware.Common.Networking.Packet
 
         public byte[] ToBytes()
         {
-            BufferWriter writer = new BufferWriter();
+            BufferWriter writer = new BufferWriter(m_useNetworkOrder);
 
             writer.WriteInt16(0);//The header length and the data length must remain at the start of the packet header
             writer.WriteInt16(DataLength);

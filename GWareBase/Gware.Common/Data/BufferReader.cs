@@ -20,12 +20,12 @@ namespace Gware.Common.Data
         #region Construction
 
         public BufferReader()
-            : this(Application.ApplicationBase.c_useNetworkOrder)
+            : this(false)
         {
 
         }
         public BufferReader(byte[] buff)
-            :this(buff,Application.ApplicationBase.c_useNetworkOrder)
+            :this(buff,false)
         {
 
         }
@@ -213,13 +213,13 @@ namespace Gware.Common.Data
 
             return (ret);
         }
-        public string ReadString()
+        public string ReadString(Encoding encoding)
         {
             int stringBytesLength = ReadInt32();
             byte[] stringBytes = ReadBytes(stringBytesLength);
             if (stringBytesLength > 0)
             {
-                return Application.ApplicationBase.c_ApplicationEncoding.GetString(stringBytes);
+                return encoding.GetString(stringBytes);
             }
             else
             {

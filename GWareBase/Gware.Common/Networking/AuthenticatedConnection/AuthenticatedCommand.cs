@@ -35,9 +35,10 @@ namespace Gware.Common.Networking.AuthenticatedConnection
     {
         private static int c_currentClientCommandID;
 
-        private static readonly Encoding c_stringEncoding = Encoding.Unicode;
+        private Encoding m_stringEncoding;
         private int m_commandID;
         private int m_errorCode;
+        private bool m_useNetworkOrder;
 
         private string m_authenticationToken;
         private string m_username;
@@ -94,37 +95,39 @@ namespace Gware.Common.Networking.AuthenticatedConnection
         {
             m_clientCommandID = c_currentClientCommandID++;
         }
-        public AuthenticatedCommand(eAuthenticatedCommand command, eErrors error)
+        public AuthenticatedCommand(eAuthenticatedCommand command, eErrors error,bool useNetworkOrder,Encoding encoding)
         {
             m_clientCommandID = c_currentClientCommandID++;
             CommandID = (int)command;
             ErrorCode = (int)error;
+            m_useNetworkOrder = useNetworkOrder;
+            m_stringEncoding = encoding;
         }
 
         public void FromBytes(byte[] bytes)
         {
-            BufferReader reader = new BufferReader(bytes);
+            BufferReader reader = new BufferReader(bytes, m_useNetworkOrder);
 
             m_clientCommandID = reader.ReadInt32();
             m_commandID = reader.ReadInt32();
             m_errorCode = reader.ReadInt32();
-            m_authenticationToken = reader.ReadString();
-            m_username = reader.ReadString();
-            m_password = reader.ReadString();
+            m_authenticationToken = reader.ReadString(m_stringEncoding);
+            m_username = reader.ReadString(m_stringEncoding);
+            m_password = reader.ReadString(m_stringEncoding);
             int dataLength = reader.ReadInt32();
             m_data = reader.ReadBytes(dataLength);
         }
 
         public byte[] ToBytes()
         {
-            BufferWriter writer = new BufferWriter();
+            BufferWriter writer = new BufferWriter(m_useNetworkOrder);
 
             writer.WriteInt32(m_clientCommandID);
             writer.WriteInt32(m_commandID);//The header length and the data length must remain at the start of the packet header
             writer.WriteInt32(m_errorCode);
-            writer.WriteString(m_authenticationToken);
-            writer.WriteString(m_username);
-            writer.WriteString(m_password);
+            writer.WriteString(m_authenticationToken,m_stringEncoding);
+            writer.WriteString(m_username, m_stringEncoding);
+            writer.WriteString(m_password, m_stringEncoding);
             writer.WriteInt32(m_data.Length);
             writer.WriteBytes(m_data);
 

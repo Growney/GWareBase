@@ -27,11 +27,6 @@ namespace Gware.Common.Data
         #endregion Declarations
 
         #region Construction
-        public BufferWriter()
-            : this(Application.ApplicationBase.c_useNetworkOrder)
-        {
-
-        }
         public BufferWriter(bool bUseNetworkByteOrder)
         {
             Init(bUseNetworkByteOrder);
@@ -175,13 +170,13 @@ namespace Gware.Common.Data
             WriteToBufferPos(new byte[] {Item},0,sizeof(byte));
         }
 
-        public void WriteString(string Item)
+        public void WriteString(string Item,Encoding encoding)
         {
             if (Item == null)
             {
                 Item = string.Empty;
             }
-            byte[] stringBytes = Application.ApplicationBase.c_ApplicationEncoding.GetBytes(Item);
+            byte[] stringBytes = encoding.GetBytes(Item);
             WriteInt32(stringBytes.Length);
             WriteBytes(stringBytes);
         }

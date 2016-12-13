@@ -12,45 +12,30 @@ using Gware.Common.DataStructures;
 using Gware.Common.Reflection;
 using Gware.Common.Encryption;
 using System.IO;
+using Gware.Common.Logging;
 
 namespace Gware.Common.Application
 {
-    public static class ApplicationBase
+    public abstract class ApplicationBase
     {
-        public static readonly Encoding c_ApplicationEncoding = Encoding.Unicode;
-        public const bool c_useNetworkOrder = false;
-        public static readonly Random c_ApplicationRandom = new Random();
+        private readonly Encoding m_applicationEncoding = Encoding.Unicode;
+        private bool m_useNetworkOrder = false;
+        private readonly Random m_applicationRandom = new Random();
 
-        private const string c_settingsFileName = "app.config";
-        private static readonly string m_applicationDataFolder;
-        private static readonly string m_settingsFilePath;
-        private static readonly string m_applicationUserFolder;
-        private static readonly Assembly m_entryAssembly;
+        private readonly string c_settingsFileName = "app.config";
+        private readonly string m_applicationDataFolder;
+        private readonly string m_settingsFilePath;
+        private readonly string m_applicationUserFolder;
+        private readonly Assembly m_entryAssembly;
 
-        private static AutoEncryptDecrypt m_encryptDecrypt;
-        private static object m_encryptionCreationLock = new object();
-        public static AutoEncryptDecrypt EncryptDecrypt
-        {
-            get 
-            {
-                lock (m_encryptionCreationLock) 
-                {
-                    if (m_encryptDecrypt == null)
-                    {
-                        m_encryptDecrypt = new AutoEncryptDecrypt(null);
-                    }
-                }
-                return ApplicationBase.m_encryptDecrypt; 
-            }
-        }
-        public static string MachineName
+        public string MachineName
         {
             get
             {
                 return Environment.MachineName;
             }
         }
-        public static string ApplicationDataFolder
+        public string ApplicationDataFolder
         {
             get
             {
@@ -62,7 +47,7 @@ namespace Gware.Common.Application
                 return retVal;
             }
         }
-        public static string ApplicationUserFolder
+        public string ApplicationUserFolder
         {
             get
             {
@@ -74,7 +59,7 @@ namespace Gware.Common.Application
                 return retVal;
             }
         }
-        public static string CompanyDataFolder
+        public string CompanyDataFolder
         {
             get
             {
@@ -86,7 +71,7 @@ namespace Gware.Common.Application
                 return retVal;
             }
         }
-        public static string CompanyUserFolder
+        public string CompanyUserFolder
         {
             get
             {
@@ -98,7 +83,7 @@ namespace Gware.Common.Application
                 return retVal;
             }
         }
-        public static string ApplicationTitle
+        public string ApplicationTitle
         {
             get 
             {
@@ -107,7 +92,7 @@ namespace Gware.Common.Application
                 
              }
         }
-        public static string ApplicationCompanyName
+        public string ApplicationCompanyName
         {
             get 
             {
@@ -115,14 +100,54 @@ namespace Gware.Common.Application
                 return entryAssembly.GetCompany();
             }
         }
-        public const int c_QueryScanInterval = 500;
-        public const int c_QueryCancelTimer = 30000;
-        static ApplicationBase()
+        public Encoding ApplicationEncoding
+        {
+            get
+            {
+                return m_applicationEncoding;
+            }
+        }
+        public bool UseNetworkOrder
+        {
+            get
+            {
+                return m_useNetworkOrder;
+            }
+
+            set
+            {
+                m_useNetworkOrder = value;
+            }
+        }
+        public Random ApplicationRandom
+        {
+            get
+            {
+                return m_applicationRandom;
+            }
+        }
+        public ApplicationBase(bool useNetworkOrder)
+            : this()
+        {
+            m_useNetworkOrder = useNetworkOrder;
+        }
+        public ApplicationBase(Encoding applicationEncoding)
+            : this()
+        {
+            m_applicationEncoding = applicationEncoding;
+        }
+        public ApplicationBase(Encoding applicationEncoding,bool useNetworkOrder)
+            :this()
+        {
+            m_applicationEncoding = applicationEncoding;
+            m_useNetworkOrder = useNetworkOrder;
+        }
+        public ApplicationBase()
         {
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             if (entryAssembly == null)
             {
-                entryAssembly  = Assembly.GetCallingAssembly();
+                entryAssembly = Assembly.GetCallingAssembly();
             }
             m_entryAssembly = entryAssembly;
             if (entryAssembly != null)
@@ -134,79 +159,18 @@ namespace Gware.Common.Application
 
                 if (!System.IO.File.Exists(m_settingsFilePath))
                 {
-                    m_settingsFilePath = System.IO.Path.Combine(entryAssembly.Location,c_settingsFileName);
+                    m_settingsFilePath = System.IO.Path.Combine(entryAssembly.Location, c_settingsFileName);
                 }
             }
-            
-            LoadBase();
-
-            m_connections.Set(DatabaseConnection.AuthenticationServer.ConnectionName, DatabaseConnection.AuthenticationServer);
-            
         }
-
-        private static Dictionary<string, DatabaseConnection> m_connections = new Dictionary<string, DatabaseConnection>();
-        private static int m_maxExecutionThreads;
-
-        public static int MaxExecutionThreads
+    
+        public void LogException(MethodBase method, Exception ex)
         {
-            get { return ApplicationBase.m_maxExecutionThreads; }
-            set { ApplicationBase.m_maxExecutionThreads = value; }
+            ExceptionLogger.Logger.LogException(method, ex, ApplicationDataFolder);
         }
-        
-        public static DatabaseConnection GetConnection(string name)
+        public void LogString(string logString)
         {
-            if (m_connections.ContainsKey(name))
-            {
-                return m_connections[name];
-            }
-            return null;
-        }
-
-        public static void LoadBase()
-        {
-            if (System.IO.File.Exists(m_settingsFilePath))
-            {
-                XmlDocument doc = new XmlDocument();
-                doc.Load(m_settingsFilePath);
-                XmlNode connectionsNode = doc.DocumentElement.GetNode("Connections");
-                if (connectionsNode != null)
-                {
-                    XmlNodeList connectionNodes = connectionsNode.GetChildNodes("Connection");
-                    foreach (XmlNode node in connectionNodes)
-                    {
-                        DatabaseConnection conn = new DatabaseConnection(node);
-                        m_connections.Set(conn.ConnectionName, conn);
-                    }
-                    
-                }
-
-                m_maxExecutionThreads = doc.DocumentElement.GetAttributeInt("MaxConcurrentExecutables", 15);
-            }
-
-        }
-        public static void SaveBase()
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.AppendChild(doc.CreateElement("config"));
-            XmlNode connectionsNode = doc.DocumentElement.AddNode("Connections");
-
-            foreach (string key in m_connections.Keys)
-            {
-                XmlNode connectionNode = connectionsNode.AddNode("Connection");
-                m_connections[key].AppendTo(connectionNode);
-            }
-
-            doc.DocumentElement.AddAttribute("MaxConcurrentExecutables", m_maxExecutionThreads);
-
-            doc.Save(m_settingsFilePath);
-        }
-
-        public static string GenerateAuthenticationToken(int size = 64)
-        {
-            byte[] tokenBytes = new byte[size];
-            c_ApplicationRandom.NextBytes(tokenBytes);
-
-            return Application.ApplicationBase.c_ApplicationEncoding.GetString(tokenBytes);
+            ExceptionLogger.Logger.LogString(logString, ApplicationDataFolder);
         }
 
     }

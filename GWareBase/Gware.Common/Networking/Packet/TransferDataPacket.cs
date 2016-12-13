@@ -11,6 +11,7 @@ namespace Gware.Common.Networking.Packet
     {
         public const int c_maxPacketDataSize = 8192;
 
+        private bool m_useNetworkOrder;
         private TransferDataPacketHeader m_header = new TransferDataPacketHeader();
 
         public TransferDataPacketHeader Header
@@ -27,9 +28,27 @@ namespace Gware.Common.Networking.Packet
             set { m_data = value; }
         }
 
+        public bool UseNetworkOrder
+        {
+            get
+            {
+                return m_useNetworkOrder;
+            }
+
+            set
+            {
+                m_useNetworkOrder = value;
+            }
+        }
+
         public TransferDataPacket()
+            :this(false)
         {
 
+        }
+        public TransferDataPacket(bool useNetworkOrder)
+        {
+            m_useNetworkOrder = useNetworkOrder;
         }
 
         public void FromBytes(byte[] bytes)
@@ -42,7 +61,7 @@ namespace Gware.Common.Networking.Packet
 
         public byte[] ToBytes()
         {
-            BufferWriter preCRCWriter = new BufferWriter();
+            BufferWriter preCRCWriter = new BufferWriter(m_useNetworkOrder);
             if (m_data != null)
             {
                 m_header.DataLength = (ushort)m_data.Length;
@@ -57,7 +76,7 @@ namespace Gware.Common.Networking.Packet
 
             m_header.PacketCRC = crc;
 
-            BufferWriter postCRCWriter = new BufferWriter();
+            BufferWriter postCRCWriter = new BufferWriter(m_useNetworkOrder);
             postCRCWriter.WriteBytes(m_header.ToBytes());
             postCRCWriter.WriteBytes(m_data);
 
@@ -92,9 +111,9 @@ namespace Gware.Common.Networking.Packet
             return retVal;
         }
 
-        public static byte[] GetData(IEnumerable<TransferDataPacket> packets)
+        public static byte[] GetData(IEnumerable<TransferDataPacket> packets,bool useNetworkOrder)
         {
-            BufferWriter writer = new BufferWriter();
+            BufferWriter writer = new BufferWriter(useNetworkOrder);
             foreach(TransferDataPacket dp in packets)
             {
                 writer.WriteBytes(dp.Data);

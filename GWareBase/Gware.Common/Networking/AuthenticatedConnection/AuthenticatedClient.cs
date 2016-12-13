@@ -11,15 +11,18 @@ namespace Gware.Common.Networking.AuthenticatedConnection
     public class AuthenticatedClient : FramedClient
     {
         private string m_token;
-        public AuthenticatedClient(ClientServerConnectionType type)
-            : base(type)
+        private bool m_useNetworkOrder;
+        private Encoding m_encoding;
+        public AuthenticatedClient(ClientServerConnectionType type,bool useNetworkOrder,Encoding encoding)
+            : base(type,useNetworkOrder)
         {
-
+            m_useNetworkOrder = useNetworkOrder;
+            m_encoding = encoding;
         }
 
         public void RequestAuthenticationAsync(string username, string password)
         {
-            AuthenticatedCommand cmd = new AuthenticatedCommand(eAuthenticatedCommand.AuthenticationRequest, eErrors.None);
+            AuthenticatedCommand cmd = new AuthenticatedCommand(eAuthenticatedCommand.AuthenticationRequest, eErrors.None,m_useNetworkOrder,m_encoding);
             cmd.Username = username;
             cmd.Password = password;
             Send(cmd);
@@ -87,7 +90,7 @@ namespace Gware.Common.Networking.AuthenticatedConnection
 
         public override void Send(byte[] data)
         {
-            AuthenticatedCommand cmd = new AuthenticatedCommand(eAuthenticatedCommand.DataTransfer, eErrors.None);
+            AuthenticatedCommand cmd = new AuthenticatedCommand(eAuthenticatedCommand.DataTransfer, eErrors.None,m_useNetworkOrder,m_encoding);
             Send(cmd);
         }
 

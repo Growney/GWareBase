@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.API
 {
-    public abstract class APIClientBase
+    public abstract class APIClientBase : IAPIClient
     {
         private string m_password;
         private string m_username;
@@ -118,5 +118,7 @@ namespace Gware.Common.API
         }
         protected abstract UserAuthenticationResult GetAuthenticationKey();
         protected abstract bool RemoveAuthenticationKey();
+
+        public abstract bool CanConnect();
     }
 }

@@ -11,11 +11,43 @@ namespace Gware.Common.Networking.AuthenticatedConnection
 
     public class AuthenticationServer : FramedServer
     {
-        private static Random m_rand = new Random();
+        private Encoding m_encoding;
+        private Random m_random;
+        private bool m_useNetworkOrder;
 
-        public AuthenticationServer(int port,ClientServerConnectionType type) :base(port,type)
+        public Random Random
         {
-            
+            get
+            {
+                return m_random;
+            }
+
+            set
+            {
+                m_random = value;
+            }
+        }
+
+        public Encoding Encoding
+        {
+            get
+            {
+                return m_encoding;
+            }
+
+            set
+            {
+                m_encoding = value;
+            }
+        }
+
+        public AuthenticationServer(Encoding encoding,Random random,bool useNetworkOrder,int port, ClientServerConnectionType type) : base(port, type,useNetworkOrder)
+        {
+            m_useNetworkOrder = useNetworkOrder;
+        }
+        public AuthenticationServer(bool useNetworkOrder,int port,ClientServerConnectionType type) :base(port,type,useNetworkOrder)
+        {
+            m_useNetworkOrder = useNetworkOrder;
         }
 
         protected override void OnDataCompleted(System.Net.IPEndPoint sender, byte[] result)
@@ -43,7 +75,7 @@ namespace Gware.Common.Networking.AuthenticatedConnection
         }
         private AuthenticatedCommand BuildCommand(eAuthenticatedCommand command, eErrors error)
         {
-            AuthenticatedCommand retVal = new AuthenticatedCommand(command,error);            
+            AuthenticatedCommand retVal = new AuthenticatedCommand(command,error, m_useNetworkOrder,m_encoding);            
             return retVal;
         }
         private void Send(System.Net.IPEndPoint to,AuthenticatedCommand cmd)
@@ -70,7 +102,7 @@ namespace Gware.Common.Networking.AuthenticatedConnection
 
                     RefreshSessionToken(cmd.AuthenticationToken,newToken, sender);
 
-                    AuthenticatedCommand retCmd = new AuthenticatedCommand(eAuthenticatedCommand.TokenRefresh,eErrors.None);
+                    AuthenticatedCommand retCmd = new AuthenticatedCommand(eAuthenticatedCommand.TokenRefresh,eErrors.None,m_useNetworkOrder,m_encoding);
                     retCmd.AuthenticationToken = newToken;
                     Send(sender, retCmd);
 
@@ -79,7 +111,7 @@ namespace Gware.Common.Networking.AuthenticatedConnection
                 }
                 else
                 {
-                    Send(sender, new AuthenticatedCommand(eAuthenticatedCommand.DataTransferResponse, authenticationResponse));
+                    Send(sender, new AuthenticatedCommand(eAuthenticatedCommand.DataTransferResponse, authenticationResponse, m_useNetworkOrder, m_encoding));
                 }
             }
 
@@ -89,7 +121,7 @@ namespace Gware.Common.Networking.AuthenticatedConnection
             if ((eAuthenticatedCommand)cmd.CommandID == eAuthenticatedCommand.AuthenticationRequest)
             {
                 eErrors authenticationResponse = OnAuthenticationResult(cmd.Username, cmd.Password);
-                AuthenticatedCommand retCmd = new AuthenticatedCommand(eAuthenticatedCommand.AuthenticationResult, authenticationResponse);
+                AuthenticatedCommand retCmd = new AuthenticatedCommand(eAuthenticatedCommand.AuthenticationResult, authenticationResponse, m_useNetworkOrder, m_encoding);
 
                 if (authenticationResponse == eErrors.None)
                 {
@@ -111,9 +143,9 @@ namespace Gware.Common.Networking.AuthenticatedConnection
         protected virtual string GenerateSessionToken()
         {
             byte[] tokenBytes = new byte[128];
-            m_rand.NextBytes(tokenBytes);
+            m_random.NextBytes(tokenBytes);
 
-            return Application.ApplicationBase.c_ApplicationEncoding.GetString(tokenBytes);
+            return Encoding.GetString(tokenBytes);
         }
         protected virtual void RefreshSessionToken(string oldToken, string newToken, System.Net.IPEndPoint ep)
         {

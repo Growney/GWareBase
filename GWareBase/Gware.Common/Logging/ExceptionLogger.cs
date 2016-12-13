@@ -31,7 +31,7 @@ namespace Gware.Common.Logging
 
         }
 
-        public void LogException(MethodBase method, Exception ex)
+        public void LogException(MethodBase method, Exception ex, string directory)
         {
             StringBuilder logEntry = new StringBuilder();
             logEntry.AppendLine(String.Format("{0} {1}::{2}", DateTime.Now, method.Name, ex.GetType().Name));
@@ -42,24 +42,24 @@ namespace Gware.Common.Logging
             {
                 logEntry.AppendLine(String.Format("{0}.{1}", frame.GetType().Name, frame.GetMethod().Name));
             }
-            LogString(logEntry.ToString());
+            LogString(logEntry.ToString(), directory);
         }
-        private void LogString(string logString)
+        public void LogString(string logString,string directory)
         {
             lock (this)
             {
-                using (StreamWriter writer = File.AppendText(GetFile()))
+                using (StreamWriter writer = File.AppendText(GetFile(directory)))
                 {
                     writer.Write(logString);
                 }
             }
         }
-        private string GetFile()
+        private string GetFile(string directory)
         {
             Assembly executingAssembly = Assembly.GetEntryAssembly();
             string fileName = executingAssembly.FullName;
             fileName += ".txt";
-            return Path.Combine(ApplicationBase.ApplicationDataFolder, fileName);
+            return Path.Combine(directory, fileName);
         }
     }
 }

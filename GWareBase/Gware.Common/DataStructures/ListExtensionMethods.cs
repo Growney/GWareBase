@@ -83,8 +83,6 @@ namespace Gware.Common.DataStructures
                 Console.WriteLine(String.Format("Array Missing Bytes {0}", missingBytes));
                 return missingBytes == 0;
             }
-            
-            return true;
         }
         public static void Empty(this Array a)
         {

@@ -25,7 +25,6 @@ namespace Gware.Common.Networking.Connection
         {
             get { throw new NotImplementedException(); }
         }
-
         public TcpNetClient(TcpClient client)
         {
             m_baseClient = client;
@@ -34,7 +33,11 @@ namespace Gware.Common.Networking.Connection
         {
             m_baseClient = new TcpClient();
         }
-
+        public TcpNetClient(string outboundAddress,int outboundPort)
+        {
+            m_outboundAddress = outboundAddress;
+            m_outboundPort = outboundPort;
+        }
         private void Initialise()
         {
             if (!m_baseClient.Connected)

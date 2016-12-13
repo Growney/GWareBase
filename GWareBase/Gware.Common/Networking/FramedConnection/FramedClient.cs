@@ -14,7 +14,7 @@ namespace Gware.Common.Networking.FramedConnection
         protected INetClient m_client;
         private ConnectionFramer m_framer;
 
-        public FramedClient(ClientServerConnectionType type)
+        public FramedClient(ClientServerConnectionType type, bool useNetworkOrder)
         {
             switch (type)
             {
@@ -27,7 +27,7 @@ namespace Gware.Common.Networking.FramedConnection
                 default:
                    throw new ArgumentException("Unsupported Client server type");
             }
-            m_framer = new ConnectionFramer(m_client);
+            m_framer = new ConnectionFramer(m_client, useNetworkOrder);
             m_framer.OnDataCompleted += OnDataCompleted;
         }
 

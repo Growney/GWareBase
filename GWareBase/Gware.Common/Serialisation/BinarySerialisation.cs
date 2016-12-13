@@ -17,18 +17,10 @@ namespace Gware.Common.Serialisation
             {
                 using (MemoryStream stream = new MemoryStream())
                 {
-                    try
-                    {
-                        BinaryFormatter binaryFormatter = new BinaryFormatter();
-                        binaryFormatter.Serialize(stream, obj);
-                        byte[] buffer = stream.GetBuffer();
-                        return buffer;
-                    }
-                    catch (Exception ex)
-                    {
-                        Gware.Common.Logging.ExceptionLogger.Logger.LogException(MethodBase.GetCurrentMethod(), ex);
-                        return null;
-                    }
+                    BinaryFormatter binaryFormatter = new BinaryFormatter();
+                    binaryFormatter.Serialize(stream, obj);
+                    byte[] buffer = stream.GetBuffer();
+                    return buffer;
                 }
             }
             return null;
@@ -40,16 +32,9 @@ namespace Gware.Common.Serialisation
                 using (MemoryStream stream = new MemoryStream(bytes))
                 {
                     BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    try
-                    {
-                        object obj = binaryFormatter.Deserialize(stream);
-                        return obj;
-                    }
-                    catch (Exception ex)
-                    {
-                        Gware.Common.Logging.ExceptionLogger.Logger.LogException(MethodBase.GetCurrentMethod(), ex);
-                        return null;
-                    }
+                   
+                    object obj = binaryFormatter.Deserialize(stream);
+                    return obj;
                 }
             }
             return null;

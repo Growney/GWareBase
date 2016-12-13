@@ -63,32 +63,6 @@ namespace Gware.Common.Database
                 param.Value = value;
             }
         }
-        protected int ExecuteNonQuery(DatabaseConnection conn)
-        {
-            return conn.ExecuteNonQuery(this);
-        }
-        protected int ExecuteNonQuery(string connectionName)
-        {
-            DatabaseConnection connection = Gware.Common.Application.ApplicationBase.GetConnection(connectionName);
-            if (connection != null)
-            {
-                return ExecuteNonQuery(connection);
-            }
-            return -1;
-        }
-        protected DataSet ExecuteQuery(string connectionName)
-        {
-            DatabaseConnection connection = Gware.Common.Application.ApplicationBase.GetConnection(connectionName);
-            if (connection != null)
-            {
-                return ExecuteQuery(connection);
-            }
-            return null;
-        }
-        protected DataSet ExecuteQuery(DatabaseConnection connection)
-        {
-            return connection.ExecuteQuery(this);
-        }
 
     }
 }

@@ -19,7 +19,7 @@ namespace Gware.Common.Networking.FramedConnection
         private INetServer m_server;
         private ConnectionFramer m_framer;
 
-        public FramedServer(int port, ClientServerConnectionType type)
+        public FramedServer(int port, ClientServerConnectionType type,bool useNetworkOrder)
         {
             switch (type)
             {
@@ -33,7 +33,7 @@ namespace Gware.Common.Networking.FramedConnection
                     throw new ArgumentException("Unsupported Client server type");
             }
 
-            m_framer = new ConnectionFramer(m_server);
+            m_framer = new ConnectionFramer(m_server, useNetworkOrder);
             m_server.OnClientConnected += OnClientConnected;
             m_framer.OnDataCompleted += OnDataCompleted;
         }

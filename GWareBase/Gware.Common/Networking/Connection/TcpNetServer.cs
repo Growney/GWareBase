@@ -125,16 +125,9 @@ namespace Gware.Common.Networking.Connection
             {
                 if (m_createConnectionOnSend)
                 {
-                    try
-                    {
-                        TcpNetClient newClient = new TcpNetClient();
-                        newClient.Connect(sendTo);
-                        return newClient.Send(data);
-                    }
-                    catch (Exception ex)
-                    {
-                        return false;
-                    }
+                    TcpNetClient newClient = new TcpNetClient();
+                    newClient.Connect(sendTo);
+                    return newClient.Send(data);
                 }
             }
             return false;
