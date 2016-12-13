@@ -96,15 +96,15 @@ namespace Gware.Common.Threading
         {
 
         }
-        public void Pause()
+        public virtual void Pause()
         {
             m_pauseEvent.Reset();
         }
-        public void Resume()
+        public virtual void Resume()
         {
             m_pauseEvent.Set();
         }
-        public void Start()
+        public virtual void Start()
         {
             m_stop = false;
             m_workerThread.Start();

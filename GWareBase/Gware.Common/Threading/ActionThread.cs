@@ -24,19 +24,21 @@ namespace Gware.Common.Threading
                 OnThreadComplete(this, this);
             }
         }
-        public void Resume()
+        public override void Resume()
         {
             if (m_action != null)
             {
                 m_action.Resume();
             }
+            base.Resume();
         }
-        public void Pause()
+        public override void Pause()
         {
             if (m_action != null)
             {
                 m_action.Pause();
             }
+            base.Pause();
         }
         public void Cancel()
         {

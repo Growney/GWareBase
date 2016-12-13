@@ -54,22 +54,6 @@ namespace Gware.Common.Networking.Connection
             m_baseClient = new UdpClient(addrFamily);
         }
 
-        private async Task ClearTimedOutClients()
-        {
-            List<IPEndPoint> keysToRemove = new List<IPEndPoint>();
-            foreach (IPEndPoint key in m_connectedClients.Keys)
-            {
-                if ((DateTime.UtcNow - m_connectedClients[key]) > m_connectionTimeOut)
-                {
-                    keysToRemove.Add(key);
-                }
-            }
-            foreach (IPEndPoint key in keysToRemove)
-            {
-                m_connectedClients.Remove(key);
-            }
-        }
-
         public bool Send(string address, int port, byte[] data)
         {
            return (m_baseClient.Send(data, data.Length, address, port) == data.Length);

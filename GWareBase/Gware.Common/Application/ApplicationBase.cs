@@ -201,9 +201,9 @@ namespace Gware.Common.Application
             doc.Save(m_settingsFilePath);
         }
 
-        public static string GenerateAuthenticationToken()
+        public static string GenerateAuthenticationToken(int size = 64)
         {
-            byte[] tokenBytes = new byte[128];
+            byte[] tokenBytes = new byte[size];
             c_ApplicationRandom.NextBytes(tokenBytes);
 
             return Application.ApplicationBase.c_ApplicationEncoding.GetString(tokenBytes);
