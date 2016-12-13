@@ -211,13 +211,10 @@ namespace Gware.Common.XML
             }
             return retVal;
         }
-
-
         public static XmlNodeList GetChildNodes(this XmlNode node, string fieldName)
         {
             return ((XmlElement)node).GetElementsByTagName(fieldName);
         }
-
         public static Dictionary<string, string> GetAttributes(this XmlNode node)
         {
             Dictionary<string, string> retVal = new Dictionary<string, string>();

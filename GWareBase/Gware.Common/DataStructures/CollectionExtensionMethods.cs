@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.DataStructures
 {
-    public static class ListExtensionMethods
+    public static class CollectionExtensionMethods
     {
         public static void Merge<T>(this BindingList<T> listOne, BindingList<T> listTwo) where T : IComparable<T>
         {
@@ -63,25 +63,31 @@ namespace Gware.Common.DataStructures
             }
         }
 
+        public static void Add<Key,Value>(this Dictionary<Key,List<Value>> dic,Key key,Value value)
+        {
+            lock (dic)
+            {
+                if (!dic.ContainsKey(key))
+                {
+                    dic.Add(key, new List<Value>());
+                }
+
+                dic[key].Add(value);
+            }
+        }
+
         public static bool ArrayFull(this Array a)
         {
             lock (a)
             {
-                int missingBytes = 0;
                 for (int i = 0; i < a.Length; i++)
                 {
                     if (a.GetValue(i) == null)
                     {
-#if DEBUG
-                        missingBytes++;
-#else
                         return false;
-#endif
                        
                     }
                 }
-                Console.WriteLine(String.Format("Array Missing Bytes {0}", missingBytes));
-                return missingBytes == 0;
             }
         }
         public static void Empty(this Array a)

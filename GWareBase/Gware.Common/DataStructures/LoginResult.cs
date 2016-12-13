@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Common.Delegates
+namespace Gware.Common.DataStructures
 {
     public struct LoginResult
     {
