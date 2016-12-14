@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Build\Debug\Any CPU\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -73,10 +73,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\DBAPIClient.cs" />
+    <Compile Include="API\APIConnectionStatus.cs" />
+    <Compile Include="API\DBAPIClientBase.cs" />
     <Compile Include="API\IAPIClient.cs" />
-    <Compile Include="API\MSSQLDBClient.cs" />
-    <Compile Include="API\WebAPIClient.cs" />
+    <Compile Include="API\MSSQLDBClientBase.cs" />
+    <Compile Include="API\WebAPIClientBase.cs" />
     <Compile Include="API\APIClientBase.cs" />
     <Compile Include="API\UserAuthenticationKey.cs" />
     <Compile Include="API\UserAuthenticationResult.cs" />
@@ -85,7 +86,8 @@
     <Compile Include="Database\MSSQLDBConnection.cs" />
     <Compile Include="Database\StoredProcedure.cs" />
     <Compile Include="DataStructures\Circularbuffer.cs" />
-    <Compile Include="DataStructures\ListExtensionMethods.cs" />
+    <Compile Include="DataStructures\CollectionExtensionMethods.cs" />
+    <Compile Include="DataStructures\LoginResult.cs" />
     <Compile Include="Data\BufferReader.cs" />
     <Compile Include="Data\BufferWriter.cs" />
     <Compile Include="Data\DataBuffer.cs" />
@@ -93,7 +95,6 @@
     <Compile Include="Data\GenerateCRC.cs" />
     <Compile Include="Delegates\EventDelegates.cs" />
     <Compile Include="Delegates\ListDelegates.cs" />
-    <Compile Include="Delegates\LoginResult.cs" />
     <Compile Include="Encryption\MD5Hash.cs" />
     <Compile Include="Filter\Filter.cs" />
     <Compile Include="Filter\IFilter.cs" />

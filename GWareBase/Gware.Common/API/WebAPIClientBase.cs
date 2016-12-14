@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Gware.Common.API
 {
-    public abstract class WebAPIClient : APIClientBase
+    public abstract class WebAPIClientBase : APIClientBase
     {
         private string m_keyParameterName;
         private string m_apiAddress;
@@ -40,9 +40,15 @@ namespace Gware.Common.API
             }
         }
 
-        public WebAPIClient(string apiAddress,string username,string password)
+        public WebAPIClientBase(string apiAddress,string username,string password)
             :base(username,password)
         {
+            m_apiAddress = apiAddress;
+        }
+        public WebAPIClientBase(string apiAddress)
+            : base()
+        {
+            m_apiAddress = apiAddress;
         }
         protected T AuthenticatedGet<T>(string uri)
         {
@@ -141,8 +147,7 @@ namespace Gware.Common.API
                 return responseTask.Result.IsSuccessStatusCode;
             }
         }
-
-        private static string BuildUri(string baseUri, params KeyValuePair<string, string>[] parameters)
+        public static string BuildUri(string baseUri, params KeyValuePair<string, string>[] parameters)
         {
             StringBuilder retVal = new StringBuilder();
             retVal.Append(baseUri);
@@ -163,6 +168,7 @@ namespace Gware.Common.API
         {
             return BuildUri(baseUri,new KeyValuePair<string,string>(KeyParameterName, AuthenticationKey.Key));
         }
+        
         
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.API
 {
-    public abstract class DBAPIClient : APIClientBase
+    public abstract class DBAPIClientBase : APIClientBase
     {
         private string m_serverName;
         private string m_databaseName;
@@ -60,8 +60,15 @@ namespace Gware.Common.API
                 m_databasePassword = value;
             }
         }
-
-        public DBAPIClient(string serverName,string databaseName,string databaseUsername, string databasePassword,string username, string password) 
+        public DBAPIClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword)
+            :base()
+        {
+            m_serverName = serverName;
+            m_databaseName = databaseName;
+            m_databaseUsername = databaseUsername;
+            m_databasePassword = databasePassword;
+        }
+        public DBAPIClientBase(string serverName,string databaseName,string databaseUsername, string databasePassword,string username, string password) 
             : base(username, password)
         {
             m_serverName = serverName;

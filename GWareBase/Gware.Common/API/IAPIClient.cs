@@ -8,9 +8,11 @@
         int UserID { get; }
         string Username { get; set; }
 
-        int Authenticate();
+        int Authenticate(string username,string password);
         bool CheckAuthenticationKey(int retry = 3);
         bool UnAuthenticate();
         bool CanConnect();
+
+        APIConnectionStatus GetConnectionStatus();
     }
 }

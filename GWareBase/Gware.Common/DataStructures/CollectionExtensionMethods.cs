@@ -78,17 +78,19 @@ namespace Gware.Common.DataStructures
 
         public static bool ArrayFull(this Array a)
         {
+            bool retVal = true;
             lock (a)
             {
                 for (int i = 0; i < a.Length; i++)
                 {
                     if (a.GetValue(i) == null)
                     {
-                        return false;
-                       
+                        retVal = false;
+                        break;
                     }
                 }
             }
+            return retVal;
         }
         public static void Empty(this Array a)
         {

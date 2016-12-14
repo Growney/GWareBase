@@ -20,6 +20,7 @@ namespace Gware.Common.Database
         private string m_username;
         private string m_serverName;
         private int m_timeOut = 30;
+        private bool m_encrypted;
         
         public string DatabaseName
         {
@@ -61,6 +62,19 @@ namespace Gware.Common.Database
             }
         }
 
+        public bool Encrypted
+        {
+            get
+            {
+                return m_encrypted;
+            }
+
+            set
+            {
+                m_encrypted = value;
+            }
+        }
+
         public MSSQLDBConnection(string connectionName, string serverName, string databaseName, string username, string password)
         {
             ConnectionName = connectionName;
@@ -92,7 +106,7 @@ namespace Gware.Common.Database
         }
         private string GetApplicationConnectionString()
         {
-            return string.Format("Server={0};Database={1};User id={2};Password={3};Trusted_Connection=False;Encrypt=True;Connection Timeout={0};", m_serverName, m_databaseName, m_username, m_password,m_timeOut);
+            return string.Format("Server={0};Database={1};User id={2};Password={3};Trusted_Connection=False;Encrypt={5};Connection Timeout={4};", m_serverName, m_databaseName, m_username, m_password,m_timeOut,m_encrypted);
         }
         public SqlConnection GetConnection()
         {

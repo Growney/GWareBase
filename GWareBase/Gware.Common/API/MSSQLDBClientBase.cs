@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.API
 {
-    public abstract class MSSQLDBClient : DBAPIClient
+    public abstract class MSSQLDBClientBase : DBAPIClientBase
     {
         private MSSQLDBConnection m_connection;
         private MSSQLDBConnection m_masterConnection;
@@ -27,10 +27,15 @@ namespace Gware.Common.API
                 return new MSSQLDBConnection("MSSQLDBClient", ServerName, "master", DatabaseUsername, DatabasePassword); ;
             }
         }
-        public MSSQLDBClient(string serverName, string databaseName, string databaseUsername, string databasePassword, string username, string password) 
+        public MSSQLDBClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword, string username, string password) 
             : base(serverName, databaseName, databaseUsername, databasePassword, username, password)
         {
             
+        }
+        public MSSQLDBClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword)
+            : base(serverName, databaseName, databaseUsername, databasePassword)
+        {
+
         }
 
         public override bool CanConnect()

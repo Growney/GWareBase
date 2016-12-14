@@ -72,9 +72,23 @@ namespace Gware.Common.API
             m_username = username;
             m_password = password;
         }
+        public APIClientBase()
+        {
+
+        }
         
         public bool CheckAuthenticationKey(int retry = 3)
         {
+            if (String.IsNullOrWhiteSpace(m_username))
+            {
+                throw new InvalidOperationException("Username cannot be empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(m_password))
+            {
+                throw new InvalidOperationException("Password cannot be empty");
+            }
+
             bool retVal = false;
             if (retry > 0)
             {
@@ -86,21 +100,34 @@ namespace Gware.Common.API
                     }
                     else
                     {
-                        Authenticate();
+                        Authenticate(m_username,m_password);
                         retVal = CheckAuthenticationKey(retry - 1);
                     }
                 }
                 else
                 {
-                    Authenticate();
+                    Authenticate(m_username,m_password);
                     retVal = CheckAuthenticationKey(retry - 1);
                 }
             }
             return false;
         }
-        public int Authenticate()
+        public int Authenticate(string username,string password)
         {
-            UserAuthenticationResult result = GetAuthenticationKey();
+            if (String.IsNullOrWhiteSpace(username))
+            {
+                throw new InvalidOperationException("Username cannot be empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new InvalidOperationException("Password cannot be empty");
+            }
+
+            m_username = username;
+            m_password = password;
+
+            UserAuthenticationResult result = GetAuthenticationKey(username,password);
             if (result.Success)
             {
                 m_authenticationKey = result.Key;
@@ -116,9 +143,10 @@ namespace Gware.Common.API
             }
             return !IsAuthenticated;
         }
-        protected abstract UserAuthenticationResult GetAuthenticationKey();
+        protected abstract UserAuthenticationResult GetAuthenticationKey(string username,string password);
         protected abstract bool RemoveAuthenticationKey();
 
+        public abstract APIConnectionStatus GetConnectionStatus();
         public abstract bool CanConnect();
     }
 }
