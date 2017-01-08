@@ -46,7 +46,10 @@ namespace Gware.Common.Data
             }
             return retVal;
         }
-
+        public static int GetFieldIndex(this DataTable table,string field)
+        {
+            return table.Columns.IndexOf(field);
+        }
         public static string GetString(this DataRow row, int index, string defaultValue)
         {
             string retVal = defaultValue;
@@ -61,6 +64,14 @@ namespace Gware.Common.Data
 
             return retVal;
         }
+        public static string GetString(this DataRow row,string defaultValue)
+        {
+            return row.GetString(0, defaultValue);
+        }
+        public static string GetString(this DataRow row, string fieldName,string defaultValue)
+        {
+            return row.GetString(row.Table.GetFieldIndex(fieldName), defaultValue);
+        }
         public static bool GetBoolean(this DataRow row, int index, bool defaultValue)
         {
             string fieldValue = row.GetString(index, defaultValue.ToString());
@@ -70,6 +81,14 @@ namespace Gware.Common.Data
                 return retVal;
             }
             return defaultValue;
+        }
+        public static bool GetBoolean(this DataRow row,bool defaultValue)
+        {
+            return row.GetBoolean(0, defaultValue);
+        }
+        public static bool GetBoolean(this DataRow row,string fieldName, bool defaultValue)
+        {
+            return row.GetBoolean(row.Table.GetFieldIndex(fieldName), defaultValue);
         }
         public static int GetInt(this DataRow row, int index, int defaultValue)
         {
@@ -81,6 +100,14 @@ namespace Gware.Common.Data
             }
             return defaultValue;
         }
+        public static int GetInt(this DataRow row, int defaultValue)
+        {
+            return row.GetInt(0, defaultValue);
+        }
+        public static int GetInt(this DataRow row, string fieldName, int defaultValue)
+        {
+            return row.GetInt(row.Table.GetFieldIndex(fieldName), defaultValue);
+        }
         public static float GetFloat(this DataRow row, int index, float defaultValue)
         {
             string fieldValue = row.GetString(index, defaultValue.ToString());
@@ -90,6 +117,14 @@ namespace Gware.Common.Data
                 return retVal;
             }
             return defaultValue;
+        }
+        public static float GetFloat(this DataRow row,float defaultValue)
+        {
+            return row.GetFloat(0, defaultValue);
+        }
+        public static float GetFloat(this DataRow row,string fieldName, float defaultValue)
+        {
+            return row.GetFloat(row.Table.GetFieldIndex(fieldName), defaultValue);
         }
         public static decimal GetDecimal(this DataRow row, int index, decimal defaultValue)
         {
@@ -101,6 +136,14 @@ namespace Gware.Common.Data
             }
             return defaultValue;
         }
+        public static decimal GetDecimal(this DataRow row, decimal defaultValue)
+        {
+            return row.GetDecimal(0, defaultValue);
+        }
+        public static decimal GetDecimal(this DataRow row, string fieldName, decimal defaultValue)
+        {
+            return row.GetDecimal(row.Table.GetFieldIndex(fieldName), defaultValue);
+        }
         public static long GetLong(this DataRow row, int index, long defaultValue)
         {
             string fieldValue = row.GetString(index, defaultValue.ToString());
@@ -111,6 +154,14 @@ namespace Gware.Common.Data
             }
             return defaultValue;
         }
+        public static long GetLong(this DataRow row, long defaultValue)
+        {
+            return row.GetLong(0, defaultValue);
+        }
+        public static long GetLong(this DataRow row,string fieldName, long defaultValue)
+        {
+            return row.GetLong(row.Table.GetFieldIndex(fieldName), defaultValue);
+        }
         public static DateTime GetDateTime(this DataRow row, int index, DateTime defaultValue)
         {
             string fieldValue = row.GetString(index, defaultValue.ToString());
@@ -120,6 +171,14 @@ namespace Gware.Common.Data
                 return retVal;
             }
             return defaultValue; 
+        }
+        public static DateTime GetDateTime(this DataRow row, DateTime defaultValue)
+        {
+            return row.GetDateTime(0, defaultValue);
+        }
+        public static DateTime GetDateTime(this DataRow row,string fieldName, DateTime defaultValue)
+        {
+            return row.GetDateTime(row.Table.GetFieldIndex(fieldName), defaultValue);
         }
         public static byte[] GetData(this DataRow row, int index, byte[] defaultValue)
         {
@@ -140,7 +199,15 @@ namespace Gware.Common.Data
             }
             return retVal;
         }
+        public static byte[] GetData(this DataRow row, byte[] defaultValue)
+        {
+            return row.GetData(0, defaultValue);
+        }
+        public static byte[] GetData(this DataRow row,string fieldName, byte[] defaultValue)
+        {
+            return row.GetData(row.Table.GetFieldIndex(fieldName), defaultValue);
+        }
 
-       
+
     }
 }

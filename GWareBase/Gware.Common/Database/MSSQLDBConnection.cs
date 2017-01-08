@@ -12,7 +12,7 @@ using Gware.Common.Encryption;
 
 namespace Gware.Common.Database
 {
-    public class MSSQLDBConnection
+    public class MSSQLDBConnection : IDBConnection
     {
         private string m_connectionName;
         private string m_databaseName;

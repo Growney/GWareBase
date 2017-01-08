@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Gware.Common.API.Session;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Common.API
+namespace Gware.Common.API.Database
 {
     public abstract class DBAPIClientBase : APIClientBase
     {
@@ -60,16 +61,8 @@ namespace Gware.Common.API
                 m_databasePassword = value;
             }
         }
-        public DBAPIClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword)
-            :base()
-        {
-            m_serverName = serverName;
-            m_databaseName = databaseName;
-            m_databaseUsername = databaseUsername;
-            m_databasePassword = databasePassword;
-        }
-        public DBAPIClientBase(string serverName,string databaseName,string databaseUsername, string databasePassword,string username, string password) 
-            : base(username, password)
+        public DBAPIClientBase(ISessonManager sessonManager,string serverName, string databaseName, string databaseUsername, string databasePassword)
+            :base(sessonManager)
         {
             m_serverName = serverName;
             m_databaseName = databaseName;

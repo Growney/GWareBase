@@ -11,6 +11,7 @@ namespace Gware.Common.Database
 {
     public abstract class StoredProcedure
     {
+        private IDBConnection m_connection;
         private string m_name;
         private Dictionary<string, SqlParameter> m_parameters;
 
@@ -24,8 +25,9 @@ namespace Gware.Common.Database
             get { return m_name; }
         }
 
-        public StoredProcedure(string name)
+        public StoredProcedure(IDBConnection connection,string name)
         {
+            m_connection = connection;
             m_name = name;
             m_parameters = new Dictionary<string,SqlParameter>();
             OnInitialiseParameters();
@@ -62,6 +64,26 @@ namespace Gware.Common.Database
                 SqlParameter param = m_parameters[name];
                 param.Value = value;
             }
+        }
+
+        public DataSet ExecuteQuery()
+        {
+            DataSet retVal = null;
+            if (m_connection != null)
+            {
+                retVal = m_connection.ExecuteQuery(this);
+            }
+            return retVal;
+        }
+
+        public int ExecuteNonQuery()
+        {
+            int retVal = -1;
+            if(m_connection != null)
+            {
+                retVal = m_connection.ExecuteNonQuery(this);
+            }
+            return retVal;
         }
 
     }

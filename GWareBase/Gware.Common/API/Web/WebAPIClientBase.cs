@@ -7,8 +7,9 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using Gware.Common.API.Session;
 
-namespace Gware.Common.API
+namespace Gware.Common.API.Web
 {
     public abstract class WebAPIClientBase : APIClientBase
     {
@@ -40,50 +41,23 @@ namespace Gware.Common.API
             }
         }
 
-        public WebAPIClientBase(string apiAddress,string username,string password)
-            :base(username,password)
-        {
-            m_apiAddress = apiAddress;
-        }
-        public WebAPIClientBase(string apiAddress)
-            : base()
+        public WebAPIClientBase(ISessonManager sessionManager,string apiAddress)
+            : base(sessionManager)
         {
             m_apiAddress = apiAddress;
         }
         protected T AuthenticatedGet<T>(string uri)
         {
-            T retVal = default(T);
-
-            if (CheckAuthenticationKey())
-            {
-                retVal = APIHttpGet<T>(uri);
-            }
-            else
-            {
-                throw new Exception("Unauthorized Request");
-            }
-
-            return retVal;
+            return APIHttpGet<T>(uri); 
         }
-
-        protected T GetAuthenticatedResult<T>(string baseUri)
+        protected T GetAuthenticatedResult<T>(string baseUri,string key)
         {
-            return AuthenticatedGet<T>(GetAuthenticatedUri(baseUri));
+            return AuthenticatedGet<T>(GetAuthenticatedUri(baseUri, key));
         }
-        protected bool PostAuthenticatedData<T>(string baseUri,T obj)
+        protected bool PostAuthenticatedData<T>(string baseUri,string key,T obj)
         {
-            bool retVal = false;
-            if (CheckAuthenticationKey())
-            {
-                retVal = APIHttpPost<T>(GetAuthenticatedUri(baseUri), obj);
-            }
-            else
-            {
-                throw new Exception("Unauthorised Request");
-            }
-            return retVal;
+            return APIHttpPost<T>(GetAuthenticatedUri(baseUri,key), obj); 
         }
-
         protected T APIHttpGet<T>(string uri)
         {
             T retVal = default(T);
@@ -138,7 +112,7 @@ namespace Gware.Common.API
                 client.BaseAddress = new Uri(APIAddress);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+                
                 MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
                 // New code:
                 Task<HttpResponseMessage> responseTask = client.PostAsync(string.Format("api/{0}", uri), postObj, formatter);
@@ -164,11 +138,10 @@ namespace Gware.Common.API
             }
             return retVal.ToString();
         }
-        private string GetAuthenticatedUri(string baseUri)
+        private string GetAuthenticatedUri(string baseUri,string key)
         {
-            return BuildUri(baseUri,new KeyValuePair<string,string>(KeyParameterName, AuthenticationKey.Key));
+            return BuildUri(baseUri,new KeyValuePair<string,string>(KeyParameterName, key));
         }
-        
-        
+           
     }
 }

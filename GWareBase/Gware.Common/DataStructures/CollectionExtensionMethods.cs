@@ -102,5 +102,18 @@ namespace Gware.Common.DataStructures
                 }
             }
         }
+
+        public static void PopulateWithRange(this IList<int> list,Range<int> range)
+        {
+            list.Clear();
+            for (int i = range.ReverseStart; i <= range.ReverseEnd; i++)
+            {
+                list.Add(i);
+            }
+        }
+        public static void PopulateWithRange(this IList<int> list, int start,int end)
+        {
+            PopulateWithRange(list, new Range<int>(start, end));
+        }
     }
 }

@@ -6,14 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.API
 {
-    public enum AuthenticationErrorCodes
-    {
-        None = 0,
-        UsernameNotFound = 1,
-        PasswordDoesNotMatch = 2,
-        SubscriptionExpired = 3,
-        SystemError = 4,
-    }
+    
     public struct UserAuthenticationResult
     {
         private string m_username;

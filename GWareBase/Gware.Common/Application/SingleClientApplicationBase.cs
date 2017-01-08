@@ -13,7 +13,7 @@ namespace Gware.Common.Application
         private int m_defaultKeyExpiry = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
         private int m_defaultKeySize = 64;
 
-        public T ApplicationApiClient
+        public virtual T ApplicationApiClient
         {
             get
             {

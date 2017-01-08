@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.DataStructures.Common
+namespace Gware.Common.DataStructures
 {
     public struct Range<T> : IComparable<Range<T>> where T : IComparable<T> 
     {
