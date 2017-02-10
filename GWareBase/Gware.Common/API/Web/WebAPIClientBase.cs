@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
-using Gware.Common.API.Session;
 
 namespace Gware.Common.API.Web
 {
-    public abstract class WebAPIClientBase : APIClientBase
+    public abstract class WebAPIClientBase : IAPIClient
     {
-        private string m_keyParameterName;
         private string m_apiAddress;
         public string APIAddress
         {
@@ -27,36 +23,9 @@ namespace Gware.Common.API.Web
                 m_apiAddress = value;
             }
         }
-
-        protected string KeyParameterName
-        {
-            get
-            {
-                return m_keyParameterName;
-            }
-
-            set
-            {
-                m_keyParameterName = value;
-            }
-        }
-
-        public WebAPIClientBase(ISessonManager sessionManager,string apiAddress)
-            : base(sessionManager)
+        public WebAPIClientBase(string apiAddress)
         {
             m_apiAddress = apiAddress;
-        }
-        protected T AuthenticatedGet<T>(string uri)
-        {
-            return APIHttpGet<T>(uri); 
-        }
-        protected T GetAuthenticatedResult<T>(string baseUri,string key)
-        {
-            return AuthenticatedGet<T>(GetAuthenticatedUri(baseUri, key));
-        }
-        protected bool PostAuthenticatedData<T>(string baseUri,string key,T obj)
-        {
-            return APIHttpPost<T>(GetAuthenticatedUri(baseUri,key), obj); 
         }
         protected T APIHttpGet<T>(string uri)
         {
@@ -138,10 +107,7 @@ namespace Gware.Common.API.Web
             }
             return retVal.ToString();
         }
-        private string GetAuthenticatedUri(string baseUri,string key)
-        {
-            return BuildUri(baseUri,new KeyValuePair<string,string>(KeyParameterName, key));
-        }
-           
+        public abstract bool CanConnect();
+        public abstract APIConnectionStatus GetConnectionStatus();
     }
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Common.Storage
+namespace Gware.Common.Storage.Adapter
 {
-    interface ILoadableFrom<T>
+    public interface IDataAdapterCollection
     {
-        void LoadFrom(T item);
+        IDataAdapter[] Adapters { get; }
     }
 }

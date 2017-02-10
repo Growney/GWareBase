@@ -1,11 +1,5 @@
-﻿using Gware.Common.API.Session;
-using Gware.Common.Database;
-using System;
-using System.Collections.Generic;
+﻿using Gware.Common.Database;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gware.Common.API.Database
 {
@@ -28,8 +22,9 @@ namespace Gware.Common.API.Database
                 return new MSSQLDBConnection("MSSQLDBClient", ServerName, "master", DatabaseUsername, DatabasePassword); ;
             }
         }
-        public MSSQLDBClientBase(ISessonManager sessonManager,string serverName, string databaseName, string databaseUsername, string databasePassword) 
-            : base(sessonManager,serverName, databaseName, databaseUsername, databasePassword)
+
+        public MSSQLDBClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword) 
+            : base(serverName, databaseName, databaseUsername, databasePassword)
         {
             
         }
@@ -63,7 +58,6 @@ namespace Gware.Common.API.Database
 
             return retVal;
         }
-
         public override APIConnectionStatus GetConnectionStatus()
         {
             bool serverExists = CanConnect();
@@ -71,6 +65,5 @@ namespace Gware.Common.API.Database
             APIConnectionStatus retVal = new APIConnectionStatus(databaseExists, false, serverExists);
             return retVal;
         }
-
     }
 }

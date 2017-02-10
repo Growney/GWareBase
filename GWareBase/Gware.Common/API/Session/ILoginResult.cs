@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Common.Storage
+namespace Gware.Common.API.Session
 {
-    interface ISaveableTo<T>
+    public interface ILoginResult
     {
-        void SaveTo(T to);
+        ISessonKey Key { get; }
+        bool Success { get; }
     }
 }

@@ -74,18 +74,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\APIConnectionStatus.cs" />
-    <Compile Include="API\Web\WebAPIRequestResult.cs" />
     <Compile Include="API\Database\DBAPIClientBase.cs" />
-    <Compile Include="API\Enumeration.cs" />
     <Compile Include="API\IAPIClient.cs" />
     <Compile Include="API\Database\MSSQLDBClientBase.cs" />
-    <Compile Include="API\Session\ISessonManager.cs" />
     <Compile Include="API\Web\WebAPIClientBase.cs" />
-    <Compile Include="API\APIClientBase.cs" />
-    <Compile Include="API\UserAuthenticationKey.cs" />
-    <Compile Include="API\UserAuthenticationResult.cs" />
     <Compile Include="Application\ApplicationBase.cs" />
-    <Compile Include="Application\SingleClientApplicationBase.cs" />
     <Compile Include="Database\IDBConnection.cs" />
     <Compile Include="Database\MSSQLDBConnection.cs" />
     <Compile Include="Database\StoredProcedure.cs" />
@@ -126,9 +119,24 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructures\Range.cs" />
     <Compile Include="Reflection\ExtensionMethods.cs" />
+    <Compile Include="API\Session\Enumeration.cs" />
+    <Compile Include="API\Session\ILoginResult.cs" />
+    <Compile Include="API\Session\ISessonClient.cs" />
+    <Compile Include="API\Session\ISessonKey.cs" />
+    <Compile Include="API\Session\ISessonServer.cs" />
     <Compile Include="Serialisation\BinarySerialisation.cs" />
-    <Compile Include="Storage\ILoadableFrom.cs" />
-    <Compile Include="Storage\ISaveableTo.cs" />
+    <Compile Include="Storage\Adapter\DataAdapterCollectionBase.cs" />
+    <Compile Include="Storage\Adapter\DataAdapterCollectionGroupBase.cs" />
+    <Compile Include="Storage\Adapter\DataSetDataAdapter.cs" />
+    <Compile Include="Storage\Adapter\DataTableDataAdapter.cs" />
+    <Compile Include="Storage\Adapter\IDataAdapterCollection.cs" />
+    <Compile Include="Storage\Adapter\IDataAdapterCollectionGroup.cs" />
+    <Compile Include="Storage\Command\IDataCommand.cs" />
+    <Compile Include="Storage\Adapter\DataAdapterBase.cs" />
+    <Compile Include="Storage\Adapter\DataRowDataAdapter.cs" />
+    <Compile Include="Storage\Adapter\IDataAdapter.cs" />
+    <Compile Include="Storage\Adapter\IDataTypeGetter.cs" />
+    <Compile Include="Storage\Adapter\XmlDataAdapter.cs" />
     <Compile Include="Threading\ActionThread.cs" />
     <Compile Include="Threading\IExecuteable.cs" />
     <Compile Include="Threading\ResetEventGroup.cs" />

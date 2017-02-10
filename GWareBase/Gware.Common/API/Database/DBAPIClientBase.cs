@@ -1,13 +1,6 @@
-﻿using Gware.Common.API.Session;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Gware.Common.API.Database
+﻿namespace Gware.Common.API.Database
 {
-    public abstract class DBAPIClientBase : APIClientBase
+    public abstract class DBAPIClientBase : IAPIClient
     {
         private string m_serverName;
         private string m_databaseName;
@@ -61,15 +54,14 @@ namespace Gware.Common.API.Database
                 m_databasePassword = value;
             }
         }
-        public DBAPIClientBase(ISessonManager sessonManager,string serverName, string databaseName, string databaseUsername, string databasePassword)
-            :base(sessonManager)
+        public DBAPIClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword)
         {
             m_serverName = serverName;
             m_databaseName = databaseName;
             m_databaseUsername = databaseUsername;
             m_databasePassword = databasePassword;
         }
-        
-
+        public abstract bool CanConnect();
+        public abstract APIConnectionStatus GetConnectionStatus();
     }
 }
