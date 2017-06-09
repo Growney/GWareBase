@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -208,6 +210,22 @@ namespace Gware.Common.Data
             return row.GetData(row.Table.GetFieldIndex(fieldName), defaultValue);
         }
 
+        public static T DeepCopy<T>(this T val)
+        {
+            T retVal = default(T);
+            if (typeof(T).IsSerializable)
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(ms, val);
+                    ms.Position = 0;
+                    retVal = (T)formatter.Deserialize(ms);
+                }
+            }
+            return retVal;
+            
+        }
 
     }
 }

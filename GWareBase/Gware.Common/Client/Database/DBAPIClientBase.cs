@@ -1,6 +1,6 @@
-﻿namespace Gware.Common.API.Database
+﻿namespace Gware.Common.Client.Database
 {
-    public abstract class DBAPIClientBase : IAPIClient
+    public abstract class DBAPIClientBase : IClient
     {
         private string m_serverName;
         private string m_databaseName;
@@ -62,6 +62,6 @@
             m_databasePassword = databasePassword;
         }
         public abstract bool CanConnect();
-        public abstract APIConnectionStatus GetConnectionStatus();
+        public abstract ClientConnectionStatus GetConnectionStatus();
     }
 }

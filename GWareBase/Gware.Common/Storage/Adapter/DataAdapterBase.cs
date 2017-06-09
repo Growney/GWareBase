@@ -10,16 +10,26 @@ namespace Gware.Common.Storage.Adapter
     public abstract class DataAdapterBase : IDataAdapter
     {
         public abstract string GetValue(string fieldName, string defaultValue);
+        public abstract byte[] GetValue(string fieldName, byte[] defaultValue);
 
         private T GetGenericValue<T>(string fieldName,T defaultValue) where T : IConvertible
         {
             T retVal = defaultValue;
             try
             {
-                IConvertible value = GetValue(fieldName, defaultValue.ToString());
-                retVal = (T)value.ToType(typeof(T), CultureInfo.InvariantCulture);
+                IConvertible value;
+                if (defaultValue != null)
+                {
+                   value = GetValue(fieldName, defaultValue.ToString());
+                }
+                else
+                {
+                    value = GetValue(fieldName, string.Empty);
+                }
+                 
+                retVal = (T)value.ToType(typeof(T), CultureInfo.CurrentCulture);
             }
-            catch
+            catch(Exception) 
             {
 
             }
@@ -81,5 +91,12 @@ namespace Gware.Common.Storage.Adapter
         {
             return GetGenericValue(fieldName, defaultValue);
         }
+
+        public T GetValue<T>(string fieldName, T t) where T : IConvertible
+        {
+            return GetGenericValue<T>(fieldName, t);
+        }
+
+        
     }
 }

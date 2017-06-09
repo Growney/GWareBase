@@ -19,5 +19,10 @@ namespace Gware.Common.Storage.Adapter
         {
             return m_row.GetString(fieldName, defaultValue);
         }
+
+        public override byte[] GetValue(string fieldName, byte[] defaultValue)
+        {
+            return m_row.GetData(fieldName, defaultValue);
+        }
     }
 }

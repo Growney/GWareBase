@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Gware.Common</RootNamespace>
     <AssemblyName>Gware.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,11 +74,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\APIConnectionStatus.cs" />
-    <Compile Include="API\Database\DBAPIClientBase.cs" />
-    <Compile Include="API\IAPIClient.cs" />
-    <Compile Include="API\Database\MSSQLDBClientBase.cs" />
-    <Compile Include="API\Web\WebAPIClientBase.cs" />
+    <Compile Include="Application\CommandControllerApplicationBase.cs" />
+    <Compile Include="Client\ClientConnectionStatus.cs" />
+    <Compile Include="Client\Database\DBAPIClientBase.cs" />
+    <Compile Include="Client\IClient.cs" />
+    <Compile Include="Client\Database\MSSQLDBClientBase.cs" />
+    <Compile Include="Client\Web\WebAPIClientBase.cs" />
     <Compile Include="Application\ApplicationBase.cs" />
     <Compile Include="Database\IDBConnection.cs" />
     <Compile Include="Database\MSSQLDBConnection.cs" />
@@ -119,11 +121,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructures\Range.cs" />
     <Compile Include="Reflection\ExtensionMethods.cs" />
-    <Compile Include="API\Session\Enumeration.cs" />
-    <Compile Include="API\Session\ILoginResult.cs" />
-    <Compile Include="API\Session\ISessonClient.cs" />
-    <Compile Include="API\Session\ISessonKey.cs" />
-    <Compile Include="API\Session\ISessonServer.cs" />
+    <Compile Include="Security\Authentication\AuthenticationToken.cs" />
+    <Compile Include="Security\SecurityHelper.cs" />
     <Compile Include="Serialisation\BinarySerialisation.cs" />
     <Compile Include="Storage\Adapter\DataAdapterCollectionBase.cs" />
     <Compile Include="Storage\Adapter\DataAdapterCollectionGroupBase.cs" />
@@ -131,12 +130,21 @@
     <Compile Include="Storage\Adapter\DataTableDataAdapter.cs" />
     <Compile Include="Storage\Adapter\IDataAdapterCollection.cs" />
     <Compile Include="Storage\Adapter\IDataAdapterCollectionGroup.cs" />
+    <Compile Include="Storage\Adapter\MemoryDataAdapter.cs" />
+    <Compile Include="Storage\CommandStoredBase.cs" />
+    <Compile Include="Storage\Command\DataCommand.cs" />
+    <Compile Include="Storage\Command\DataCommandFactory.cs" />
+    <Compile Include="Storage\Command\DataCommandParameter.cs" />
+    <Compile Include="Storage\Command\ICommandController.cs" />
     <Compile Include="Storage\Command\IDataCommand.cs" />
     <Compile Include="Storage\Adapter\DataAdapterBase.cs" />
     <Compile Include="Storage\Adapter\DataRowDataAdapter.cs" />
     <Compile Include="Storage\Adapter\IDataAdapter.cs" />
     <Compile Include="Storage\Adapter\IDataTypeGetter.cs" />
     <Compile Include="Storage\Adapter\XmlDataAdapter.cs" />
+    <Compile Include="Storage\Command\MSSQLCommandController.cs" />
+    <Compile Include="Storage\LoadedFromAdapterBase.cs" />
+    <Compile Include="Storage\LoadedFromAdapterValue.cs" />
     <Compile Include="Threading\ActionThread.cs" />
     <Compile Include="Threading\IExecuteable.cs" />
     <Compile Include="Threading\ResetEventGroup.cs" />

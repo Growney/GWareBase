@@ -166,6 +166,26 @@ namespace Gware.Common.Database
             }
             return retVal;
         }
+        public DataTable ExecuteTableQuery(string query)
+        {
+            return GetDataTable(ExecuteQuery(query));   
+        }
+        public DataTable ExecuteTableQuery(StoredProcedure sp)
+        {
+            return GetDataTable(ExecuteQuery(sp));
+        }
+        private DataTable GetDataTable(DataSet data)
+        {
+            DataTable retVal = null;
+            if (data != null)
+            {
+                if (data.Tables.Count > 0)
+                {
+                    retVal = data.Tables[0];
+                }
+            }
+            return retVal;
+        }
         public DataSet ExecuteQuery(StoredProcedure sp)
         {
             DataSet retVal = new DataSet();

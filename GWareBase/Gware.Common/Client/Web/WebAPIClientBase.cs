@@ -6,9 +6,9 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Common.API.Web
+namespace Gware.Common.Client.Web
 {
-    public abstract class WebAPIClientBase : IAPIClient
+    public abstract class WebAPIClientBase : IClient
     {
         private string m_apiAddress;
         public string APIAddress
@@ -108,6 +108,8 @@ namespace Gware.Common.API.Web
             return retVal.ToString();
         }
         public abstract bool CanConnect();
-        public abstract APIConnectionStatus GetConnectionStatus();
+        public abstract ClientConnectionStatus GetConnectionStatus();
+
+    
     }
 }

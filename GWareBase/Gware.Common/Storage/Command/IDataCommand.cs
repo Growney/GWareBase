@@ -9,12 +9,20 @@ namespace Gware.Common.Storage.Command
 {
     public interface IDataCommand
     {
-        void AddParameter(string name, System.Data.DbType dataType, System.Data.ParameterDirection direction);
-        void AddParameter(string name, System.Data.DbType dataType);
-        void SetParameter(string name, object value);
+        string Name { get; }
+        string CommandMethod { get; }
 
-        IDataAdapterCollectionGroup ExecuteCommandGroup();
-        IDataAdapterCollection ExecuteCommand();
-        bool ExecuteQuery();
+        bool Success { get; set; }
+        Exception Exception { get; set; }
+        int ParameterCount { get; }
+
+
+        DataCommandParameter AddParameter(DataCommandParameter param);
+        DataCommandParameter AddParameter(string name, System.Data.DbType dataType, System.Data.ParameterDirection direction);
+        DataCommandParameter AddParameter(string name, System.Data.DbType dataType);
+        void SetParameter(string name, object value);
+        object GetParameterValue(string name);
+        DataCommandParameter GetParameter(string name);
+        DataCommandParameter GetParameter(int index);
     }
 }

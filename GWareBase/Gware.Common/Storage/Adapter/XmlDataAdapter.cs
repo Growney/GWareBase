@@ -9,7 +9,7 @@ namespace Gware.Common.Storage.Adapter
 {
     public class XmlDataAdapter : DataAdapterBase
     {
-        public System.Xml.XmlNode m_node;
+        private System.Xml.XmlNode m_node;
 
         public XmlDataAdapter(System.Xml.XmlNode node)
         {
@@ -19,6 +19,11 @@ namespace Gware.Common.Storage.Adapter
         public override string GetValue(string fieldName, string defaultValue)
         {
             return m_node.GetString(fieldName, defaultValue);
+        }
+
+        public override byte[] GetValue(string fieldName, byte[] defaultValue)
+        {
+            return Encoding.Unicode.GetBytes(GetValue(fieldName, Encoding.Unicode.GetString(defaultValue)));
         }
     }
 }

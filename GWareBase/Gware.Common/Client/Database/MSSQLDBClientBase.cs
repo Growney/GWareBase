@@ -1,7 +1,7 @@
 ﻿using Gware.Common.Database;
 using System.Data.SqlClient;
 
-namespace Gware.Common.API.Database
+namespace Gware.Common.Client.Database
 {
     public abstract class MSSQLDBClientBase : DBAPIClientBase
     {
@@ -58,11 +58,11 @@ namespace Gware.Common.API.Database
 
             return retVal;
         }
-        public override APIConnectionStatus GetConnectionStatus()
+        public override ClientConnectionStatus GetConnectionStatus()
         {
             bool serverExists = CanConnect();
             bool databaseExists = serverExists && DatabaseExists();
-            APIConnectionStatus retVal = new APIConnectionStatus(databaseExists, false, serverExists);
+            ClientConnectionStatus retVal = new ClientConnectionStatus(databaseExists,1);
             return retVal;
         }
     }

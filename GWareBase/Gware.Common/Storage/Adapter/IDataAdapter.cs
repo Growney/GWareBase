@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Gware.Common.Storage.Adapter
 {
     public interface IDataAdapter
-        : 
+        :
         IDataTypeGetter<sbyte>,
         IDataTypeGetter<short>,
         IDataTypeGetter<int>,
@@ -24,9 +24,7 @@ namespace Gware.Common.Storage.Adapter
         IDataTypeGetter<bool>,
         IDataTypeGetter<DateTime>
     {
-        
-
-
-
+        T GetValue<T>(string v, T t) where T : IConvertible;
+        byte[] GetValue(string field, byte[] defaultValue);
     }
 }
