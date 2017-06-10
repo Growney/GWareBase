@@ -47,9 +47,23 @@ namespace Gware.Business.Entity
         {
 
         }
+        public void SaveWithAssignmentToChildEntity(EntityBase child)
+        {
+            SaveWithAssignmentToChildEntity(child, this);
+        }
+        public void SaveAssignmentToChildEntity(EntityBase child)
+        {
+            SaveAssignmentToParentEntity(child, this);
+        }
+        
+
         public void SaveWithAssignmentToParentEntity(EntityBase parent)
         {
             SaveWithAssignmentToParentEntity(this, parent);
+        }
+        public void SaveAssignmentToParentEntity(EntityBase parent)
+        {
+            SaveAssignmentToParentEntity(this, parent);
         }
         protected override void OnSave()
         {
@@ -120,15 +134,7 @@ namespace Gware.Business.Entity
             }
             return m_parentEntities[entityTypeID].Add(value);
         }
-
-        protected void SetParentEntity<T>(T value) where T : EntityBase
-        {
-            SetParentEntity<T>(value, 0);
-        }
-        protected void SetParentEntity<T>(T value, int index) where T : EntityBase
-        {
-            SetParentEntity<T>(value.GetClassEntityType(), value, index);
-        }
+       
         protected void SetParentEntity<T>(IConvertible entityTypeID, T value) where T : EntityBase
         {
             SetParentEntity<T>(entityTypeID.ToInt32(CultureInfo.CurrentCulture), value, 0);
@@ -143,7 +149,21 @@ namespace Gware.Business.Entity
             {
                 m_parentEntities.Add(entityTypeID, new ArrayList());
             }
-            m_parentEntities[entityTypeID][index] = value;
+            if (index >= 0 && index < m_parentEntities[entityTypeID].Count)
+            {
+                m_parentEntities[entityTypeID][index] = value;
+            }
+            else
+            {
+                if(index >= 0)
+                {
+                    m_parentEntities[entityTypeID].Insert(index, value);
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException();
+                }
+            }
         }
         protected T GetParentEntity<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
@@ -175,11 +195,11 @@ namespace Gware.Business.Entity
 
             return retVal;
         }
-        protected List<T> GetParentEntites<T>(IConvertible entityTypeID) where T : EntityBase, new()
+        protected IReadOnlyList<T> GetParentEntites<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
             return GetParentEntites<T>(entityTypeID.ToInt32(CultureInfo.CurrentCulture));
         }
-        protected List<T> GetParentEntites<T>(int entityTypeID) where T : EntityBase, new()
+        protected IReadOnlyList<T> GetParentEntites<T>(int entityTypeID) where T : EntityBase, new()
         {
             List<T> retVal = new List<T>();
 
@@ -209,7 +229,16 @@ namespace Gware.Business.Entity
         public static void SaveWithAssignmentToParentEntity(EntityBase childEntity, EntityBase parentEntity)
         {
             childEntity.Save();
+            SaveAssignmentToParentEntity(childEntity, parentEntity);
+        }
+        public static void SaveAssignmentToParentEntity(EntityBase childEntity,EntityBase parentEntity)
+        {
             EntityAssignment.Save(parentEntity.Id, parentEntity.GetClassEntityType(), childEntity.Id, childEntity.GetClassEntityType());
+        }
+        public static void SaveWithAssignmentToChildEntity(EntityBase child, EntityBase parent)
+        {
+            parent.Save();
+            SaveAssignmentToParentEntity(child, parent);
         }
         public static List<T> LoadParentEntities<T>(int entityID, int entityTypeID, int parentEntityTypeID) where T : EntityBase, new()
         {
