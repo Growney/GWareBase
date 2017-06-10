@@ -118,15 +118,7 @@ namespace Gware.Business.Entity
             }
             return m_childEntities[entityTypeID].Add(value);
         }
-
-        protected void SetChildEntity<T>(T value) where T : EntityBase
-        {
-            SetChildEntity<T>(value, 0);
-        }
-        protected void SetChildEntity<T>(T value, int index) where T : EntityBase
-        {
-            SetChildEntity<T>(value.GetClassEntityType(), value, index);
-        }
+        
         protected void SetChildEntity<T>(IConvertible entityTypeID, T value) where T : EntityBase
         {
             SetChildEntity<T>(entityTypeID.ToInt32(CultureInfo.CurrentCulture), value, 0);
@@ -141,7 +133,22 @@ namespace Gware.Business.Entity
             {
                 m_childEntities.Add(entityTypeID, new ArrayList());
             }
-            m_childEntities[entityTypeID][index] = value;
+            if(index >=0 && index < m_childEntities[entityTypeID].Count)
+            {
+                m_childEntities[entityTypeID][index] = value;
+            }
+            else
+            {
+                if(index >= 0)
+                {
+                    m_childEntities[entityTypeID].Insert(index, value);
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException();
+                }
+            }
+            
         }
 
         protected T GetChildEntity<T>(IConvertible entityTypeID) where T : EntityBase, new()
@@ -182,11 +189,11 @@ namespace Gware.Business.Entity
             }
             return retVal;
         }
-        protected List<T> GetChildEntites<T>(IConvertible entityTypeID) where T : EntityBase, new()
+        protected IReadOnlyList<T> GetChildEntites<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
             return GetChildEntites<T>(entityTypeID.ToInt32(CultureInfo.CurrentCulture));
         }
-        protected List<T> GetChildEntites<T>(int entityTypeID) where T : EntityBase, new()
+        protected IReadOnlyList<T> GetChildEntites<T>(int entityTypeID) where T : EntityBase, new()
         {
             List<T> retVal = new List<T>();
 
