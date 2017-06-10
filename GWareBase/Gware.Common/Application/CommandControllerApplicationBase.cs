@@ -9,6 +9,23 @@ namespace Gware.Common.Application
 {
     public abstract class CommandControllerApplicationBase
     {
+        private static object m_initLock = new object();
+        private static CommandControllerApplicationBase m_main;
+        public static CommandControllerApplicationBase Main
+        {
+            get
+            {
+                return m_main;
+            }
+        }
+        public static void InitializeBase(CommandControllerApplicationBase appBase)
+        {
+            lock (m_initLock)
+            {
+                m_main = appBase;
+            }
+        }
+
         private ICommandController m_controller;
         public ICommandController Controller
         {
@@ -30,11 +47,6 @@ namespace Gware.Common.Application
         public CommandControllerApplicationBase(ICommandController controller)
         {
             Init(controller);
-        }
-
-        public CommandControllerApplicationBase()
-        {
-
         }
     }
 }

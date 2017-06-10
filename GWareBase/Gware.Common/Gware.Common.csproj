@@ -145,6 +145,7 @@
     <Compile Include="Storage\Command\MSSQLCommandController.cs" />
     <Compile Include="Storage\LoadedFromAdapterBase.cs" />
     <Compile Include="Storage\LoadedFromAdapterValue.cs" />
+    <Compile Include="Storage\StoredObjectBase.cs" />
     <Compile Include="Threading\ActionThread.cs" />
     <Compile Include="Threading\IExecuteable.cs" />
     <Compile Include="Threading\ResetEventGroup.cs" />

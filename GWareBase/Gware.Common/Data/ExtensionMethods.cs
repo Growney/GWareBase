@@ -95,8 +95,7 @@ namespace Gware.Common.Data
         public static int GetInt(this DataRow row, int index, int defaultValue)
         {
             string fieldValue = row.GetString(index, defaultValue.ToString());
-            int retVal;
-            if (Int32.TryParse(fieldValue, out retVal))
+            if (Int32.TryParse(fieldValue, out int retVal))
             {
                 return retVal;
             }
@@ -131,8 +130,7 @@ namespace Gware.Common.Data
         public static decimal GetDecimal(this DataRow row, int index, decimal defaultValue)
         {
             string fieldValue = row.GetString(index, defaultValue.ToString());
-            decimal retVal;
-            if (decimal.TryParse(fieldValue, out retVal))
+            if (decimal.TryParse(fieldValue, out decimal retVal))
             {
                 return retVal;
             }
