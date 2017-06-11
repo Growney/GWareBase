@@ -11,7 +11,7 @@ using Gware.Common.Security;
 
 namespace Gware.Business.Entity
 {
-    public class EntityToken : EntityBase
+    public abstract class EntityToken : EntityBase
     {
         private DateTime m_expiry;
         private string m_key;
@@ -28,19 +28,19 @@ namespace Gware.Business.Entity
         public DateTime Expiry
         {
             get { return m_expiry; }
-            private set { m_expiry = value; }
+            protected set { m_expiry = value; }
         }
 
         public string Key
         {
             get { return m_key; }
-            private set { m_key = value; }
+            protected set { m_key = value; }
         }
 
         public DateTime Created
         {
             get { return m_created; }
-            private set { m_created = value; }
+            protected set { m_created = value; }
         }
 
         public EntityToken()
@@ -55,30 +55,13 @@ namespace Gware.Business.Entity
             m_created = adapter.GetValue("Created", DateTime.MinValue);
         }
 
-        public static EntityToken CreateToken(TimeSpan length)
-        {
-            DateTime now = DateTime.UtcNow;
-            return new EntityToken()
-            {
-                Expiry = DateTime.UtcNow.Add(length),
-                Key = SecurityHelper.CreateKey(15),
-                Created = now
-            };
-        }
+        
 
         public override DataCommand CreateSaveCommand()
         {
             return TokenCommandFactory.SaveToken(Id, Expiry, Key, Created);
         }
+        
 
-        public override DataCommand CreateDeleteCommand()
-        {
-            return TokenCommandFactory.DeleteToken(Id);
-        }
-
-        public static EntityToken GetToken(string token)
-        {
-            return LoadSingle<EntityToken>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(TokenCommandFactory.GetToken(token)));
-        }
     }
 }

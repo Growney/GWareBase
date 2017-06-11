@@ -26,18 +26,6 @@ namespace Gware.Business.Commands
             return retVal;
         }
         
-        public static DataCommand DeleteToken(int id)
-        {
-            DataCommand retVal = new TokenCommandFactory().CreateCommand("Delete");
-            retVal.AddParameter("Id", System.Data.DbType.Int32).Value = id;
-            return retVal;
-        }
-
-        public static DataCommand GetToken(string key)
-        {
-            DataCommand retVal = new TokenCommandFactory().CreateCommand("GetToken");
-            retVal.AddParameter("Key", System.Data.DbType.Int32).Value = key;
-            return retVal;
-        }
+        
     }
 }
