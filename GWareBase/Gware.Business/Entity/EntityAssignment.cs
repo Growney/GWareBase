@@ -1,4 +1,5 @@
 ﻿using Gware.Business.Commands;
+using Gware.Common.Application;
 using Gware.Common.Storage;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Storage.Command;
@@ -96,12 +97,12 @@ namespace Gware.Business.Entity
 
         }
 
-        public override DataCommand CreateSaveCommand()
+        public override IDataCommand CreateSaveCommand()
         {
             return EntityCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID);
         }
 
-        public override DataCommand CreateDeleteCommand()
+        public override IDataCommand CreateDeleteCommand()
         {
             return EntityCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID);
         }
@@ -117,7 +118,6 @@ namespace Gware.Business.Entity
             };
             return val.Save();
         }
-
         public static bool Delete(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
         {
             EntityAssignment val = new EntityAssignment()
@@ -129,7 +129,10 @@ namespace Gware.Business.Entity
             };
             return val.Delete();
         }
-
+        public static bool Delete(int fromEntityID, int fromEntityTypeID)
+        {
+            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.DeleteEntityAssignment(fromEntityID, fromEntityTypeID))).Value;
+        }
 
     }
 }

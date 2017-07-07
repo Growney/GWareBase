@@ -39,12 +39,24 @@ namespace Gware.Common.Storage
 
         }
 
+        protected internal virtual IDataCommand[] GetSaveReCacheCommands()
+        {
+            return new IDataCommand[0];
+        }
+
+        protected internal virtual IDataCommand[] GetDeleteReCacheCommands()
+        {
+            return new IDataCommand[0];
+        }
+
         public virtual int Save()
         {
             int retVal = Id;
             if (Dirty)
             {
-                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(CreateSaveCommand())).Value;
+                IDataCommand command = CreateSaveCommand();
+                command.AddReCacheCommand(GetSaveReCacheCommands());
+                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
                 Id = retVal;
             }
 
@@ -54,7 +66,9 @@ namespace Gware.Common.Storage
 
         public virtual bool Delete()
         {
-            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(CreateDeleteCommand())).Value;
+            IDataCommand command = CreateDeleteCommand();
+            command.AddReCacheCommand(GetDeleteReCacheCommands());
+            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
         }
         
     }

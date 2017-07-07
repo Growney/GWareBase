@@ -87,5 +87,9 @@ namespace Gware.Common.Storage.Command
             m_dataType = type;
         }
 
+        public bool Equals(DataCommandParameter obj)
+        {
+            return m_name.Equals(obj.Name) && m_value.Equals(obj.Value);
+        }
     }
 }

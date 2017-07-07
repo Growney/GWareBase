@@ -85,7 +85,8 @@
     <Compile Include="Database\MSSQLDBConnection.cs" />
     <Compile Include="Database\StoredProcedure.cs" />
     <Compile Include="DataStructures\Circularbuffer.cs" />
-    <Compile Include="DataStructures\CollectionExtensionMethods.cs" />
+    <Compile Include="DataStructures\ExtensionMethods.cs" />
+    <Compile Include="DataStructures\HashedDictionary.cs" />
     <Compile Include="DataStructures\LoginResult.cs" />
     <Compile Include="Data\BufferReader.cs" />
     <Compile Include="Data\BufferWriter.cs" />
@@ -132,6 +133,11 @@
     <Compile Include="Storage\Adapter\IDataAdapterCollectionGroup.cs" />
     <Compile Include="Storage\Adapter\MemoryDataAdapter.cs" />
     <Compile Include="Storage\CommandStoredBase.cs" />
+    <Compile Include="Storage\Command\Cache\CacheCommandBase.cs" />
+    <Compile Include="Storage\Command\Cache\InfiniteCache.cs" />
+    <Compile Include="Storage\Command\Cache\IRecacheTrigger.cs" />
+    <Compile Include="Storage\Command\Cache\ManualRecacheTrigger.cs" />
+    <Compile Include="Storage\Command\Cache\ZeroCache.cs" />
     <Compile Include="Storage\Command\DataCommand.cs" />
     <Compile Include="Storage\Command\DataCommandFactory.cs" />
     <Compile Include="Storage\Command\DataCommandParameter.cs" />

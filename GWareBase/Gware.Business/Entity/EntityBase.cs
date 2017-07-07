@@ -1,4 +1,5 @@
 ﻿using Gware.Business.Commands;
+using Gware.Business.Entity.Collection;
 using Gware.Common.Application;
 using Gware.Common.Storage;
 using Gware.Common.Storage.Adapter;
@@ -15,8 +16,14 @@ namespace Gware.Business.Entity
     public abstract class EntityBase : StoredObjectBase
     {
         private DateTime m_lastUpdated;
-
-
+        private readonly int m_entityTypeID;
+        public int EntityTypeID
+        {
+            get
+            {
+                return m_entityTypeID;
+            }
+        }
 
         public DateTime LastUpdated
         {
@@ -31,35 +38,27 @@ namespace Gware.Business.Entity
             }
         }
 
-        private int m_parentLevelsLoaded;
-        private Dictionary<int, ArrayList> m_parentEntities = new Dictionary<int, ArrayList>();
-        private List<AllowedEntityAssignment> m_allowedParentAssignments = new List<AllowedEntityAssignment>();
 
-        public int ParentLevelsLoaded
-        {
-            get
-            {
-                return m_parentLevelsLoaded;
-            }
-        }
+
+        private MultiEntityTypeCollection m_parents;
 
         public EntityBase()
         {
-
+            m_entityTypeID = GetType().GetEntityTypeID();
+            m_parents = new MultiEntityTypeCollection(this,EntityRelationship.Parent);
         }
         public void SaveWithAssignmentToChildEntity(EntityBase child)
         {
-            SaveWithAssignmentToChildEntity(child, this);
+            SaveParentWithChildAssignment(child, this);
         }
         public void SaveAssignmentToChildEntity(EntityBase child)
         {
             SaveAssignmentToParentEntity(child, this);
         }
-        
 
         public void SaveWithAssignmentToParentEntity(EntityBase parent)
         {
-            SaveWithAssignmentToParentEntity(this, parent);
+            SaveChildWithParentAssignment(this, parent);
         }
         public void SaveAssignmentToParentEntity(EntityBase parent)
         {
@@ -67,17 +66,30 @@ namespace Gware.Business.Entity
         }
         protected override void OnSave()
         {
-            foreach (int entityType in m_parentEntities.Keys)
+            foreach (EntityBase parent in m_parents)
             {
-                foreach (EntityBase parentEntity in m_parentEntities[entityType])
-                {
-                    SaveWithAssignmentToParentEntity(parentEntity);
-                }
+                SaveParentWithChildAssignment(this, parent);
             }
         }
-        public override DataCommand CreateDeleteCommand()
+        protected override IDataCommand[] GetSaveReCacheCommands()
         {
-            return EntityCommandFactory.Delete(GetClassEntityType(), Id);
+            return new IDataCommand[] {
+                EntityCommandFactory.LoadEntities(EntityTypeID),
+                EntityCommandFactory.LoadEntity(Id, EntityTypeID)
+            };
+        }
+
+        public override IDataCommand CreateDeleteCommand()
+        {
+            return EntityCommandFactory.Delete(EntityTypeID, Id);
+        }
+
+        protected override IDataCommand[] GetDeleteReCacheCommands()
+        {
+            return new IDataCommand[] {
+                EntityCommandFactory.LoadEntities(EntityTypeID),
+                EntityCommandFactory.LoadEntity(Id, EntityTypeID)
+            };
         }
         protected override void OnLoad(IDataAdapter adapter)
         {
@@ -85,56 +97,12 @@ namespace Gware.Business.Entity
             OnLoadFrom(adapter);
         }
         protected abstract void OnLoadFrom(IDataAdapter adapter);
-        public virtual int GetClassEntityType()
-        {
-            int retVal = -1;
 
-            object[] attributes = GetType().GetCustomAttributes(false);
-            for (int i = 0; i < attributes.Length; i++)
-            {
-                if (attributes[i] is EntityTypeAttribute)
-                {
-                    retVal = (int)(attributes[i] as EntityTypeAttribute).EntityType;
-                    break;
-                }
-            }
-            return retVal;
+        public virtual void AddParentEntity(EntityBase value)
+        {
+            m_parents.Add(value);
         }
 
-        public void LoadParentEntities()
-        {
-            LoadParentEntities(0);
-        }
-        public void LoadParentEntities(int levels)
-        {
-            m_parentLevelsLoaded = levels;
-            IDataAdapterCollectionGroup data = CommandControllerApplicationBase.Main.Controller.ExecuteGroupCommand(EntityCommandFactory.LoadParentEntities(GetClassEntityType(), Id));
-            LoadEntites(data, m_allowedParentAssignments, m_parentEntities, false);
-            foreach (int entityType in m_parentEntities.Keys)
-            {
-                foreach (EntityBase parent in m_parentEntities[entityType])
-                {
-                    if (levels < 0 || levels > 1)
-                    {
-                        if (parent is EntityBase)
-                        {
-                            (parent as EntityBase).LoadParentEntities(levels - 1);
-                        }
-                    }
-                }
-            }
-        }
-
-        public int AddParentEntity(EntityBase value)
-        {
-            int entityTypeID = value.GetClassEntityType();
-            if (!m_parentEntities.ContainsKey(entityTypeID))
-            {
-                m_parentEntities.Add(entityTypeID, new ArrayList());
-            }
-            return m_parentEntities[entityTypeID].Add(value);
-        }
-       
         protected void SetParentEntity<T>(IConvertible entityTypeID, T value) where T : EntityBase
         {
             SetParentEntity<T>(entityTypeID.ToInt32(CultureInfo.CurrentCulture), value, 0);
@@ -145,25 +113,7 @@ namespace Gware.Business.Entity
         }
         protected void SetParentEntity<T>(int entityTypeID, T value, int index) where T : EntityBase
         {
-            if (!m_parentEntities.ContainsKey(entityTypeID))
-            {
-                m_parentEntities.Add(entityTypeID, new ArrayList());
-            }
-            if (index >= 0 && index < m_parentEntities[entityTypeID].Count)
-            {
-                m_parentEntities[entityTypeID][index] = value;
-            }
-            else
-            {
-                if(index >= 0)
-                {
-                    m_parentEntities[entityTypeID].Insert(index, value);
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException();
-                }
-            }
+            m_parents.Set(index, entityTypeID, value);
         }
         protected T GetParentEntity<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
@@ -179,21 +129,7 @@ namespace Gware.Business.Entity
         }
         protected T GetParentEntity<T>(int entityTypeID, int index) where T : EntityBase, new()
         {
-            T retVal = default(T);
-
-            if (!m_parentEntities.ContainsKey(entityTypeID))
-            {
-                m_parentEntities.Add(entityTypeID, new ArrayList(LoadParentEntities<T>(Id, GetClassEntityType(), entityTypeID)));
-            }
-
-            if (index >= 0
-                && index < m_parentEntities[entityTypeID].Count
-                && m_parentEntities[entityTypeID][index] is T)
-            {
-                retVal = m_parentEntities[entityTypeID][index] as T;
-            }
-
-            return retVal;
+            return m_parents.Get<T>(index, entityTypeID);
         }
         protected IReadOnlyList<T> GetParentEntites<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
@@ -201,41 +137,28 @@ namespace Gware.Business.Entity
         }
         protected IReadOnlyList<T> GetParentEntites<T>(int entityTypeID) where T : EntityBase, new()
         {
-            List<T> retVal = new List<T>();
-
-            if (!m_parentEntities.ContainsKey(entityTypeID))
-            {
-                m_parentEntities.Add(entityTypeID, new ArrayList(LoadParentEntities<T>(Id, GetClassEntityType(), entityTypeID)));
-            }
-            foreach (object obj in m_parentEntities[entityTypeID])
-            {
-                if (obj is T)
-                {
-                    retVal.Add((T)obj);
-                }
-            }
-            return retVal;
+            return m_parents.Get<T>(entityTypeID);
         }
 
         protected virtual DataCommand GetLoadSingleCommand(int id)
         {
-            return EntityCommandFactory.LoadEntity(GetClassEntityType(), id);
+            return EntityCommandFactory.LoadEntity(EntityTypeID, id);
         }
 
         protected virtual DataCommand GetLoadCommand()
         {
-            return EntityCommandFactory.LoadEntities(GetClassEntityType());
+            return EntityCommandFactory.LoadEntities(EntityTypeID);
         }
-        public static void SaveWithAssignmentToParentEntity(EntityBase childEntity, EntityBase parentEntity)
+        public static void SaveChildWithParentAssignment(EntityBase childEntity, EntityBase parentEntity)
         {
             childEntity.Save();
             SaveAssignmentToParentEntity(childEntity, parentEntity);
         }
-        public static void SaveAssignmentToParentEntity(EntityBase childEntity,EntityBase parentEntity)
+        public static void SaveAssignmentToParentEntity(EntityBase childEntity, EntityBase parentEntity)
         {
-            EntityAssignment.Save(parentEntity.Id, parentEntity.GetClassEntityType(), childEntity.Id, childEntity.GetClassEntityType());
+            EntityAssignment.Save(parentEntity.Id, parentEntity.EntityTypeID, childEntity.Id, childEntity.EntityTypeID);
         }
-        public static void SaveWithAssignmentToChildEntity(EntityBase child, EntityBase parent)
+        public static void SaveParentWithChildAssignment(EntityBase child, EntityBase parent)
         {
             parent.Save();
             SaveAssignmentToParentEntity(child, parent);
@@ -252,35 +175,6 @@ namespace Gware.Business.Entity
         {
             return LoadSingle<T>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(new T().GetLoadSingleCommand(id)));
         }
-        public static void LoadEntites(IDataAdapterCollectionGroup data, List<AllowedEntityAssignment> allowedAssigned, Dictionary<int, ArrayList> assignments, bool toFrom)
-        {
-            allowedAssigned.Clear();
-            allowedAssigned.AddRange(Load<AllowedEntityAssignment>(data.Collections[0]));
-            assignments.Clear();
-            for (int i = 0; i < allowedAssigned.Count; i++)
-            {
-                int assignedEntityTypeID = toFrom ? allowedAssigned[i].ToEntityType : allowedAssigned[i].FromEntityType;
-                if (data.Collections.Length > i + 1)
-                {
-                    if (!assignments.ContainsKey(assignedEntityTypeID))
-                    {
-                        assignments.Add(assignedEntityTypeID, new ArrayList());
-                    }
-                    assignments[assignedEntityTypeID].Clear();
-                }
 
-                assignments[assignedEntityTypeID].Clear();
-
-                for (int j = 0; j < data.Collections[i + 1].Adapters.Length; j++)
-                {
-                    EntityBase entity = EntityFactory.CreateEntity(assignedEntityTypeID);
-                    EntityBase nonDirty = EntityFactory.CreateEntity(assignedEntityTypeID);
-                    entity.Load(data.Collections[i + 1].Adapters[j]);
-                    nonDirty.Load(data.Collections[i + 1].Adapters[j]);
-                    entity.SetNonDirtyState(nonDirty);
-                    assignments[assignedEntityTypeID].Add(entity);
-                }
-            }
-        }
     }
 }

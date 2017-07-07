@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,8 +9,25 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.DataStructures
 {
-    public static class CollectionExtensionMethods
+    public static class ExtensionMethods
     {
+        public static void Insert(this IList data,int index, object item, bool expand)
+        {
+            if (expand)
+            {
+                if (index > 0)
+                {
+                    while (index > data.Count)
+                    {
+                        data.Add(null);
+                    }
+
+                }
+            }
+            data[index] = item;
+
+        }
+
         public static void Merge<T>(this BindingList<T> listOne, BindingList<T> listTwo) where T : IComparable<T>
         {
             for (int i = 0; i < listTwo.Count; i++)
@@ -63,17 +81,42 @@ namespace Gware.Common.DataStructures
             }
         }
 
-        public static void Add<Key,Value>(this Dictionary<Key,List<Value>> dic,Key key,Value value)
+        public static void AddItem<Key,Value,CollectionType>(this Dictionary<Key, CollectionType> dic,Key key,Value value) where CollectionType : ICollection<Value>,new ()
         {
             lock (dic)
             {
                 if (!dic.ContainsKey(key))
                 {
-                    dic.Add(key, new List<Value>());
+                    dic.Add(key, new CollectionType());
                 }
 
                 dic[key].Add(value);
             }
+        }
+
+        public static void Set<Key, Value, CollectionType>(this Dictionary<Key, CollectionType> dic,int index, Key key, Value value) where CollectionType : IList, new()
+        {
+            lock (dic)
+            {
+                if (!dic.ContainsKey(key))
+                {
+                    dic.Add(key, new CollectionType());
+                }
+
+                dic[key].Insert(index,value,true);
+            }
+        }
+
+        public static T Get<T>(this IList<T> data,int index)
+        {
+            T retVal = default(T);
+
+            if(index > 0 && index < data.Count)
+            {
+                retVal = data[index];
+            }
+
+            return retVal;
         }
 
         public static bool ArrayFull(this Array a)

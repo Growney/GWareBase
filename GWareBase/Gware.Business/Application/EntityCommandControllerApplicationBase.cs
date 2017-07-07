@@ -15,5 +15,6 @@ namespace Gware.Business.Application
         {
             EntityFactory.InitialiseEntityTypes();
         }
+        
     }
 }

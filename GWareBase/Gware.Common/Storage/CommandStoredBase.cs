@@ -9,7 +9,7 @@ namespace Gware.Common.Storage
 {
     public abstract class CommandStoredBase : LoadedFromAdapterBase
     {
-        public abstract DataCommand CreateSaveCommand();
-        public abstract DataCommand CreateDeleteCommand();
+        public abstract IDataCommand CreateSaveCommand();
+        public abstract IDataCommand CreateDeleteCommand();
     }
 }

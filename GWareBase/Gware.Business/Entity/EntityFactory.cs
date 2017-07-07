@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using Gware.Common.DataStructures;
+using Gware.Common.Storage;
 
 namespace Gware.Business.Entity
 {
@@ -80,8 +81,15 @@ namespace Gware.Business.Entity
             EntityBase retVal = null;
             if (m_entityTypes.ContainsKey(entityTypeID))
             {
-                retVal = Activator.CreateInstance(m_entityTypes[entityTypeID]) as EntityBase;
+                Type createType = m_entityTypes[entityTypeID];
+                retVal = Activator.CreateInstance(createType) as EntityBase;
+
+                if(retVal != null)
+                {
+                    retVal.SetNonDirtyState(Activator.CreateInstance(createType) as LoadedFromAdapterBase);
+                }   
             }
+            
             return retVal;
         }
     }

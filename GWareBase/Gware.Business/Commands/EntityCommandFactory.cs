@@ -35,8 +35,11 @@ namespace Gware.Business.Commands
                 m_factory = value;
             }
         }
+        protected EntityCommandFactory(string commandName, bool requiredAuthentication, bool cache) : base(commandName, requiredAuthentication, cache)
+        {
 
-        protected EntityCommandFactory(string commandName,bool requiredAuthentication) : base(commandName,requiredAuthentication)
+        }
+        protected EntityCommandFactory(string commandName, bool requiredAuthentication) : base(commandName, requiredAuthentication)
         {
 
         }
@@ -45,12 +48,13 @@ namespace Gware.Business.Commands
 
         }
 
-        public EntityCommandFactory() : base("Entity", true)
+        public EntityCommandFactory() : base("Entity", true, true)
         {
 
         }
 
-       
+        #region ---- Read ----
+
         public static DataCommand LoadEntity(int entityTypeID, int entityID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadEntity");
@@ -95,34 +99,6 @@ namespace Gware.Business.Commands
             return retVal;
         }
 
-        public static DataCommand Delete(int entityTypeID, int entityID)
-        {
-            DataCommand retVal = Factory.CreateCommand("Delete");
-            retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
-            retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
-            return retVal;
-        }
-
-
-        public static DataCommand SaveEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
-        {
-            DataCommand retVal = Factory.CreateCommand("SaveEntityAssignment");
-            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
-            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
-            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = toEntityID;
-            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = toEntityTypeID;
-            return retVal;
-        }
-        public static DataCommand DeleteEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
-        {
-            DataCommand retVal = Factory.CreateCommand("DeleteEntityAssignment");
-            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
-            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
-            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = toEntityID;
-            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = toEntityTypeID;
-            return retVal;
-        }
-
         public static DataCommand LoadChildEntitiesWithType(int entityID, int entityTypeID, int childEntityTypeID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadChildEntitiesWithType");
@@ -142,5 +118,54 @@ namespace Gware.Business.Commands
             retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = parentEntityTypeID;
             return retVal;
         }
+
+        #endregion ---- Read ----
+
+        #region ---- Write ----
+
+        public static DataCommand Delete(int entityTypeID, int entityID)
+        {
+            DataCommand retVal = Factory.CreateCommand("Delete",
+                LoadEntities(entityTypeID),
+                LoadEntity(entityTypeID, entityID));
+            retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
+            retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
+            return retVal;
+        }
+
+
+        public static DataCommand SaveEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
+        {
+            DataCommand retVal = Factory.CreateCommand("SaveEntityAssignment",
+                LoadParentEntities(fromEntityID, fromEntityTypeID),
+                LoadChildEntities(fromEntityID, toEntityTypeID));
+            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
+            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
+            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = toEntityID;
+            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = toEntityTypeID;
+            return retVal;
+        }
+        public static DataCommand DeleteEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
+        {
+            DataCommand retVal = Factory.CreateCommand("DeleteEntityAssignment",
+                LoadParentEntities(fromEntityID, fromEntityTypeID),
+                LoadChildEntities(fromEntityID, toEntityTypeID));
+            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
+            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
+            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = toEntityID;
+            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = toEntityTypeID;
+            return retVal;
+        }
+        public static DataCommand DeleteEntityAssignment(int fromEntityID, int fromEntityTypeID)
+        {
+            DataCommand retVal = Factory.CreateCommand("DeleteAllEntityAssignment",
+                LoadParentEntities(fromEntityID, fromEntityTypeID));
+            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
+            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
+            return retVal;
+        }
+
+        #endregion ---- Write ----
+
     }
 }

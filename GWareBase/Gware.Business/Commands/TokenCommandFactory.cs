@@ -22,7 +22,6 @@ namespace Gware.Business.Commands
             retVal.AddParameter("Expiry", System.Data.DbType.DateTime).Value = expiry;
             retVal.AddParameter("Key", System.Data.DbType.String).Value = key;
             retVal.AddParameter("Created", System.Data.DbType.DateTime).Value = created;
-
             return retVal;
         }
         

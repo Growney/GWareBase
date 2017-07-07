@@ -35,7 +35,7 @@ namespace Gware.Common.Storage
         }
         public LoadedFromAdapterBase()
         {
-
+            SetNonDirtyState(Activator.CreateInstance(this.GetType()) as LoadedFromAdapterBase);
         }
         
         private bool ChangedFromDirtyState()
@@ -81,28 +81,25 @@ namespace Gware.Common.Storage
         public virtual void Load(IDataAdapter adapter)
         {
             LoadFrom(adapter);
+            if(m_nonDirtyState != null)
+            {
+                m_nonDirtyState.Load(adapter);
+            }
         }
         protected abstract void LoadFrom(IDataAdapter adapter);
 
         public static T LoadSingle<T>(IDataAdapterCollection collection,int index) where T : LoadedFromAdapterBase, new()
         {
             T retVal;
-            T nonDirty;
             if (collection.Adapters.Length > 0 && collection.Adapters.Length >= index)
             {
                 retVal = new T();
-                nonDirty = new T();
-                retVal.LoadFrom(collection.Adapters[index]);
-                nonDirty.LoadFrom(collection.Adapters[index]);
+                retVal.SetNonDirtyState(new T());
+                retVal.Load(collection.Adapters[index]);
             }
             else
             {
                 retVal = default(T);
-                nonDirty = default(T);
-            }
-            if(retVal != null)
-            {
-                retVal.SetNonDirtyState(nonDirty);
             }
             
             return retVal;
@@ -118,11 +115,9 @@ namespace Gware.Common.Storage
 
             for (int i = 0; i < collection.Adapters.Length; i++)
             {
-                T nonDirty = new T();
                 T item = new T();
+                item.SetNonDirtyState(new T());
                 item.LoadFrom(collection.Adapters[i]);
-                nonDirty.LoadFrom(collection.Adapters[i]);
-                item.SetNonDirtyState(nonDirty);
                 retVal.Add(item);
             }
 

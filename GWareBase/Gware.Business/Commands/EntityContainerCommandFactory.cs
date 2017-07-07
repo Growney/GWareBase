@@ -45,7 +45,9 @@ namespace Gware.Business.Commands
         }
         public static DataCommand Save(int id, int entityContainerTypeID)
         {
-            DataCommand retVal = Factory.CreateCommand("Save");
+            DataCommand retVal = Factory.CreateCommand("Save",
+                Load(entityContainerTypeID),
+                LoadSingle(id,entityContainerTypeID));
             retVal.AddParameter("Id", DbType.Int32).Value = id;
             retVal.AddParameter("EntityContainerTypeID", DbType.String).Value = entityContainerTypeID;
             return retVal;

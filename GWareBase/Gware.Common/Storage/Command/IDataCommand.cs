@@ -15,8 +15,12 @@ namespace Gware.Common.Storage.Command
         bool Success { get; set; }
         Exception Exception { get; set; }
         int ParameterCount { get; }
+        bool Cache { get; }
+        bool TriggersReCache { get; }
+        List<IDataCommand> ReCacheCommands { get; }
 
-
+        void AddReCacheCommand(IDataCommand command);
+        void AddReCacheCommand(ICollection<IDataCommand> commands);
         DataCommandParameter AddParameter(DataCommandParameter param);
         DataCommandParameter AddParameter(string name, System.Data.DbType dataType, System.Data.ParameterDirection direction);
         DataCommandParameter AddParameter(string name, System.Data.DbType dataType);
@@ -24,5 +28,7 @@ namespace Gware.Common.Storage.Command
         object GetParameterValue(string name);
         DataCommandParameter GetParameter(string name);
         DataCommandParameter GetParameter(int index);
+
+
     }
 }

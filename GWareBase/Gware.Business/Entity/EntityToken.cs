@@ -57,7 +57,7 @@ namespace Gware.Business.Entity
 
         
 
-        public override DataCommand CreateSaveCommand()
+        public override IDataCommand CreateSaveCommand()
         {
             return TokenCommandFactory.SaveToken(Id, Expiry, Key, Created);
         }
