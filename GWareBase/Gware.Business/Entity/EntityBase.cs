@@ -149,24 +149,7 @@ namespace Gware.Business.Entity
         {
             return EntityCommandFactory.LoadEntities(EntityTypeID);
         }
-        public static void SaveChildWithParentAssignment(EntityBase childEntity, EntityBase parentEntity)
-        {
-            childEntity.Save();
-            SaveAssignmentToParentEntity(childEntity, parentEntity);
-        }
-        public static void SaveAssignmentToParentEntity(EntityBase childEntity, EntityBase parentEntity)
-        {
-            EntityAssignment.Save(parentEntity.Id, parentEntity.EntityTypeID, childEntity.Id, childEntity.EntityTypeID);
-        }
-        public static void SaveParentWithChildAssignment(EntityBase child, EntityBase parent)
-        {
-            parent.Save();
-            SaveAssignmentToParentEntity(child, parent);
-        }
-        public static List<T> LoadParentEntities<T>(int entityID, int entityTypeID, int parentEntityTypeID) where T : EntityBase, new()
-        {
-            return Load<T>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadParentEntitiesWithType(entityID, entityTypeID, parentEntityTypeID)));
-        }
+        
         public static List<T> LoadEntities<T>() where T : EntityBase, new()
         {
             return Load<T>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(new T().GetLoadCommand()));

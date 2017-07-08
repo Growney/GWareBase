@@ -20,7 +20,7 @@ namespace Gware.Business.Entity
         private int m_parentEntityTypeID;
         private int m_childEntityID;
         private int m_childEntityTypeID;
-
+        private int m_index;
 
         public DateTime Lastupdate
         {
@@ -83,6 +83,18 @@ namespace Gware.Business.Entity
             }
         }
 
+        public int Index
+        {
+            get
+            {
+                return m_index;
+            }
+
+            set
+            {
+                m_index = value;
+            }
+        }
         public EntityAssignment()
         {
 
@@ -94,44 +106,43 @@ namespace Gware.Business.Entity
             m_parentEntityTypeID = adapter.GetValue("ParentEntityTypeID", 0);
             m_childEntityID = adapter.GetValue("ChildEntityTypeID", 0);
             m_childEntityTypeID = adapter.GetValue("ChildEntityTypeID", 0);
+            m_index = adapter.GetValue("Index", 0);
 
         }
 
         public override IDataCommand CreateSaveCommand()
         {
-            return EntityCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID);
+            return EntityCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
         }
 
         public override IDataCommand CreateDeleteCommand()
         {
-            return EntityCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID);
+            return EntityCommandFactory.DeleteEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
         }
 
-        public static int Save(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
+        public static int Save(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID,int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
                 ParentEntityID = fromEntityID,
                 ParentEntityTypeID = fromEntityTypeID,
                 ChildEntityID = toEntityID,
-                ChildEntityTypeID = toEntityTypeID
+                ChildEntityTypeID = toEntityTypeID,
+                Index = index
             };
             return val.Save();
         }
-        public static bool Delete(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID)
+        public static bool Delete(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID,int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
                 ParentEntityID = fromEntityID,
                 ParentEntityTypeID = fromEntityTypeID,
                 ChildEntityID = toEntityID,
-                ChildEntityTypeID = toEntityTypeID
+                ChildEntityTypeID = toEntityTypeID,
+                Index = index
             };
             return val.Delete();
-        }
-        public static bool Delete(int fromEntityID, int fromEntityTypeID)
-        {
-            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.DeleteEntityAssignment(fromEntityID, fromEntityTypeID))).Value;
         }
 
     }

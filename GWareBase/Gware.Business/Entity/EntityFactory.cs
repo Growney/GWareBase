@@ -64,7 +64,7 @@ namespace Gware.Business.Entity
                         }
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
 
                 }

@@ -95,20 +95,7 @@ namespace Gware.Business.Entity
             return EntityContainerCommandFactory.Load(EntityTypeID);
         }
 
-        public static T LoadEntity<T>(int ID, int childLevels) where T : EntityContainer, new()
-        {
-            T retVal = LoadEntity<T>(ID);
-            return retVal;
-        }
-        public static List<T> LoadEntities<T>(int childLevels) where T : EntityContainer, new()
-        {
-            List<T> retVal = LoadEntities<T>();
-            return retVal;
-        }
-        public static List<T> LoadChildEntitties<T>(int entityID, int entityTypeID, int childEntityTypeID) where T : EntityBase, new()
-        {
-            return Load<T>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadChildEntitiesWithType(entityID, entityTypeID, childEntityTypeID)));
-        }
+        
 
 
     }

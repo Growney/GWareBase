@@ -5,8 +5,6 @@ namespace Gware.Common.Client.Database
 {
     public abstract class MSSQLDBClientBase : DBAPIClientBase
     {
-        private MSSQLDBConnection m_connection;
-        private MSSQLDBConnection m_masterConnection;
 
         public MSSQLDBConnection Connection
         {

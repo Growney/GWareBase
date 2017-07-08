@@ -83,9 +83,5 @@ namespace Gware.Business.Entity
             m_toEntityType = adapter.GetValue("ChildEntityType", -1);
         }
 
-        public static List<AllowedEntityAssignment> LoadAllowedForEntityType(int entityType)
-        {
-            return Load<AllowedEntityAssignment>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadAllowedForEntityType(entityType)));
-        }
     }
 }
