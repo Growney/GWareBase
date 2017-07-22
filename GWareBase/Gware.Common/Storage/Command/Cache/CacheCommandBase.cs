@@ -4,21 +4,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.Storage.Adapter;
+using Gware.Common.Storage.Command.Interface;
 
 namespace Gware.Common.Storage.Command.Cache
 {
-    public abstract class CacheCommandBase : ICommandController
+    public abstract class CacheCommandBase : CacheCommandBase<ICommandController>
+    {
+        public CacheCommandBase(ICommandController controller) : this(controller, new ManualRecacheTrigger())
+        {
+        }
+        public CacheCommandBase(ICommandController controller, IRecacheTrigger trigger)
+            :base(controller,trigger)
+        {
+
+        }
+    }
+
+    public abstract class CacheCommandBase<T> : ICommandController where T : ICommandController
     {
         private IRecacheTrigger m_trigger;
         private ulong m_hit;
         private ulong m_miss;
         private ulong m_skip;
-        private ICommandController m_controller;
+        private T m_controller;
 
-        public CacheCommandBase(ICommandController controller) : this(controller,new ManualRecacheTrigger())
+        protected T Controller
+        {
+            get
+            {
+                return m_controller;
+            }
+        }
+
+        public CacheCommandBase(T controller) : this(controller,new ManualRecacheTrigger())
         {
         }
-        public CacheCommandBase(ICommandController controller,IRecacheTrigger trigger)
+        public CacheCommandBase(T controller,IRecacheTrigger trigger)
         {
             m_controller = controller;
             m_trigger = trigger;
@@ -51,65 +72,43 @@ namespace Gware.Common.Storage.Command.Cache
         protected abstract IDataAdapterCollection CheckForColllection(IDataCommand command);
         public IDataAdapterCollection ExecuteCollectionCommand(IDataCommand command)
         {
-            IDataAdapterCollection results = null;
-            if (command.Cache)
-            {
-                results = CheckForColllection(command);
-            }
-
-            if (results == null)
-            {
-
-                results = m_controller.ExecuteCollectionCommand(command);
-                if (command.Cache)
-                {
-                    m_miss++;
-                    Task.Factory.StartNew(x =>
-                    {
-                        StoreCollection(command, results);
-                    }, TaskCreationOptions.None);
-                }
-                else
-                {
-                    m_skip++;
-                }
-
-            }
-            else
-            {
-                m_hit++;
-            }
-            CheckForReCache(command);
-            return results;
+            return ExecuteCacheCommand<IDataAdapterCollection>(command, CheckForColllection, m_controller.ExecuteCollectionCommand, StoreCollection);
         }
 
         protected abstract void StoreGroup(IDataCommand command, IDataAdapterCollectionGroup group);
         protected abstract IDataAdapterCollectionGroup CheckForGroup(IDataCommand command);
         public IDataAdapterCollectionGroup ExecuteGroupCommand(IDataCommand command)
         {
-            IDataAdapterCollectionGroup results = null;
+            return ExecuteCacheCommand<IDataAdapterCollectionGroup>(command, CheckForGroup, m_controller.ExecuteGroupCommand, StoreGroup);
+        }
+
+        protected abstract void Recache(IDataCommand command);
+
+        protected delegate K CheckMethod<K>(IDataCommand command);
+        protected delegate void StoreMethod<K>(IDataCommand command,K item);
+
+        protected Result ExecuteCacheCommand<Result>(IDataCommand command, CheckMethod<Result> check,CheckMethod<Result> execute,StoreMethod<Result> store)
+        {
+            Result results = default(Result);
+
             if (command.Cache)
             {
-                results = CheckForGroup(command);
+                results = check(command);
             }
-            
-            if (results == null)
+
+            if(results == null)
             {
-               
-                results = m_controller.ExecuteGroupCommand(command);
+                results = execute(command);
                 if (command.Cache)
                 {
                     m_miss++;
-                    Task.Factory.StartNew(x =>
-                    {
-                        StoreGroup(command, results);
-                    }, TaskCreationOptions.None);
+                    
+                    store(command, results);
                 }
                 else
                 {
                     m_skip++;
                 }
-                
             }
             else
             {
@@ -119,25 +118,19 @@ namespace Gware.Common.Storage.Command.Cache
             return results;
         }
 
-        protected abstract void Recache(IDataCommand command);
-
         public int ExecuteQuery(IDataCommand command)
         {
             CheckForReCache(command);
             return m_controller.ExecuteQuery(command);
         }
-
-        private void CheckForReCache(IDataCommand command)
+        protected void CheckForReCache(IDataCommand command)
         {
             if (command.TriggersReCache)
             {
-                Task.Factory.StartNew(x =>
+                foreach (IDataCommand recache in command.ReCacheCommands)
                 {
-                    foreach (IDataCommand recache in command.ReCacheCommands)
-                    {
-                        Recache(recache);
-                    }
-                }, TaskCreationOptions.None);
+                    Recache(recache);
+                }
             }
         }
     }

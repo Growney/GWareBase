@@ -3,6 +3,7 @@ using Gware.Common.Application;
 using Gware.Common.Storage;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Storage.Command;
+using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -112,12 +113,12 @@ namespace Gware.Business.Entity
 
         public override IDataCommand CreateSaveCommand()
         {
-            return EntityCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
+            return EntityAssignmentCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
         }
 
         public override IDataCommand CreateDeleteCommand()
         {
-            return EntityCommandFactory.DeleteEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
+            return EntityAssignmentCommandFactory.DeleteEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
         }
 
         public static int Save(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID,int index)

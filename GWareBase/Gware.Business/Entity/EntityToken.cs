@@ -8,6 +8,7 @@ using Gware.Common.Storage.Command;
 using Gware.Business.Commands;
 using Gware.Common.Application;
 using Gware.Common.Security;
+using Gware.Common.Storage.Command.Interface;
 
 namespace Gware.Business.Entity
 {

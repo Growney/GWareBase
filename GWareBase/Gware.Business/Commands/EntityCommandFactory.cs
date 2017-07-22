@@ -62,22 +62,7 @@ namespace Gware.Business.Commands
             retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
             return retVal;
         }
-        public static DataCommand LoadChildEntity(int parentEntityTypeID, int parentEntityID, int index)
-        {
-            DataCommand retVal = Factory.CreateCommand("LoadChildEntity");
-            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = parentEntityTypeID;
-            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = parentEntityID;
-            retVal.AddParameter("Index", DbType.Int32).Value = index;
-            return retVal;
-        }
-        public static DataCommand LoadParentEntity(int childEntityTypeID, int childEntityID, int index)
-        {
-            DataCommand retVal = Factory.CreateCommand("LoadParentEntity");
-            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = childEntityTypeID;
-            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = childEntityID;
-            retVal.AddParameter("Index", DbType.Int32).Value = index;
-            return retVal;
-        }
+
         public static DataCommand LoadEntities(int entityTypeID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadEntities");
@@ -85,23 +70,43 @@ namespace Gware.Business.Commands
             return retVal;
         }
 
-        public static DataCommand LoadChildEntitiesWithType(int entityID, int entityTypeID, int childEntityTypeID)
+        public static DataCommand LoadChildEntity(int parentEntityTypeID, int parentEntityID, int childEntityTypeID, int index)
         {
-            DataCommand retVal = Factory.CreateCommand("LoadChildEntitiesWithType");
-
-            retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
-            retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
+            DataCommand retVal = Factory.CreateCommand("LoadChildEntity");
+            retVal.AddParameter("EntityTypeID", DbType.Int32).Value = parentEntityTypeID;
+            retVal.AddParameter("EntityID", DbType.Int32).Value = parentEntityID;
             retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = childEntityTypeID;
+            retVal.AddParameter("Index", DbType.Int32).Value = index;
             return retVal;
         }
-
-        public static DataCommand LoadParentEntitiesWithType(int entityID, int entityTypeID, int parentEntityTypeID)
+        public static DataCommand LoadParentEntity(int childEntityTypeID, int childEntityID, int parentEntityTypeID, int index)
         {
-            DataCommand retVal = Factory.CreateCommand("LoadParentEntitiesWithType");
+            DataCommand retVal = Factory.CreateCommand("LoadParentEntity");
+            retVal.AddParameter("EntityTypeID", DbType.Int32).Value = childEntityTypeID;
+            retVal.AddParameter("EntityID", DbType.Int32).Value = childEntityID;
+            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = parentEntityTypeID;
+            retVal.AddParameter("Index", DbType.Int32).Value = index;
+            return retVal;
+        }
+       
+
+        public static DataCommand LoadParentEntites(int entityID, int entityTypeID, int parentEntityTypeID)
+        {
+            DataCommand retVal = Factory.CreateCommand("LoadParentEntites");
 
             retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
             retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
             retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = parentEntityTypeID;
+            return retVal;
+        }
+
+        public static DataCommand LoadChildEntites(int entityID, int entityTypeID, int childEntityTypeID)
+        {
+            DataCommand retVal = Factory.CreateCommand("LoadChildEntities");
+
+            retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
+            retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
+            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = childEntityTypeID;
             return retVal;
         }
 
@@ -111,7 +116,7 @@ namespace Gware.Business.Commands
 
         public static DataCommand Delete(int entityTypeID, int entityID)
         {
-            DataCommand retVal = Factory.CreateCommand("Delete",
+            DataCommand retVal = Factory.CreateCommand("Delete",true,false,
                 LoadEntities(entityTypeID),
                 LoadEntity(entityTypeID, entityID));
             retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
@@ -120,34 +125,7 @@ namespace Gware.Business.Commands
         }
 
 
-        public static DataCommand SaveEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
-        {
-            DataCommand retVal = Factory.CreateCommand("SaveEntityAssignment", GetWriteAssignmentRecache(fromEntityID, fromEntityTypeID, toEntityID, toEntityTypeID, index));
-            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
-            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
-            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = toEntityID;
-            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = toEntityTypeID;
-            return retVal;
-        }
-        public static DataCommand DeleteEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
-        {
-            DataCommand retVal = Factory.CreateCommand("DeleteEntityAssignment", GetWriteAssignmentRecache(fromEntityID,fromEntityTypeID,toEntityID,toEntityTypeID,index));
-            retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
-            retVal.AddParameter("ParentEntityID", DbType.Int32).Value = fromEntityID;
-            retVal.AddParameter("ChildEntityID", DbType.Int32).Value = toEntityID;
-            retVal.AddParameter("ChildEntityTypeID", DbType.Int32).Value = toEntityTypeID;
-            return retVal;
-        }
-
-        private static IDataCommand[] GetWriteAssignmentRecache(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
-        {
-            return new IDataCommand[] {
-                LoadChildEntitiesWithType(fromEntityID, fromEntityTypeID, toEntityTypeID),
-                LoadParentEntitiesWithType(toEntityID, toEntityTypeID, fromEntityTypeID),
-                LoadParentEntity(toEntityTypeID, toEntityID, index),
-                LoadChildEntity(fromEntityTypeID, fromEntityID, index)
-            };
-        }
+        
         #endregion ---- Write ----
 
     }

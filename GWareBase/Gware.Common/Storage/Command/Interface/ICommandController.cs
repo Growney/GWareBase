@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Common.Storage.Command
+namespace Gware.Common.Storage.Command.Interface
 {
     public interface ICommandController
     {

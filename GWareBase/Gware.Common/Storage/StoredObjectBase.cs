@@ -1,6 +1,7 @@
 ﻿using Gware.Common.Application;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Storage.Command;
+using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,14 +50,24 @@ namespace Gware.Common.Storage
             return new IDataCommand[0];
         }
 
+        protected override bool GetIsDirty()
+        {
+            if(Id == 0)
+            {
+                return true;
+            }
+            return base.GetIsDirty();
+        }
+
         public virtual int Save()
         {
             int retVal = Id;
-            if (Dirty)
+            if (GetIsDirty())
             {
                 IDataCommand command = CreateSaveCommand();
                 command.AddReCacheCommand(GetSaveReCacheCommands());
-                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
+                command.Cache = false;
+                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase<IStoredObjectCommandController>.Main.Controller.ExecuteCollectionCommand(command)).Value;
                 Id = retVal;
             }
 
@@ -68,7 +79,7 @@ namespace Gware.Common.Storage
         {
             IDataCommand command = CreateDeleteCommand();
             command.AddReCacheCommand(GetDeleteReCacheCommands());
-            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
+            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase<IStoredObjectCommandController>.Main.Controller.ExecuteCollectionCommand(command)).Value;
         }
         
     }

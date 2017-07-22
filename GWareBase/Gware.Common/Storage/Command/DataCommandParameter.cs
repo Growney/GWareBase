@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Storage.Command.Interface;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -7,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Storage.Command
 {
-    public class DataCommandParameter
+    public class DataCommandParameter : IDataCommandParameter
     {
         private string m_name;
         private DbType m_dataType;
         private ParameterDirection m_direction;
         private object m_value;
+        private bool m_anyValueInCache;
 
         public DbType DataType
         {
@@ -62,7 +64,17 @@ namespace Gware.Common.Storage.Command
                 m_value = value;
             }
         }
-
+        public bool AnyValueInCache
+        {
+            get
+            {
+                return m_anyValueInCache;
+            }
+            set
+            {
+                m_anyValueInCache = value;
+            }
+        }
         public DataCommandParameter(string name)
             :this(name,null)
         {
@@ -79,17 +91,56 @@ namespace Gware.Common.Storage.Command
         {
 
         }
-        public DataCommandParameter(string name,object value,DbType type,ParameterDirection direction)
+        public DataCommandParameter(string name, object value, DbType type, ParameterDirection direction)
+            :this(name,value,type,direction,false)
+        {
+
+        }
+        public DataCommandParameter(string name, object value, DbType type,bool anyValueInCache)
+            :this(name,value,type,ParameterDirection.Input,anyValueInCache)
+        {
+
+        }
+        public DataCommandParameter(string name,object value,DbType type,ParameterDirection direction, bool anyValueInCache)
         {
             m_name = name;
             m_value = value;
             m_direction = ParameterDirection.Input;
             m_dataType = type;
         }
+        
+        public string ToString(bool cache)
+        {
+            string retVal = string.Empty;
+            if (!cache || !AnyValueInCache)
+            {
+                retVal = ToString();
+            }
+            return retVal;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}:{1}", Name, Value);
+        }
 
         public bool Equals(DataCommandParameter obj)
         {
-            return m_name.Equals(obj.Name) && m_value.Equals(obj.Value);
+            if(obj != null && obj.Value != null & m_value != null)
+            {
+                return m_name.Equals(obj.Name) && m_value.Equals(obj.Value);
+            }
+            else
+            {
+                if (m_name.Equals(obj.Name))
+                {
+                    return m_value == null && obj.Value == null;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
     }
 }

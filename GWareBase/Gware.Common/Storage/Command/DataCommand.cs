@@ -1,4 +1,5 @@
 ﻿using Gware.Common.Security.Authentication;
+using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +18,7 @@ namespace Gware.Common.Storage.Command
         private AuthenticationToken m_token;
         private bool m_cache;
         private List<IDataCommand> m_recacheCommands = new List<IDataCommand>();
-        private List<DataCommandParameter> m_parameters = new List<DataCommandParameter>();
+        private List<IDataCommandParameter> m_parameters = new List<IDataCommandParameter>();
 
 
         public string CommandMethod
@@ -79,6 +80,10 @@ namespace Gware.Common.Storage.Command
             {
                 return m_cache;
             }
+            set
+            {
+                m_cache = value;
+            }
         }
 
         public List<IDataCommand> ReCacheCommands
@@ -114,11 +119,11 @@ namespace Gware.Common.Storage.Command
                 m_recacheCommands.AddRange(recacheCommands);
             }
         }
-        public DataCommandParameter AddParameter(string name, DbType dataType)
+        public IDataCommandParameter AddParameter(string name, DbType dataType)
         {
             return AddParameter(new DataCommandParameter(name, null, dataType));
         }
-        public DataCommandParameter AddParameter(DataCommandParameter param)
+        public IDataCommandParameter AddParameter(IDataCommandParameter param)
         {
             if (GetParameter(param.Name) == null)
             {
@@ -130,11 +135,21 @@ namespace Gware.Common.Storage.Command
                 throw new ArgumentException("An element with the same key already exists in the collection");
             }
         }
-        public DataCommandParameter AddParameter(string name, DbType dataType, ParameterDirection direction)
+        public IDataCommandParameter AddParameter(string name, DbType dataType, ParameterDirection direction)
         {
-            return AddParameter(new DataCommandParameter(name, null, dataType, direction));
+            return AddParameter(new DataCommandParameter(name,  null, dataType, direction));
         }
-        
+
+        public IDataCommandParameter AddParameter(string name, DbType dataType, ParameterDirection direction, bool anyValueInCache)
+        {
+            return AddParameter(new DataCommandParameter(name, null, dataType, direction,anyValueInCache));
+        }
+
+        public IDataCommandParameter AddParameter(string name, DbType dataType, bool anyValueInCache)
+        {
+            return AddParameter(new DataCommandParameter(name, null, dataType, anyValueInCache));
+        }
+
         public object GetParameterValue(int index)
         {
             return GetParameter(index).Value;
@@ -145,9 +160,9 @@ namespace Gware.Common.Storage.Command
             return GetParameter(name).Value;
         }
 
-        public DataCommandParameter GetParameter(string name)
+        public IDataCommandParameter GetParameter(string name)
         {
-            DataCommandParameter retVal = null;
+            IDataCommandParameter retVal = null;
             string loweredName = name.ToLower();
             for (int i = 0; i < m_parameters.Count; i++)
             {
@@ -161,7 +176,7 @@ namespace Gware.Common.Storage.Command
             return retVal;
         }
 
-        public DataCommandParameter GetParameter(int index)
+        public IDataCommandParameter GetParameter(int index)
         {
             return m_parameters[index];
         }
@@ -171,24 +186,30 @@ namespace Gware.Common.Storage.Command
             GetParameter(name).Value = value;
         }
 
+        public override bool Equals(object obj)
+        {
+            if(obj is DataCommand)
+            {
+                return Equals(obj as DataCommand);
+            }
+            return base.Equals(obj);
+        }
+
         public bool Equals(DataCommand val)
         {
             bool retVal = Name.Equals(val.Name) && CommandMethod.Equals(val.CommandMethod);
             if (retVal)
             {
-                for (int i = 0; i < m_parameters.Count; i++)
+                retVal = m_parameters.Count == val.m_parameters.Count;
+                if (retVal)
                 {
-                    for (int j = 0; j < val.m_parameters.Count; j++)
+                    for (int i = 0; i < m_parameters.Count; i++)
                     {
-                        retVal = m_parameters[i].Equals(val.m_parameters[j]);
+                        retVal = m_parameters[i].Equals(val.m_parameters[i]);
                         if (!retVal)
                         {
                             break;
                         }
-                    }
-                    if (!retVal)
-                    {
-                        break;
                     }
                 }
             }
@@ -197,19 +218,29 @@ namespace Gware.Common.Storage.Command
 
         public override string ToString()
         {
+            return ToString(false);
+        }
+
+        public string ToString(bool cache)
+        {
             StringBuilder cacheString = new StringBuilder();
             cacheString.AppendFormat("{0}:{1}?", Name, CommandMethod);
             for (int i = 0; i < m_parameters.Count; i++)
             {
-                DataCommandParameter param = m_parameters[i];
-                cacheString.AppendFormat("{0}:{1}",param.Name,param.Value);
+                IDataCommandParameter param = m_parameters[i];
+                cacheString.Append(param.ToString(cache));
             }
-            return base.ToString();
+            return cacheString.ToString();
         }
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return GetHashCode(false);
+        }
+
+        public int GetHashCode(bool cache)
+        {
+            return ToString(cache).GetHashCode();
         }
 
         public void AddReCacheCommand(IDataCommand command)
@@ -221,5 +252,7 @@ namespace Gware.Common.Storage.Command
         {
             m_recacheCommands.AddRange(commands);
         }
+
+        
     }
 }

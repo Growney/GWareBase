@@ -16,57 +16,59 @@ namespace Gware.Common.Storage
         private bool m_gotDirty = false;
         private bool m_dirty;
 
-        public bool Dirty
-        {
-            get
-            {
-                lock (this)
-                {
-                    if (!m_gotDirty)
-                    {
-                        m_gotDirty = true;
-                        m_dirty = ChangedFromDirtyState();
-                        
-                    }
-                    return m_dirty;
-                }
-                
-            }
-        }
+        
         public LoadedFromAdapterBase()
         {
-            SetNonDirtyState(Activator.CreateInstance(this.GetType()) as LoadedFromAdapterBase);
+            
         }
-        
+
+        protected virtual bool GetIsDirty()
+        {
+            lock (this)
+            {
+                if (!m_gotDirty)
+                {
+                    m_gotDirty = true;
+                    m_dirty = ChangedFromDirtyState();
+
+                }
+                return m_dirty;
+            }
+            
+        }
+
         private bool ChangedFromDirtyState()
         {
-            bool retVal = m_nonDirtyState == null;
-            if(!retVal)
-            {
-                retVal = false;
-                this.IteratePropertiesPerformAction(new Reflection.ExtensionMethods.ReflectionPropertyAction(delegate (object x, PropertyInfo y)
-                {
-                    object nonDirtyPropertyValue = y.GetValue(m_nonDirtyState);
-                    object thisPropertyValue = y.GetValue(x);
+            bool retVal = false;
 
-                    if(thisPropertyValue != null && nonDirtyPropertyValue != null)
-                    {
-                        if (!thisPropertyValue.Equals(nonDirtyPropertyValue))
-                        {
-                            retVal = true;
-                        }
-                    }
-                    else if(thisPropertyValue == null && nonDirtyPropertyValue != null)
-                    {
-                        retVal = true;
-                    }
-                    else if(thisPropertyValue != null && nonDirtyPropertyValue == null)
-                    {
-                        retVal = true;
-                    }
-                    
-                }));
+            if(m_nonDirtyState == null)
+            {
+                SetNonDirtyState(Activator.CreateInstance(this.GetType()) as LoadedFromAdapterBase);
             }
+            
+            this.IteratePropertiesPerformAction(new Reflection.ExtensionMethods.ReflectionPropertyAction(delegate (object x, PropertyInfo y)
+            {
+                object nonDirtyPropertyValue = y.GetValue(m_nonDirtyState);
+                object thisPropertyValue = y.GetValue(x);
+
+                if(thisPropertyValue != null && nonDirtyPropertyValue != null)
+                {
+                    if (!thisPropertyValue.Equals(nonDirtyPropertyValue))
+                    {
+                        retVal = true;
+                    }
+                }
+                else if(thisPropertyValue == null && nonDirtyPropertyValue != null)
+                {
+                    retVal = true;
+                }
+                else if(thisPropertyValue != null && nonDirtyPropertyValue == null)
+                {
+                    retVal = true;
+                }
+                    
+            }));
+            
             return retVal;
         }
         public void SetNonDirtyState(LoadedFromAdapterBase value)
@@ -94,7 +96,6 @@ namespace Gware.Common.Storage
             if (collection.Adapters.Length > 0 && collection.Adapters.Length >= index)
             {
                 retVal = new T();
-                retVal.SetNonDirtyState(new T());
                 retVal.Load(collection.Adapters[index]);
             }
             else
@@ -116,7 +117,6 @@ namespace Gware.Common.Storage
             for (int i = 0; i < collection.Adapters.Length; i++)
             {
                 T item = new T();
-                item.SetNonDirtyState(new T());
                 item.LoadFrom(collection.Adapters[i]);
                 retVal.Add(item);
             }

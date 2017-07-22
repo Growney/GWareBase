@@ -1,4 +1,5 @@
 ﻿using Gware.Common.Storage.Command;
+using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;

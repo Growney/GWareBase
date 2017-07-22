@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Database;
 using System.Data;
+using Gware.Common.Storage.Command.Interface;
 
 namespace Gware.Common.Storage.Command
 {
@@ -67,7 +68,7 @@ namespace Gware.Common.Storage.Command
         {
             AddParameterToStoredProcedure(procedure, new DataCommandParameter(name, value, type, direction));
         }
-        public static void AddParameterToStoredProcedure(StoredProcedure procedure, DataCommandParameter command)
+        public static void AddParameterToStoredProcedure(StoredProcedure procedure, IDataCommandParameter command)
         {
             string dbCommandName = GetDatabaseParameterName(command.Name);
             procedure.AddParameter(dbCommandName, ConvertToSqlDBType(command.DataType), command.Direction);

@@ -46,11 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\EntityCommandControllerApplicationBase.cs" />
+    <Compile Include="Commands\EntityAssignmentCommandFactory.cs" />
     <Compile Include="Commands\EntityCommandFactory.cs" />
     <Compile Include="Commands\EntityContainerCommandFactory.cs" />
     <Compile Include="Commands\TokenCommandFactory.cs" />
     <Compile Include="Entity\AllowedEntityAssignment.cs" />
-    <Compile Include="Entity\Collection\MultiEntityTypeCollection.cs" />
+    <Compile Include="Entity\Collection\IMultiEntityTypeStorage.cs" />
+    <Compile Include="Entity\Collection\StoredMultiEntityTypeCollection.cs" />
     <Compile Include="Entity\EntityAssignment.cs" />
     <Compile Include="Entity\EntityBase.cs" />
     <Compile Include="Entity\EntityContainer.cs" />

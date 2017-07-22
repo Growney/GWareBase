@@ -11,6 +11,21 @@ namespace Gware.Common.DataStructures
 {
     public static class ExtensionMethods
     {
+        public static List<To> Convert<From,To>(this List<From> items) where To : From
+        {
+            List<To> retVal = new List<To>();
+
+            foreach (From item in items)
+            {
+                if(item is To)
+                {
+                    retVal.Add((To)item);
+                }
+            }
+
+            return retVal;
+        }
+
         public static void Insert(this IList data,int index, object item, bool expand)
         {
             if (expand)
@@ -21,13 +36,11 @@ namespace Gware.Common.DataStructures
                     {
                         data.Add(null);
                     }
-
                 }
             }
             data[index] = item;
 
         }
-
         public static void Merge<T>(this BindingList<T> listOne, BindingList<T> listTwo) where T : IComparable<T>
         {
             for (int i = 0; i < listTwo.Count; i++)

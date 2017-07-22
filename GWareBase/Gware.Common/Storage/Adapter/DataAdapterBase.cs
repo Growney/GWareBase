@@ -11,6 +11,23 @@ namespace Gware.Common.Storage.Adapter
     {
         public abstract string GetValue(string fieldName, string defaultValue);
         public abstract byte[] GetValue(string fieldName, byte[] defaultValue);
+        private T? GetGenericValue<T>(string fieldName) where T : struct,IConvertible
+        {
+            T? retVal = null;
+            try
+            {
+                IConvertible value;
+
+                value = GetValue(fieldName, string.Empty);
+                
+                retVal = (T)value.ToType(typeof(T), CultureInfo.CurrentCulture);
+            }
+            catch (Exception)
+            {
+
+            }
+            return retVal;
+        }
 
         private T GetGenericValue<T>(string fieldName,T defaultValue) where T : IConvertible
         {

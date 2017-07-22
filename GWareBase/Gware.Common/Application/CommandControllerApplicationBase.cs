@@ -1,4 +1,5 @@
 ﻿using Gware.Common.Storage.Command;
+using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,18 +8,25 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Application
 {
-    public abstract class CommandControllerApplicationBase
+    public abstract class CommandControllerApplicationBase : CommandControllerApplicationBase<ICommandController>
+    {
+        public CommandControllerApplicationBase(ICommandController controller) : base(controller)
+        {
+        }
+    }
+
+    public abstract class CommandControllerApplicationBase<T> where T :ICommandController
     {
         private static object m_initLock = new object();
-        private static CommandControllerApplicationBase m_main;
-        public static CommandControllerApplicationBase Main
+        private static CommandControllerApplicationBase<T> m_main;
+        public static CommandControllerApplicationBase<T> Main
         {
             get
             {
                 return m_main;
             }
         }
-        public static void InitializeBase(CommandControllerApplicationBase appBase)
+        public static void InitializeBase(CommandControllerApplicationBase<T> appBase)
         {
             lock (m_initLock)
             {
@@ -26,8 +34,8 @@ namespace Gware.Common.Application
             }
         }
 
-        private ICommandController m_controller;
-        public ICommandController Controller
+        private T m_controller;
+        public T Controller
         {
             get
             {
@@ -39,12 +47,12 @@ namespace Gware.Common.Application
             }
         }
 
-        public void Init(ICommandController controller)
+        public void Init(T controller)
         {
             Controller = controller;
         }
 
-        public CommandControllerApplicationBase(ICommandController controller)
+        public CommandControllerApplicationBase(T controller)
         {
             Init(controller);
         }

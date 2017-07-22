@@ -78,16 +78,18 @@ namespace Gware.Business.Entity
 
         public static EntityBase CreateEntity(int entityTypeID)
         {
+            lock (m_typeLock)
+            {
+                if(m_entityTypes.Count == 0)
+                {
+                    InitialiseEntityTypes();
+                }
+            }
             EntityBase retVal = null;
             if (m_entityTypes.ContainsKey(entityTypeID))
             {
                 Type createType = m_entityTypes[entityTypeID];
                 retVal = Activator.CreateInstance(createType) as EntityBase;
-
-                if(retVal != null)
-                {
-                    retVal.SetNonDirtyState(Activator.CreateInstance(createType) as LoadedFromAdapterBase);
-                }   
             }
             
             return retVal;

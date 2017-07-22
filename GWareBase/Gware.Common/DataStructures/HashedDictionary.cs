@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.DataStructures
 {
-    public class HashedDictionary<Key,Value>
+    public class HashedDictionary<Key,Value> : IHashedDictionary<Key, Value>
     {
         private object m_editLock = new object();
         private Dictionary<int, List<KeyValuePair<Key, Value>>> m_dictionary;
@@ -46,31 +46,35 @@ namespace Gware.Common.DataStructures
             lock (m_editLock)
             {
                 List<KeyValuePair<Key, Value>> collection;
-                if (!m_dictionary.ContainsKey(hash))
+                lock (m_editLock)
                 {
-                    collection = new List<KeyValuePair<Key, Value>>();
-                    m_dictionary.Add(hash, collection);
-                }
-                else
-                {
+                    if (!m_dictionary.ContainsKey(hash))
+                    {
+                        m_dictionary.Add(hash, new List<KeyValuePair<Key, Value>>());
+                    }
                     collection = m_dictionary[hash];
                 }
-
-                bool found = false;
-                for (int i = 0; i < collection.Count; i++)
+                
+                lock (collection)
                 {
-                    if (collection[i].Key.Equals(key))
+                    KeyValuePair<Key, Value>? item = null;
+                    for (int i = 0; i < collection.Count; i++)
                     {
-                        found = true;
-                        break;
+                        if (collection[i].Key.Equals(key))
+                        {
+                            item = collection[i];
+                            break;
+                        }
+                    }
+
+                    if (item != null)
+                    {
+                        collection.Remove(item.Value);
                     }
                 }
+                
+                collection.Add(new KeyValuePair<Key, Value>(key, value));
 
-                if (!found)
-                {
-                    collection.Add(new KeyValuePair<Key, Value>(key, value));
-                }
-               
             }
 
         }
