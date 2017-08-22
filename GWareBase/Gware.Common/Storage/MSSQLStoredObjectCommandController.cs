@@ -8,23 +8,13 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Storage
 {
-    public class MSSQLStoredObjectCommandController : MSSQLCommandController, IStoredObjectCommandController
+    public class MSSQLStoredObjectCommandController : MSSQLCommandController, ICommandController
     {
 
         public MSSQLStoredObjectCommandController(string serverName, string databaseName, string databaseUsername, string databasePassword)
             : base(serverName, databaseName, databaseUsername, databasePassword)
         {
 
-        }
-
-        public IList<T> ExecuteMultipleCommand<T>(IDataCommand command) where T : StoredObjectBase, new()
-        {
-            return LoadedFromAdapterBase.Load<T>(ExecuteCollectionCommand(command));
-        }
-
-        public T ExecuteSingleCommand<T>(IDataCommand command) where T : StoredObjectBase, new()
-        {
-            return LoadedFromAdapterBase.LoadSingle<T>(ExecuteCollectionCommand(command));
         }
     }
 }

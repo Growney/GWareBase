@@ -236,31 +236,31 @@ namespace Gware.Business.Entity
 
         public static IList<T> LoadEntities<T>() where T : EntityBase, new()
         {
-            return EntityCommandControllerApplicationBase.Main.Controller.ExecuteMultipleCommand<T>(new T().GetLoadCommand());
+            return Load<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(new T().GetLoadCommand()));
         }
         public static T LoadEntity<T>(int id) where T : EntityBase, new()
         {
-            return EntityCommandControllerApplicationBase.Main.Controller.ExecuteSingleCommand<T>(new T().GetLoadSingleCommand(id));
+            return LoadSingle<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(new T().GetLoadSingleCommand(id)));
         }
 
         public static T LoadChildEntity<T>(int parentEntityTypeID, int parentEntityID, int childEntityTypeID, int index) where T : EntityBase, new()
         {
-            return EntityCommandControllerApplicationBase.Main.Controller.ExecuteSingleCommand<T>(EntityCommandFactory.LoadChildEntity(parentEntityTypeID, parentEntityID, childEntityTypeID, index));
+            return LoadSingle<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadChildEntity(parentEntityTypeID, parentEntityID, childEntityTypeID, index)));
         }
 
         public static T LoadParentEntity<T>(int childEntityTypeID, int childEntityID, int parentEntityTypeID, int index) where T : EntityBase, new()
         {
-            return EntityCommandControllerApplicationBase.Main.Controller.ExecuteSingleCommand<T>(EntityCommandFactory.LoadParentEntity(childEntityTypeID, childEntityID, parentEntityTypeID, index));
+            return LoadSingle<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadParentEntity(childEntityTypeID, childEntityID, parentEntityTypeID, index)));
         }
 
         public static IList<T> LoadParentEntities<T>(int entityID, int entityTypeID, int parentEntityTypeID) where T : EntityBase, new()
         {
-            return EntityCommandControllerApplicationBase.Main.Controller.ExecuteMultipleCommand<T>(EntityCommandFactory.LoadParentEntites(entityID, entityTypeID, parentEntityTypeID));
+            return Load<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadParentEntites(entityID, entityTypeID, parentEntityTypeID)));
         }
 
         public static IList<T> LoadChildEntities<T>(int entityID, int entityTypeID, int childEntityTypeID) where T : EntityBase, new()
         {
-            return EntityCommandControllerApplicationBase.Main.Controller.ExecuteMultipleCommand<T>(EntityCommandFactory.LoadChildEntites(entityID, entityTypeID, childEntityTypeID));
+            return Load<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadChildEntites(entityID, entityTypeID, childEntityTypeID)));
         }
 
         #endregion --- Static Loaders ---

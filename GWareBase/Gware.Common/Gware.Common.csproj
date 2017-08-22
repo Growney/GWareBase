@@ -89,6 +89,7 @@
     <Compile Include="DataStructures\HashedDictionary.cs" />
     <Compile Include="DataStructures\IHashedDictionary.cs" />
     <Compile Include="DataStructures\LoginResult.cs" />
+    <Compile Include="DataStructures\MultiKeyTree.cs" />
     <Compile Include="Data\BufferReader.cs" />
     <Compile Include="Data\BufferWriter.cs" />
     <Compile Include="Data\DataBuffer.cs" />
@@ -134,13 +135,6 @@
     <Compile Include="Storage\Adapter\IDataAdapterCollectionGroup.cs" />
     <Compile Include="Storage\Adapter\MemoryDataAdapter.cs" />
     <Compile Include="Storage\CommandStoredBase.cs" />
-    <Compile Include="Storage\Command\Cache\CacheCommandBase.cs" />
-    <Compile Include="Storage\Command\Cache\CachedCommandHashedDictonary.cs" />
-    <Compile Include="Storage\Command\Cache\InfiniteCache.cs" />
-    <Compile Include="Storage\Command\Cache\IRecacheTrigger.cs" />
-    <Compile Include="Storage\Command\Cache\ManualRecacheTrigger.cs" />
-    <Compile Include="Storage\Command\Cache\StoredObjectCacheCommand.cs" />
-    <Compile Include="Storage\Command\Cache\ZeroCache.cs" />
     <Compile Include="Storage\Command\DataCommand.cs" />
     <Compile Include="Storage\Command\DataCommandFactory.cs" />
     <Compile Include="Storage\Command\DataCommandParameter.cs" />
@@ -153,7 +147,6 @@
     <Compile Include="Storage\Adapter\XmlDataAdapter.cs" />
     <Compile Include="Storage\Command\Interface\IDataCommandParameter.cs" />
     <Compile Include="Storage\Command\MSSQLCommandController.cs" />
-    <Compile Include="Storage\IStoredObjectCommandController.cs" />
     <Compile Include="Storage\LoadedFromAdapterBase.cs" />
     <Compile Include="Storage\LoadedFromAdapterValue.cs" />
     <Compile Include="Storage\MSSQLStoredObjectCommandController.cs" />

@@ -78,11 +78,6 @@ namespace Gware.Business.Commands
             return retVal;
         }
 
-        public static DataCommand SaveParentEntityRecache(int entityID,int entityTypeID)
-        {
-
-        }
-
         private static IDataCommand[] GetWriteAssignmentRecache(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
         {
             return new IDataCommand[] {

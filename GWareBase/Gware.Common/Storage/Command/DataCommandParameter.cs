@@ -14,7 +14,7 @@ namespace Gware.Common.Storage.Command
         private DbType m_dataType;
         private ParameterDirection m_direction;
         private object m_value;
-        private bool m_anyValueInCache;
+        private bool m_any;
 
         public DbType DataType
         {
@@ -64,17 +64,19 @@ namespace Gware.Common.Storage.Command
                 m_value = value;
             }
         }
-        public bool AnyValueInCache
+        public bool Any
         {
             get
             {
-                return m_anyValueInCache;
+                return m_any;
             }
             set
             {
-                m_anyValueInCache = value;
+                m_any = value;
             }
         }
+
+        
         public DataCommandParameter(string name)
             :this(name,null)
         {
@@ -96,12 +98,12 @@ namespace Gware.Common.Storage.Command
         {
 
         }
-        public DataCommandParameter(string name, object value, DbType type,bool anyValueInCache)
-            :this(name,value,type,ParameterDirection.Input,anyValueInCache)
+        public DataCommandParameter(string name, object value, DbType type,bool any)
+            :this(name,value,type,ParameterDirection.Input,any)
         {
 
         }
-        public DataCommandParameter(string name,object value,DbType type,ParameterDirection direction, bool anyValueInCache)
+        public DataCommandParameter(string name,object value,DbType type,ParameterDirection direction, bool any)
         {
             m_name = name;
             m_value = value;
@@ -109,38 +111,5 @@ namespace Gware.Common.Storage.Command
             m_dataType = type;
         }
         
-        public string ToString(bool cache)
-        {
-            string retVal = string.Empty;
-            if (!cache || !AnyValueInCache)
-            {
-                retVal = ToString();
-            }
-            return retVal;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("{0}:{1}", Name, Value);
-        }
-
-        public bool Equals(DataCommandParameter obj)
-        {
-            if(obj != null && obj.Value != null & m_value != null)
-            {
-                return m_name.Equals(obj.Name) && m_value.Equals(obj.Value);
-            }
-            else
-            {
-                if (m_name.Equals(obj.Name))
-                {
-                    return m_value == null && obj.Value == null;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
     }
 }

@@ -93,7 +93,18 @@ namespace Gware.Common.DataStructures
                 }
             }
         }
-
+        public static Value Get<Key,Value>(this Dictionary<Key,Value> dic,Key key)
+        {
+            lock (dic)
+            {
+                Value retVal = default(Value);
+                if (dic.ContainsKey(key))
+                {
+                    retVal = dic[key];
+                }
+                return retVal;
+            }
+        }
         public static void AddItem<Key,Value,CollectionType>(this Dictionary<Key, CollectionType> dic,Key key,Value value) where CollectionType : ICollection<Value>,new ()
         {
             lock (dic)

@@ -67,7 +67,7 @@ namespace Gware.Common.Storage
                 IDataCommand command = CreateSaveCommand();
                 command.AddReCacheCommand(GetSaveReCacheCommands());
                 command.Cache = false;
-                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase<IStoredObjectCommandController>.Main.Controller.ExecuteCollectionCommand(command)).Value;
+                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
                 Id = retVal;
             }
 
@@ -79,7 +79,7 @@ namespace Gware.Common.Storage
         {
             IDataCommand command = CreateDeleteCommand();
             command.AddReCacheCommand(GetDeleteReCacheCommands());
-            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase<IStoredObjectCommandController>.Main.Controller.ExecuteCollectionCommand(command)).Value;
+            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
         }
         
     }

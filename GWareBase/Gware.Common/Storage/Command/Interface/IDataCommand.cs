@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Storage.Command.Interface
 {
-    public interface IDataCommand
+    public interface IDataCommand : IEnumerable<IDataCommandParameter>
     {
         string Name { get; }
         string CommandMethod { get; }
 
+        IDataCommandParameter this[string name] { get; }
         bool Success { get; set; }
         Exception Exception { get; set; }
         int ParameterCount { get; }
@@ -29,11 +30,5 @@ namespace Gware.Common.Storage.Command.Interface
         void SetParameter(string name, object value);
         object GetParameterValue(string name);
         IDataCommandParameter GetParameter(string name);
-        IDataCommandParameter GetParameter(int index);
-
-        int GetHashCode(bool cache);
-        string ToString(bool cache);
-
-
     }
 }

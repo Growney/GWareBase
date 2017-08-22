@@ -50,9 +50,9 @@ namespace Gware.Common.Storage.Command
             StoredProcedure retVal = new StoredProcedure(GetDatabaseStoredProcedureName(command.Name));
             AddParameterToStoredProcedure(retVal, "Result", command.CommandMethod);
             int parameterCount = command.ParameterCount;
-            for (int i = 0; i < parameterCount; i++)
+            foreach(IDataCommandParameter param in command)
             {
-                AddParameterToStoredProcedure(retVal, command.GetParameter(i));
+                AddParameterToStoredProcedure(retVal, param);
             }
             return retVal;
         }

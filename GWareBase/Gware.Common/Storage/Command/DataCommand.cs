@@ -6,6 +6,8 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Gware.Common.DataStructures;
+using System.Collections;
 
 namespace Gware.Common.Storage.Command
 {
@@ -18,7 +20,7 @@ namespace Gware.Common.Storage.Command
         private AuthenticationToken m_token;
         private bool m_cache;
         private List<IDataCommand> m_recacheCommands = new List<IDataCommand>();
-        private List<IDataCommandParameter> m_parameters = new List<IDataCommandParameter>();
+        private Dictionary<string,IDataCommandParameter> m_parameters = new Dictionary<string, IDataCommandParameter>();
 
 
         public string CommandMethod
@@ -46,7 +48,6 @@ namespace Gware.Common.Storage.Command
                 m_exception = value;
             }
         }
-
         public bool Success
         {
             get
@@ -73,7 +74,6 @@ namespace Gware.Common.Storage.Command
                 return ReCacheCommands.Count > 0;
             }
         }
-
         public bool Cache
         {
             get
@@ -85,12 +85,19 @@ namespace Gware.Common.Storage.Command
                 m_cache = value;
             }
         }
-
         public List<IDataCommand> ReCacheCommands
         {
             get
             {
                 return m_recacheCommands;
+            }
+        }
+
+        public IDataCommandParameter this[string name]
+        {
+            get
+            {
+                return GetParameter(name);
             }
         }
 
@@ -125,9 +132,10 @@ namespace Gware.Common.Storage.Command
         }
         public IDataCommandParameter AddParameter(IDataCommandParameter param)
         {
-            if (GetParameter(param.Name) == null)
+            string nameLower = param.Name.ToLower();
+            if (GetParameter(nameLower) == null)
             {
-                m_parameters.Add(param);
+                m_parameters.Set(nameLower, param);
                 return param;
             }
             else
@@ -149,12 +157,7 @@ namespace Gware.Common.Storage.Command
         {
             return AddParameter(new DataCommandParameter(name, null, dataType, anyValueInCache));
         }
-
-        public object GetParameterValue(int index)
-        {
-            return GetParameter(index).Value;
-        }
-
+        
         public object GetParameterValue(string name)
         {
             return GetParameter(name).Value;
@@ -162,87 +165,14 @@ namespace Gware.Common.Storage.Command
 
         public IDataCommandParameter GetParameter(string name)
         {
-            IDataCommandParameter retVal = null;
-            string loweredName = name.ToLower();
-            for (int i = 0; i < m_parameters.Count; i++)
-            {
-                if (m_parameters[i].Name.ToLower() == loweredName)
-                {
-                    retVal = m_parameters[i];
-                    break;
-                }
-            }
-
-            return retVal;
+            return m_parameters.Get(name);
         }
-
-        public IDataCommandParameter GetParameter(int index)
-        {
-            return m_parameters[index];
-        }
-
+        
         public void SetParameter(string name, object value)
         {
             GetParameter(name).Value = value;
         }
-
-        public override bool Equals(object obj)
-        {
-            if(obj is DataCommand)
-            {
-                return Equals(obj as DataCommand);
-            }
-            return base.Equals(obj);
-        }
-
-        public bool Equals(DataCommand val)
-        {
-            bool retVal = Name.Equals(val.Name) && CommandMethod.Equals(val.CommandMethod);
-            if (retVal)
-            {
-                retVal = m_parameters.Count == val.m_parameters.Count;
-                if (retVal)
-                {
-                    for (int i = 0; i < m_parameters.Count; i++)
-                    {
-                        retVal = m_parameters[i].Equals(val.m_parameters[i]);
-                        if (!retVal)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            return retVal;
-        }
-
-        public override string ToString()
-        {
-            return ToString(false);
-        }
-
-        public string ToString(bool cache)
-        {
-            StringBuilder cacheString = new StringBuilder();
-            cacheString.AppendFormat("{0}:{1}?", Name, CommandMethod);
-            for (int i = 0; i < m_parameters.Count; i++)
-            {
-                IDataCommandParameter param = m_parameters[i];
-                cacheString.Append(param.ToString(cache));
-            }
-            return cacheString.ToString();
-        }
-
-        public override int GetHashCode()
-        {
-            return GetHashCode(false);
-        }
-
-        public int GetHashCode(bool cache)
-        {
-            return ToString(cache).GetHashCode();
-        }
-
+     
         public void AddReCacheCommand(IDataCommand command)
         {
             m_recacheCommands.Add(command);
@@ -253,6 +183,17 @@ namespace Gware.Common.Storage.Command
             m_recacheCommands.AddRange(commands);
         }
 
-        
+        public IEnumerator<IDataCommandParameter> GetEnumerator()
+        {
+            foreach(string key in m_parameters.Keys)
+            {
+                yield return m_parameters[key];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }
