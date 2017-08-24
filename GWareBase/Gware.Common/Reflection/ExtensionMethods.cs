@@ -1,6 +1,7 @@
 ﻿using Gware.Common.Serialisation;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,31 +13,11 @@ namespace Gware.Common.Reflection
     {
         public delegate void ReflectionPropertyAction(object performOn, PropertyInfo property);
 
-        public static object GetPropertyValue(string propertyType, string propertyValue)
+        public static object GetPropertyValue(Type propertyType, string propertyValue)
         {
-            if (propertyType.Equals(typeof(String).Name))
+            if (propertyType.IsAssignableFrom(typeof(IConvertible)))
             {
-                return propertyValue;
-            }
-            else if (propertyType.Equals(typeof(Int16).Name))
-            {
-                return Convert.ToInt16(propertyValue);
-            }
-            else if (propertyType.Equals(typeof(Boolean).Name))
-            {
-                return Convert.ToBoolean(propertyValue);
-            }
-            else if (propertyType.Equals(typeof(DateTime).Name))
-            {
-                return Convert.ToDateTime(propertyValue);
-            }
-            else if (propertyType.Equals(typeof(Int64).Name))
-            {
-                return Convert.ToInt64(propertyValue);
-            }
-            else if (propertyType.Equals(typeof(Int32).Name))
-            {
-                return Convert.ToInt32(propertyValue);
+                return (propertyType as IConvertible).ToType(propertyType, CultureInfo.CurrentCulture);
             }
             return null;
         }
@@ -55,7 +36,7 @@ namespace Gware.Common.Reflection
             {
                 if (property.Name.Equals(propertyName))
                 {
-                    object value = GetPropertyValue(property.GetType().Name, valueSetTo);
+                    object value = GetPropertyValue(property.GetType(), valueSetTo);
                     if (value != null)
                         property.SetValue(setOn, value);
                 }

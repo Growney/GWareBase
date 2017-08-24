@@ -95,6 +95,11 @@ namespace Gware.Common.DataStructures
             return retVal;
         }
 
+        public bool Contains(T item)
+        {
+            return m_start.CompareTo(item) <= 0 && m_end.CompareTo(item) >= 0;
+        }
+
         public bool Overlaps(T start, T end)
         {
             return Overlaps(new Range<T>(start, end));
@@ -103,6 +108,11 @@ namespace Gware.Common.DataStructures
         public bool Overlaps(Range<T> val)
         {
             return HelperMethods.Overlap<T>(ReverseStart, ReverseEnd, val.ReverseStart, val.ReverseEnd);
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0} - {1}", Start.ToString(), End.ToString());
         }
     }
 }

@@ -24,5 +24,10 @@ namespace Gware.Common.Storage.Adapter
         {
             return m_row.GetData(fieldName, defaultValue);
         }
+
+        public override void SetValue(string field, IConvertible value)
+        {
+            m_row[field] = value;
+        }
     }
 }

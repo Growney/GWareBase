@@ -89,7 +89,6 @@
     <Compile Include="DataStructures\HashedDictionary.cs" />
     <Compile Include="DataStructures\IHashedDictionary.cs" />
     <Compile Include="DataStructures\LoginResult.cs" />
-    <Compile Include="DataStructures\MultiKeyTree.cs" />
     <Compile Include="Data\BufferReader.cs" />
     <Compile Include="Data\BufferWriter.cs" />
     <Compile Include="Data\DataBuffer.cs" />
@@ -147,6 +146,7 @@
     <Compile Include="Storage\Adapter\XmlDataAdapter.cs" />
     <Compile Include="Storage\Command\Interface\IDataCommandParameter.cs" />
     <Compile Include="Storage\Command\MSSQLCommandController.cs" />
+    <Compile Include="Storage\Command\XmlCommandController.cs" />
     <Compile Include="Storage\LoadedFromAdapterBase.cs" />
     <Compile Include="Storage\LoadedFromAdapterValue.cs" />
     <Compile Include="Storage\MSSQLStoredObjectCommandController.cs" />

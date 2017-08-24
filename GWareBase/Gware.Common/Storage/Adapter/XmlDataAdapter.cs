@@ -25,5 +25,10 @@ namespace Gware.Common.Storage.Adapter
         {
             return Encoding.Unicode.GetBytes(GetValue(fieldName, Encoding.Unicode.GetString(defaultValue)));
         }
+
+        public override void SetValue(string field, IConvertible value)
+        {
+            m_node.Set(field, value.ToString());
+        }
     }
 }

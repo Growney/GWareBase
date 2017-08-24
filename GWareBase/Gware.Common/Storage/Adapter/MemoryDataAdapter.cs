@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,6 @@ namespace Gware.Common.Storage.Adapter
         {
             m_object = item;
         }
-
         public override string GetValue(string fieldName, string defaultValue)
         {
             try
@@ -27,7 +27,6 @@ namespace Gware.Common.Storage.Adapter
             }
             
         }
-
         public override byte[] GetValue(string fieldName, byte[] defaultValue)
         {
             try
@@ -38,6 +37,10 @@ namespace Gware.Common.Storage.Adapter
             {
                 return defaultValue;
             }
+        }
+        public override void SetValue(string field, IConvertible value)
+        {
+            m_object.GetType().FindAndSetProperty(field, value.ToString());
         }
     }
 }

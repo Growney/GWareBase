@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8439DC6E-68E3-4F91-ACC3-AB44D654C687}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Gware.Gaming.Common</RootNamespace>
+    <AssemblyName>Gware.Gaming.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Build\Debug\Any CPU\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Gware.Common">
+      <HintPath>..\Build\Debug\Any CPU\Gware.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Application\GameClientApplicationBase.cs" />
+    <Compile Include="LargeVector2.cs" />
+    <Compile Include="Noise\CellularGenerator.cs" />
+    <Compile Include="Noise\Enumeration.cs" />
+    <Compile Include="Noise\ImplicitAutoCorrect.cs" />
+    <Compile Include="Noise\ImplicitBasisFunction.cs" />
+    <Compile Include="Noise\ImplicitBias.cs" />
+    <Compile Include="Noise\ImplicitBlend.cs" />
+    <Compile Include="Noise\ImplicitBrightContrast.cs" />
+    <Compile Include="Noise\ImplicitCache.cs" />
+    <Compile Include="Noise\ImplicitCeiling.cs" />
+    <Compile Include="Noise\ImplicitCellular.cs" />
+    <Compile Include="Noise\ImplicitClamp.cs" />
+    <Compile Include="Noise\ImplicitCombiner.cs" />
+    <Compile Include="Noise\ImplicitConstant.cs" />
+    <Compile Include="Noise\ImplicitCos.cs" />
+    <Compile Include="Noise\ImplicitFloor.cs" />
+    <Compile Include="Noise\ImplicitFractal.cs" />
+    <Compile Include="Noise\ImplicitGain.cs" />
+    <Compile Include="Noise\ImplicitGradient.cs" />
+    <Compile Include="Noise\ImplicitInvert.cs" />
+    <Compile Include="Noise\ImplicitLog.cs" />
+    <Compile Include="Noise\ImplicitModuleBase.cs" />
+    <Compile Include="Noise\ImplicitPow.cs" />
+    <Compile Include="Noise\ImplicitRotateDomain.cs" />
+    <Compile Include="Noise\ImplicitScaleDomain.cs" />
+    <Compile Include="Noise\ImplicitScaleOffset.cs" />
+    <Compile Include="Noise\ImplicitSelect.cs" />
+    <Compile Include="Noise\ImplicitSin.cs" />
+    <Compile Include="Noise\ImplicitSphere.cs" />
+    <Compile Include="Noise\ImplicitTan.cs" />
+    <Compile Include="Noise\ImplicitTiers.cs" />
+    <Compile Include="Noise\ImplicitTranslateDomain.cs" />
+    <Compile Include="Noise\ImplicitXmlChain.cs" />
+    <Compile Include="Noise\Mapping.cs" />
+    <Compile Include="Noise\MappingRanges.cs" />
+    <Compile Include="Noise\Noise.cs" />
+    <Compile Include="Noise\NoiseGenerator.cs" />
+    <Compile Include="Noise\NoiseLookupTable.cs" />
+    <Compile Include="Noise\Utilities.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="World\WorldChunk.cs" />
+    <Compile Include="World\WorldGenerator.cs" />
+    <Compile Include="World\WorldSegmentGenerator.cs" />
+    <Compile Include="World\WorldTile.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

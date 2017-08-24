@@ -12,8 +12,9 @@ namespace Gware.Common.Threading
         private const int c_sleepTime = 50;
         private const int c_stopTimeout = 500;
 
+        private bool m_running;
+        private int m_sleepTime;
         private bool m_stop;
-        private Thread m_workerThread;
         private EventWaitHandle m_pauseEvent;
         private EventWaitHandle m_stoppedEvent;
         private DateTime m_lastThreadRun;
@@ -48,21 +49,43 @@ namespace Gware.Common.Threading
                 return m_stop;
             }
         }
-        public ThreadBase()
+
+        public bool IsRunning
         {
+            get
+            {
+                return m_running;
+            }
+        }
+
+        public ThreadBase()
+            :this(c_sleepTime)
+        {
+
+        }
+
+        public ThreadBase(int sleepTime)
+        {
+            m_sleepTime = sleepTime;
             m_stop = false;
-            m_workerThread = new Thread(new ThreadStart(DoWork));
-            m_workerThread.Name = this.GetType().Name;
             m_pauseEvent = new EventWaitHandle(true, EventResetMode.ManualReset);
             m_stoppedEvent = new EventWaitHandle(false, EventResetMode.ManualReset);
         }
 
-        private void DoWork()
+        private void DoWork(object threadContext)
         {
-            OnThreadInit();
-            ExecuteEntireThreadCycle();
-            OnThreadExit();
-            m_stoppedEvent.Set();
+            try
+            {
+                OnThreadInit();
+                ExecuteEntireThreadCycle();
+                OnThreadExit();
+            }
+            finally
+            {
+                m_stoppedEvent.Set();
+                m_running = false;
+            }
+            
         }
         protected virtual void ExecuteSingleThreadCycle()
         {
@@ -84,7 +107,7 @@ namespace Gware.Common.Threading
                 {
                     m_lastThreadRun = DateTime.UtcNow;
                     ExecuteSingleThreadCycle();
-                    Thread.Sleep(c_sleepTime);
+                    Thread.Sleep(m_sleepTime);
                 }
             }
         }
@@ -106,8 +129,9 @@ namespace Gware.Common.Threading
         }
         public virtual void Start()
         {
+            m_running = true;
             m_stop = false;
-            m_workerThread.Start();
+            ThreadPool.QueueUserWorkItem(DoWork);
         }
         public virtual bool Stop(int timeout = c_stopTimeout)
         {
@@ -115,6 +139,5 @@ namespace Gware.Common.Threading
             Resume();
             return m_stoppedEvent.WaitOne(timeout);
         }
-
     }
 }
