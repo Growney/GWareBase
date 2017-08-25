@@ -9,6 +9,8 @@ namespace Gware.Common.Storage.Adapter
 {
     public abstract class DataAdapterBase : IDataAdapter
     {
+        
+
         public abstract string GetValue(string fieldName, string defaultValue);
         public abstract byte[] GetValue(string fieldName, byte[] defaultValue);
 
@@ -55,5 +57,6 @@ namespace Gware.Common.Storage.Adapter
         }
         
         public abstract void SetValue(string field, IConvertible value);
+        public abstract IEnumerable<string> GetFields();
     }
 }

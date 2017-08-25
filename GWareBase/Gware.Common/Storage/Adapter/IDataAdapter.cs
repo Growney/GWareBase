@@ -8,6 +8,8 @@ namespace Gware.Common.Storage.Adapter
 {
     public interface IDataAdapter
     {
+        IEnumerable<string> GetFields();
+
         T GetValue<T>(string v, T t) where T : IConvertible;
         byte[] GetValue(string field, byte[] defaultValue);
 

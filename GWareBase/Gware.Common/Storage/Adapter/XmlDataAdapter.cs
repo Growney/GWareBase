@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.XML;
+using System.Xml;
 
 namespace Gware.Common.Storage.Adapter
 {
@@ -29,6 +30,27 @@ namespace Gware.Common.Storage.Adapter
         public override void SetValue(string field, IConvertible value)
         {
             m_node.Set(field, value.ToString());
+        }
+
+        public override IEnumerable<string> GetFields()
+        {
+            List<string> retVal = new List<string>();
+
+            XmlNodeList nodes = m_node.ChildNodes;
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                XmlNode child = nodes[i];
+                if(child.ParentNode == m_node)
+                {
+                    if (!retVal.Contains(child.Name))
+                    {
+                        retVal.Add(child.Name);
+                    }
+                }
+            }
+
+            return retVal;
         }
     }
 }

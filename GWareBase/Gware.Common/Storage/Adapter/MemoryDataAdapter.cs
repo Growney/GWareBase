@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,12 +10,27 @@ namespace Gware.Common.Storage.Adapter
 {
     public class MemoryDataAdapter : DataAdapterBase
     {
+        
+
         private object m_object; 
 
         public MemoryDataAdapter(object item)
         {
             m_object = item;
         }
+
+        public override IEnumerable<string> GetFields()
+        {
+            List<string> retVal = new List<string>();
+
+            m_object.IteratePropertiesPerformAction((object performOn, PropertyInfo property) =>
+            {
+                retVal.Add(property.Name);
+            });
+
+            return retVal;
+        }
+
         public override string GetValue(string fieldName, string defaultValue)
         {
             try
@@ -42,5 +58,7 @@ namespace Gware.Common.Storage.Adapter
         {
             m_object.GetType().FindAndSetProperty(field, value.ToString());
         }
+
+        
     }
 }
