@@ -9,30 +9,14 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Networking.FramedConnection
 {
-    public enum ClientServerConnectionType
-    {
-        UDP,
-        TCP
-    }
     public class FramedServer
     {
         private INetServer m_server;
         private ConnectionFramer m_framer;
 
-        public FramedServer(int port, ClientServerConnectionType type,bool useNetworkOrder)
+        public FramedServer(INetServer server,bool useNetworkOrder)
         {
-            switch (type)
-            {
-                case ClientServerConnectionType.UDP:
-                    m_server = new UdpNetClient(port);
-                    break;
-                case ClientServerConnectionType.TCP:
-                    m_server = new TcpNetServer(port);
-                    break;
-                default:
-                    throw new ArgumentException("Unsupported Client server type");
-            }
-
+            m_server = server;
             m_framer = new ConnectionFramer(m_server, useNetworkOrder);
             m_server.OnClientConnected += OnClientConnected;
             m_framer.OnDataCompleted += OnDataCompleted;

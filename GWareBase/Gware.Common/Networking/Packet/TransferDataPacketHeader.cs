@@ -36,7 +36,7 @@ namespace Gware.Common.Networking.Packet
             set { m_dataCRC = value; }
         }
 
-        public DateTime DateTimeObject
+        public DateTime DateTime
         {
             get 
             { 

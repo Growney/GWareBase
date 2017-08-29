@@ -64,13 +64,13 @@ namespace Gware.Common.Networking.Connection
         }
         public bool Send(string address, int port, Packet.TransferDataPacket data)
         {
-            data.Header.DateTimeObject = DateTime.UtcNow;
+            data.Header.DateTime = DateTime.UtcNow;
             return Send(address, port, data.ToBytes());
         }
 
         public bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
         {
-            data.Header.DateTimeObject = DateTime.UtcNow;
+            data.Header.DateTime = DateTime.UtcNow;
             return Send(sendTo, data.ToBytes());
         }
 
@@ -121,7 +121,7 @@ namespace Gware.Common.Networking.Connection
 
         public bool Send(Packet.TransferDataPacket data)
         {
-            data.Header.DateTimeObject = DateTime.UtcNow;
+            data.Header.DateTime = DateTime.UtcNow;
             return Send(data.ToBytes());
         }
         public void StartListening()
