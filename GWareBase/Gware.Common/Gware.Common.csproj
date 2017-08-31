@@ -111,9 +111,11 @@
     <Compile Include="Networking\Connection\IDataReceiver.cs" />
     <Compile Include="Networking\Connection\INetClient.cs" />
     <Compile Include="Networking\Connection\INetServer.cs" />
+    <Compile Include="Networking\Connection\KeyedUdpNetClient.cs" />
     <Compile Include="Networking\Connection\TcpNetClient.cs" />
     <Compile Include="Networking\Connection\TcpNetServer.cs" />
-    <Compile Include="Networking\Connection\UdpNetClient.cs" />
+    <Compile Include="Networking\Connection\UdpConnection.cs" />
+    <Compile Include="Networking\Connection\UdpNetSender.cs" />
     <Compile Include="Networking\FramedConnection\ConnectionFramer.cs" />
     <Compile Include="Networking\FramedConnection\FramedClient.cs" />
     <Compile Include="Networking\FramedConnection\FramedServer.cs" />

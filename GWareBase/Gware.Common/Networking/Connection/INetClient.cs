@@ -8,10 +8,8 @@ using Gware.Common.Networking.Packet;
 
 namespace Gware.Common.Networking.Connection
 {
-    public interface INetClient
+    public interface INetClient : IDataReceiver
     {
-        event Gware.Common.Delegates.SingleResult<IPEndPoint, byte[]> OnDataRecevied;
-
         bool Connected
         {
             get;
@@ -26,7 +24,6 @@ namespace Gware.Common.Networking.Connection
         bool Send(byte[] data);
         bool Send(TransferDataPacket data);
 
-        void StartListening();
-        void StopListening();
+        
     }
 }

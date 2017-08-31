@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Delegates;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,6 +10,9 @@ namespace Gware.Common.Networking.Connection
 {
     public interface IDataReceiver
     {
-        event Gware.Common.Delegates.SingleResult<IPEndPoint, byte[]> OnDataRecevied;
+        event SingleResult<IPEndPoint, byte[]> OnDataRecevied;
+
+        void StartListening();
+        void StopListening();
     }
 }
