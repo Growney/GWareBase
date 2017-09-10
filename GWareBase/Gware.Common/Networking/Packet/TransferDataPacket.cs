@@ -59,7 +59,14 @@ namespace Gware.Common.Networking.Packet
             m_data = reader.ReadBytesAt(m_header.HeaderLength, m_header.DataLength);
         }
 
-        public byte[] ToBytes()
+        public void FromBuffer(BufferReader reader)
+        {
+            m_header.FromBuffer(reader);
+
+            m_data = reader.ReadBytesAt(m_header.HeaderLength, m_header.DataLength);
+        }
+
+        public void ToBuffer(BufferWriter writer)
         {
             BufferWriter preCRCWriter = new BufferWriter(m_useNetworkOrder);
             if (m_data != null)
@@ -72,15 +79,21 @@ namespace Gware.Common.Networking.Packet
             byte[] bufferPreCRC = preCRCWriter.GetBuffer();
 
             uint crc = 0;
-            GenerateCRC.GenerateCRC32(bufferPreCRC, bufferPreCRC.Length,ref crc);
+            GenerateCRC.GenerateCRC32(bufferPreCRC, bufferPreCRC.Length, ref crc);
 
             m_header.PacketCRC = crc;
+            
+            writer.WriteBytes(m_header.ToBytes());
+            writer.WriteBytes(m_data);
 
-            BufferWriter postCRCWriter = new BufferWriter(m_useNetworkOrder);
-            postCRCWriter.WriteBytes(m_header.ToBytes());
-            postCRCWriter.WriteBytes(m_data);
+        }
 
-            return postCRCWriter.GetBuffer();
+        public byte[] ToBytes()
+        {
+            BufferWriter writer = new BufferWriter(m_useNetworkOrder);
+            ToBuffer(writer);
+
+            return writer.GetBuffer();
         }
 
         public static List<TransferDataPacket> GetPackets(byte[] data)

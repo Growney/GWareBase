@@ -9,18 +9,14 @@ namespace Gware.Common.Networking.Packet
 {
     public class TransferDataPacketHeader
     {
-
-        public static readonly int SizeRequiredForDataLength = sizeof(ushort) + sizeof(ushort);
-        public static readonly int DataLengthLocation = sizeof(ushort);
-        public static readonly int HeaderLengthLocation = 0;
-
         private bool m_useNetworkOrder;
         private ushort m_headerLength;
         private ushort m_packetNumber;
         private ushort m_packetTotal;
         private ushort m_dataLength;
 
-        private long m_dateTimeTicks;
+        private int m_sequence;
+        private uint m_ack;
 
         private uint m_dataCRC;
         private uint m_packetCRC;
@@ -30,29 +26,24 @@ namespace Gware.Common.Networking.Packet
             get { return m_packetCRC; }
             set { m_packetCRC = value; }
         }
+
         public uint DataCRC
         {
             get { return m_dataCRC; }
             set { m_dataCRC = value; }
         }
 
-        public DateTime DateTime
+        public uint Ack
         {
-            get 
-            { 
-                return new DateTime(m_dateTimeTicks, DateTimeKind.Utc); 
-            }
-            set
-            {   
-                m_dateTimeTicks = value.ToUniversalTime().Ticks;
-            }
+            get { return m_ack; }
+            set { m_ack = value; }
         }
 
-        public long DateTimeTicks
+        public int Sequence
         {
-            get { return m_dateTimeTicks; }
-            set { m_dateTimeTicks = value; }
-        }
+            get { return m_sequence; }
+            set { m_sequence = value; }
+        } 
 
         public ushort DataLength
         {
@@ -84,38 +75,49 @@ namespace Gware.Common.Networking.Packet
             m_useNetworkOrder = useNetworkOrder;
         }
 
+        public void FromBuffer(BufferReader reader)
+        {
+            HeaderLength = reader.ReadUInt16();//The header length and the data length must remain at the start of the packet header
+            DataLength = reader.ReadUInt16();
+            PacketNumber = reader.ReadUInt16();
+            PacketTotal = reader.ReadUInt16();
+
+            Ack = reader.ReadUInt32();
+            Sequence = reader.ReadInt32();
+
+            PacketCRC = reader.ReadUInt32();
+            DataCRC = reader.ReadUInt32();
+        }
+
         public void FromBytes(byte[] bytes)
         {
             BufferReader reader = new BufferReader(bytes);
 
-            HeaderLength = (ushort)reader.ReadInt16();//The header length and the data length must remain at the start of the packet header
-            DataLength = (ushort)reader.ReadInt16();
-            PacketNumber = (ushort)reader.ReadInt16();
-            PacketTotal = (ushort)reader.ReadInt16();
+            FromBuffer(reader);
+        }
 
-            DateTimeTicks = reader.ReadInt64();
+        public void ToBuffer(BufferWriter writer)
+        {
+            writer.WriteInt16(0);//The header length and the data length must remain at the start of the packet header
+            writer.WriteInt16(DataLength);
+            writer.WriteInt16(PacketNumber);
+            writer.WriteInt16(PacketTotal);
 
-            PacketCRC = (uint)reader.ReadInt32();
-            DataCRC = (uint)reader.ReadInt32();
+            writer.WriteInt32((int)Ack);
+            writer.WriteInt32(Sequence);
 
+            writer.WriteInt32((int)PacketCRC);
+            writer.WriteInt32((int)DataCRC);
+
+            byte[] retVal = writer.GetBuffer();
+            writer.WriteInt16At((short)retVal.Length, 0);
         }
 
         public byte[] ToBytes()
         {
             BufferWriter writer = new BufferWriter(m_useNetworkOrder);
 
-            writer.WriteInt16(0);//The header length and the data length must remain at the start of the packet header
-            writer.WriteInt16(DataLength);
-            writer.WriteInt16(PacketNumber);
-            writer.WriteInt16(PacketTotal);
-
-            writer.WriteInt64(DateTimeTicks);
-
-            writer.WriteInt32((int)PacketCRC);
-            writer.WriteInt32((int)DataCRC);
-
-            byte[] retVal = writer.GetBuffer();
-            writer.WriteInt16At((short)retVal.Length,0);
+            ToBuffer(writer);
 
             return writer.GetBuffer();
         }

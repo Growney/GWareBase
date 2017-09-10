@@ -15,27 +15,17 @@ namespace Gware.Common.Networking.Connection
     {
         private const int c_sleepTime = 0;
         private Queue<KeyValuePair<IPEndPoint, byte[]>> m_packetQueue = new Queue<KeyValuePair<IPEndPoint, byte[]>>();
-        private UdpClient m_baseClient;
+        private System.Net.Sockets.UdpClient m_baseClient;
         
         public UdpNetSender()
-            :base(c_sleepTime)
+            :this(0)
         {
-            m_baseClient = new UdpClient();
-        }
-        public UdpNetSender(int port,AddressFamily addrFamily)
-            : base(c_sleepTime)
-        {
-            m_baseClient = new UdpClient(port, addrFamily);
+
         }
         public UdpNetSender(int port)
             : base(c_sleepTime)
         {
-            m_baseClient = new UdpClient(port);
-        }
-        public UdpNetSender(AddressFamily addrFamily)
-            : base(c_sleepTime)
-        {
-            m_baseClient = new UdpClient(addrFamily);
+            m_baseClient = new System.Net.Sockets.UdpClient(port);
         }
 
         protected override void ExecuteSingleThreadCycle()
@@ -76,15 +66,13 @@ namespace Gware.Common.Networking.Connection
         {
             return (m_baseClient.Send(data, data.Length, sendTo) == data.Length);
         }
-        public bool Send(string address, int port, Packet.TransferDataPacket data)
+        public virtual bool Send(string address, int port, Packet.TransferDataPacket data)
         {
-            data.Header.DateTime = DateTime.UtcNow;
             return Send(address, port, data.ToBytes());
         }
 
-        public bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
+        public virtual bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
         {
-            data.Header.DateTime = DateTime.UtcNow;
             return Send(sendTo, data.ToBytes());
         }
         

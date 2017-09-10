@@ -15,12 +15,19 @@ namespace Gware.Common.Networking.Connection
         private readonly int c_key;
 
         public KeyedUdpNetClient()
-            :this(Assembly.GetEntryAssembly().GetTitle().GetHashCode())
+            :this(0)
         {
 
         }
 
-        public KeyedUdpNetClient(int key)
+        public KeyedUdpNetClient(int port)
+            :this(port, Assembly.GetEntryAssembly().GetTitle().GetHashCode())
+        {
+
+        }
+
+        public KeyedUdpNetClient(int port, int key)
+            :base(port)
         {
             c_key = key;
         }
