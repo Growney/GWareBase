@@ -107,6 +107,7 @@
     <Compile Include="Networking\AuthenticatedConnection\AuthenticatedClient.cs" />
     <Compile Include="Networking\AuthenticatedConnection\AuthenticatedCommand.cs" />
     <Compile Include="Networking\AuthenticatedConnection\AuthenticationServer.cs" />
+    <Compile Include="Networking\Connection\ConnectionTracker.cs" />
     <Compile Include="Networking\Connection\ExtensionMethods.cs" />
     <Compile Include="Networking\Connection\IDataReceiver.cs" />
     <Compile Include="Networking\Connection\INetClient.cs" />
