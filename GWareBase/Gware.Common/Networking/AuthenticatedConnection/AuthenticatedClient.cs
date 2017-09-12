@@ -1,4 +1,5 @@
-﻿using Gware.Common.Networking.FramedConnection;
+﻿using Gware.Common.Networking.Connection;
+using Gware.Common.Networking.FramedConnection;
 using Gware.Common.Threading;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,8 @@ namespace Gware.Common.Networking.AuthenticatedConnection
         private string m_token;
         private bool m_useNetworkOrder;
         private Encoding m_encoding;
-        public AuthenticatedClient(ClientServerConnectionType type,bool useNetworkOrder,Encoding encoding)
-            : base(type,useNetworkOrder)
+        public AuthenticatedClient(INetClient client,bool useNetworkOrder,Encoding encoding)
+            : base(client,useNetworkOrder)
         {
             m_useNetworkOrder = useNetworkOrder;
             m_encoding = encoding;

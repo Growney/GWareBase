@@ -119,7 +119,6 @@ namespace Gware.Common.Networking.Connection
         }
         public bool Send(Packet.TransferDataPacket data)
         {
-            data.Header.DateTime = DateTime.UtcNow;
             return Send(data.ToBytes());
         }
         public void Dispose()

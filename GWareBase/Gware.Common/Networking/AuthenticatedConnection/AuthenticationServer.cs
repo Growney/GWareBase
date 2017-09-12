@@ -40,12 +40,8 @@ namespace Gware.Common.Networking.AuthenticatedConnection
                 m_encoding = value;
             }
         }
-
-        public AuthenticationServer(Encoding encoding,Random random,bool useNetworkOrder,int port, ClientServerConnectionType type) : base(port, type,useNetworkOrder)
-        {
-            m_useNetworkOrder = useNetworkOrder;
-        }
-        public AuthenticationServer(bool useNetworkOrder,int port,ClientServerConnectionType type) :base(port,type,useNetworkOrder)
+        
+        public AuthenticationServer(INetServer server,bool useNetworkOrder) :base(server, useNetworkOrder)
         {
             m_useNetworkOrder = useNetworkOrder;
         }

@@ -9,13 +9,17 @@ namespace Gware.Common.Networking.Packet
 {
     public class TransferDataPacketHeader
     {
+        public static readonly int SizeRequiredForDataLength = sizeof(ushort) + sizeof(ushort);
+        public static readonly int DataLengthLocation = sizeof(ushort);
+        public static readonly int HeaderLengthLocation = 0;
+
         private bool m_useNetworkOrder;
         private ushort m_headerLength;
         private ushort m_packetNumber;
         private ushort m_packetTotal;
         private ushort m_dataLength;
 
-        private int m_sequence;
+        private ushort m_sequence;
         private uint m_ack;
 
         private uint m_dataCRC;
@@ -39,7 +43,7 @@ namespace Gware.Common.Networking.Packet
             set { m_ack = value; }
         }
 
-        public int Sequence
+        public ushort Sequence
         {
             get { return m_sequence; }
             set { m_sequence = value; }
@@ -83,7 +87,7 @@ namespace Gware.Common.Networking.Packet
             PacketTotal = reader.ReadUInt16();
 
             Ack = reader.ReadUInt32();
-            Sequence = reader.ReadInt32();
+            Sequence = reader.ReadUInt16();
 
             PacketCRC = reader.ReadUInt32();
             DataCRC = reader.ReadUInt32();
@@ -104,10 +108,10 @@ namespace Gware.Common.Networking.Packet
             writer.WriteInt16(PacketTotal);
 
             writer.WriteInt32((int)Ack);
-            writer.WriteInt32(Sequence);
+            writer.WriteInt16(Sequence);
 
-            writer.WriteInt32((int)PacketCRC);
-            writer.WriteInt32((int)DataCRC);
+            writer.WriteUInt32(PacketCRC);
+            writer.WriteUInt32(DataCRC);
 
             byte[] retVal = writer.GetBuffer();
             writer.WriteInt16At((short)retVal.Length, 0);

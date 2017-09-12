@@ -134,13 +134,11 @@ namespace Gware.Common.Networking.Connection
         }
         public bool Send(string address, int port, Packet.TransferDataPacket data)
         {
-            data.Header.DateTime = DateTime.UtcNow;
             return Send(address, port, data.ToBytes());
         }
 
         public bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
         {
-            data.Header.DateTime = DateTime.UtcNow;
             return Send(sendTo, data.ToBytes());
         }
         public int Broadcast(byte[] data)

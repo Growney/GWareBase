@@ -186,6 +186,10 @@ namespace Gware.Common.Data
             WriteToBufferPos(BitConverter.GetBytes(HostToNetworkOrder(Item)), 0, sizeof(long));
         }
 
+        public void WriteUInt32(uint item)
+        {
+            WriteToBufferPos(BitConverter.GetBytes(HostToNetworkOrder(unchecked((int)item))), 0, sizeof(uint));
+        }
         public void WriteInt32(int Item)
         {
             WriteToBufferPos(BitConverter.GetBytes(HostToNetworkOrder(Item)), 0, sizeof(int));
