@@ -7,31 +7,55 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Networking.Connection
 {
-    public struct ConnectionTracker
+    public class ConnectionTracker
     {
         private const ushort c_halfSequenceMax = ushort.MaxValue / 2;
-        public ushort RemoteSequence { get; private set; }
+        public ushort Sequence { get; private set; }
         public uint Ack { get; private set; }
         public IPEndPoint EndPoint { get; private set; }
 
         public ConnectionTracker(IPEndPoint endPoint,ushort sequenceStart)
         {
-            RemoteSequence = sequenceStart;
-            Ack = 1;
+            Sequence = sequenceStart;
+            Ack = 0;
             EndPoint = endPoint;
         }
 
         public ConnectionTracker(IPEndPoint endPoint)
         {
-            RemoteSequence = 0;
+            Sequence = 0;
             Ack = 0;
             EndPoint = endPoint;
         }
 
+        public ConnectionTracker()
+        {
+            Sequence = 0;
+            Ack = 0;
+            EndPoint = null;
+        }
+
+        public ushort GetNextSequence()
+        {
+            ushort retVal = unchecked((ushort)(Sequence + 1));
+            Ack  = Ack << 1;
+            Sequence = retVal;
+            return retVal;
+        }
+
+        public void AckSequence(ushort sequence,uint ack)
+        {
+            int difference = SequenceDifference(Sequence, sequence,out bool greater);
+            if(difference  == 0 || (difference < sizeof(uint) * 8 && greater))
+            {
+                Ack |= ack << difference;
+            }
+        }
+
         public void UpdateRemoteSequence(ushort remoteSequence)
         {
-            bool greaterSequence = IsSequenceGreaterThan(remoteSequence, RemoteSequence, out bool overflow);
-            int difference = SequenceDifference(remoteSequence, RemoteSequence,greaterSequence, overflow);
+            bool greaterSequence = IsSequenceGreaterThan(remoteSequence, Sequence, out bool overflow);
+            int difference = SequenceDifference(remoteSequence, Sequence,greaterSequence, overflow);
             if (!greaterSequence)
             {
                 if (difference < (sizeof(uint) * 8))
@@ -52,10 +76,16 @@ namespace Gware.Common.Networking.Connection
                 
                 Ack |= 0x01;
 
-                RemoteSequence = remoteSequence;
+                Sequence = remoteSequence;
             }
         }
-        private int SequenceDifference(ushort nextValue, ushort previousValue,bool greater,bool overflow)
+        private static int SequenceDifference(ushort next,ushort previousValue,out bool greaterSequence)
+        {
+            greaterSequence = IsSequenceGreaterThan(next, previousValue, out bool overflow);
+            return SequenceDifference(next, previousValue, greaterSequence, overflow);
+        }
+
+        private static int SequenceDifference(ushort nextValue, ushort previousValue,bool greater,bool overflow)
         {
             ushort maxValue = Math.Max(previousValue, nextValue);
             ushort minValue = Math.Min(previousValue, nextValue);
@@ -70,7 +100,7 @@ namespace Gware.Common.Networking.Connection
             }          
             
         }
-        private bool IsSequenceGreaterThan(ushort nextValue, ushort previousValue, out bool overflow)
+        private static bool IsSequenceGreaterThan(ushort nextValue, ushort previousValue, out bool overflow)
         {
             bool forwardOverflow = (nextValue < previousValue) && (previousValue - nextValue > c_halfSequenceMax);
             overflow = ((nextValue > previousValue) && nextValue - previousValue > c_halfSequenceMax) || forwardOverflow;
