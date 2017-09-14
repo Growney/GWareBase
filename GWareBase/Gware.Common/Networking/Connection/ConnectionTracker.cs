@@ -9,44 +9,62 @@ namespace Gware.Common.Networking.Connection
 {
     public class ConnectionTracker
     {
+        private const uint c_uintBits = sizeof(uint) * 8;
+        private const uint c_ackLastBit = 0x8000_0000;
         private const ushort c_halfSequenceMax = ushort.MaxValue / 2;
         public ushort Sequence { get; private set; }
         public uint Ack { get; private set; }
         public IPEndPoint EndPoint { get; private set; }
+        public bool PastZeroHour { get; private set; }
 
-        public ConnectionTracker(IPEndPoint endPoint,ushort sequenceStart)
+
+        private Action<IPEndPoint, ushort> m_packetLossCallback;
+
+        public ConnectionTracker(IPEndPoint endPoint,Action<IPEndPoint,ushort> onPacketLoss, ushort sequenceStart)
         {
             Sequence = sequenceStart;
             Ack = 0;
             EndPoint = endPoint;
+            m_packetLossCallback = onPacketLoss;
         }
 
-        public ConnectionTracker(IPEndPoint endPoint)
+        public ConnectionTracker(IPEndPoint endPoint,ushort sequenceStart)
+            :this(endPoint,null,sequenceStart)
         {
-            Sequence = 0;
-            Ack = 0;
-            EndPoint = endPoint;
+        }
+        public ConnectionTracker(IPEndPoint endPoint,Action<IPEndPoint,ushort> onPacketLoss)
+            : this(endPoint,onPacketLoss, 0)
+        {
+        }
+        public ConnectionTracker(IPEndPoint endPoint)
+            : this(endPoint, 0)
+        {
         }
 
         public ConnectionTracker()
+            :this(null)
         {
-            Sequence = 0;
-            Ack = 0;
-            EndPoint = null;
+
         }
 
         public ushort GetNextSequence()
         {
+            if(PastZeroHour && (Ack & c_ackLastBit) == 0)
+            {
+                m_packetLossCallback?.Invoke(EndPoint, unchecked((ushort)(Sequence - c_uintBits)));
+            }
             ushort retVal = unchecked((ushort)(Sequence + 1));
             Ack  = Ack << 1;
             Sequence = retVal;
+            PastZeroHour |= retVal > c_uintBits;
+
             return retVal;
         }
 
         public void AckSequence(ushort sequence,uint ack)
         {
             int difference = SequenceDifference(Sequence, sequence,out bool greater);
-            if(difference  == 0 || (difference < sizeof(uint) * 8 && greater))
+            if(difference  == 0 || (difference < c_uintBits && greater))
             {
                 Ack |= ack << difference;
             }
@@ -58,14 +76,14 @@ namespace Gware.Common.Networking.Connection
             int difference = SequenceDifference(remoteSequence, Sequence,greaterSequence, overflow);
             if (!greaterSequence)
             {
-                if (difference < (sizeof(uint) * 8))
+                if (difference < c_uintBits)
                 {
                     Ack |= (uint)Math.Pow(2, difference);
                 }
             }
             else
             {
-                if(difference > sizeof(uint) * 8)
+                if(difference > c_uintBits)
                 {
                     Ack = 0;
                 }

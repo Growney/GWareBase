@@ -12,6 +12,7 @@ namespace Gware.Common.Networking.Connection
 {
     public class UdpServer : KeyedUdpNetClient,INetServer
     {
+        private Dictionary<IPEndPoint, ConnectionTracker> m_connectionTrackers = new Dictionary<IPEndPoint, ConnectionTracker>();
         public int ConnectedClients => throw new NotImplementedException();
 
         public UdpServer(int port, int key)
@@ -34,7 +35,6 @@ namespace Gware.Common.Networking.Connection
             TransferDataPacket packet = new TransferDataPacket();
             packet.FromBuffer(data);
             //TODO sequence checking and acking
-
 
         }
 
