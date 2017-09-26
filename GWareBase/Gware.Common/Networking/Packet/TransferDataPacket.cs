@@ -11,6 +11,7 @@ namespace Gware.Common.Networking.Packet
     {
         public const int c_maxPacketDataSize = 8192;
 
+        private uint m_localCRC;
         private bool m_useNetworkOrder;
         private TransferDataPacketHeader m_header = new TransferDataPacketHeader();
 
@@ -41,6 +42,14 @@ namespace Gware.Common.Networking.Packet
             }
         }
 
+        public bool IsValid
+        {
+            get
+            {
+                return m_localCRC == m_header.PacketCRC;
+            }
+        }
+
         public TransferDataPacket()
             :this(false)
         {
@@ -53,10 +62,8 @@ namespace Gware.Common.Networking.Packet
 
         public void FromBytes(byte[] bytes)
         {
-            m_header.FromBytes(bytes);
-
             BufferReader reader = new BufferReader(bytes);
-            m_data = reader.ReadBytesAt(m_header.HeaderLength, m_header.DataLength);
+            FromBuffer(reader);
         }
 
         public void FromBuffer(BufferReader reader)
@@ -64,6 +71,22 @@ namespace Gware.Common.Networking.Packet
             m_header.FromBuffer(reader);
 
             m_data = reader.ReadBytesAt(m_header.HeaderLength, m_header.DataLength);
+
+            GenerateLocalCRC();
+        }
+
+        private void GenerateLocalCRC()
+        {
+            BufferWriter writer = new BufferWriter(m_useNetworkOrder);
+            m_header.ToCRCBuffer(writer);
+            writer.WriteBytes(m_data);
+
+            byte[] buffer = writer.GetBuffer();
+
+            uint crc = 0;
+            GenerateCRC.GenerateCRC32(buffer, buffer.Length, ref crc);
+
+            m_localCRC = crc;
         }
 
         public void ToBuffer(BufferWriter writer)

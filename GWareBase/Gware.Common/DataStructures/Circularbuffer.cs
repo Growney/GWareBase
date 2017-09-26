@@ -6,22 +6,34 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.DataStructures
 {
-    public class Circularbuffer<T>
+    public class CircularBuffer<T>
     {
         private object m_lock = new object();
         private T[] m_buffer;
         private int m_readPointer;
         private int m_writePointer;
-        private int m_unreadBytes;
- 
-        public int UnreadBytes
+        private int m_unreadCount;
+        
+        public T this[int index]
         {
-            get { return m_unreadBytes; }
-            set { m_unreadBytes = value; }
+            get
+            {
+                return m_buffer[m_buffer.GetNextPointer(m_readPointer, index)];
+            }
+            set
+            {
+                m_buffer[m_buffer.GetNextPointer(m_readPointer, index)] = value;
+            }
+        }
+       
+        public int UnreadCount
+        {
+            get { return m_unreadCount; }
+            set { m_unreadCount = value; }
         }
 
 
-        public Circularbuffer(int bufferSize)
+        public CircularBuffer(int bufferSize)
         {
             m_buffer = new T[bufferSize];
             m_readPointer = 0;
@@ -37,8 +49,8 @@ namespace Gware.Common.DataStructures
                 int bytesAfterOverlap = bytes.Length - bytesBeforeOverlap;
                 Array.Copy(bytes, bytesBeforeOverlap, m_buffer, 0, bytesAfterOverlap);
 
-                m_unreadBytes += bytes.Length;
-                m_writePointer = GetNextPointer(m_writePointer, bytes.Length);
+                m_unreadCount += bytes.Length;
+                m_writePointer = m_buffer.GetNextPointer(m_writePointer, bytes.Length);
             }
         }
         public void Write(T val)
@@ -46,8 +58,8 @@ namespace Gware.Common.DataStructures
             lock (m_lock)
             {
                 m_buffer[m_writePointer] = val;
-                m_unreadBytes++;
-                m_writePointer = GetNextPointer(m_writePointer);
+                m_unreadCount++;
+                m_writePointer = m_buffer.GetNextPointer(m_writePointer);
             }
         }
         public T[] Peek(int count)
@@ -69,8 +81,8 @@ namespace Gware.Common.DataStructures
 
             lock (m_lock)
             {
-                m_unreadBytes -= count;
-                m_readPointer = GetNextPointer(m_readPointer, count);
+                m_unreadCount -= count;
+                m_readPointer = m_buffer.GetNextPointer(m_readPointer, count);
             }
 
             return retVal;
@@ -81,16 +93,12 @@ namespace Gware.Common.DataStructures
             lock (m_lock)
             {
                 T retVal = m_buffer[m_readPointer];
-                m_unreadBytes--;
-                m_readPointer = GetNextPointer(m_readPointer);
+                m_unreadCount--;
+                m_readPointer = m_buffer.GetNextPointer(m_readPointer);
 
                 return retVal;
             }
         }
-   
-        private int GetNextPointer(int currentPointer,int add = 1)
-        {
-            return (currentPointer + add) % m_buffer.Length;
-        }
+        
     }
 }

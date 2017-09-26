@@ -100,7 +100,12 @@ namespace Gware.Common.Networking.Packet
             FromBuffer(reader);
         }
 
-        public void ToBuffer(BufferWriter writer)
+        public void ToCRCBuffer(BufferWriter writer)
+        {
+            ToBuffer(writer, 0);
+        }
+
+        private void ToBuffer(BufferWriter writer,uint packetCRC)
         {
             writer.WriteInt16(0);//The header length and the data length must remain at the start of the packet header
             writer.WriteInt16(DataLength);
@@ -110,11 +115,16 @@ namespace Gware.Common.Networking.Packet
             writer.WriteInt32((int)Ack);
             writer.WriteInt16(Sequence);
 
-            writer.WriteUInt32(PacketCRC);
+            writer.WriteUInt32(packetCRC);
             writer.WriteUInt32(DataCRC);
 
             byte[] retVal = writer.GetBuffer();
             writer.WriteInt16At((short)retVal.Length, 0);
+        }
+
+        public void ToBuffer(BufferWriter writer)
+        {
+            ToBuffer(writer,PacketCRC);
         }
 
         public byte[] ToBytes()

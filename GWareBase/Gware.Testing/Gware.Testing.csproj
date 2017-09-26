@@ -48,6 +48,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\DataStructures\CircularBufferTest.cs" />
+    <Compile Include="Common\DataStructures\ExtensionMethodsTest.cs" />
     <Compile Include="Common\Networking\Connection\ConnectionTrackerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

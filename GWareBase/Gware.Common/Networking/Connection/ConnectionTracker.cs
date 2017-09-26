@@ -96,6 +96,7 @@ namespace Gware.Common.Networking.Connection
 
                 Sequence = remoteSequence;
             }
+            
         }
         private static int SequenceDifference(ushort next,ushort previousValue,out bool greaterSequence)
         {

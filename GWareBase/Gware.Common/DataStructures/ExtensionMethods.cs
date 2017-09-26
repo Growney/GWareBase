@@ -181,5 +181,10 @@ namespace Gware.Common.DataStructures
         {
             PopulateWithRange(list, new Range<int>(start, end));
         }
+
+        public static int GetNextPointer<T>(this T[] array, int currentPointer, int add = 1)
+        {
+            return (currentPointer + add) % array.Length;
+        }
     }
 }

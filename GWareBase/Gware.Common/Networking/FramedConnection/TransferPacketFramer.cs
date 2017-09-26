@@ -11,14 +11,14 @@ namespace Gware.Common.Networking.FramedConnection
 {
     public class TransferPacketFramer
     {
-        private Circularbuffer<byte> m_buffer;
+        private CircularBuffer<byte> m_buffer;
         private int m_requiredTotal;
         private bool m_building;
         private object m_lock = new object();
 
         public TransferPacketFramer()
         {
-            m_buffer = new Circularbuffer<byte>((int)(TransferDataPacket.c_maxPacketDataSize*2.5));
+            m_buffer = new CircularBuffer<byte>((int)(TransferDataPacket.c_maxPacketDataSize*2.5));
             m_building = false;
         }
         public List<TransferDataPacket> AddBytes(byte[] bytes)
@@ -48,7 +48,7 @@ namespace Gware.Common.Networking.FramedConnection
 
             if (!m_building)
             {
-                if (m_buffer.UnreadBytes >= TransferDataPacketHeader.SizeRequiredForDataLength)
+                if (m_buffer.UnreadCount >= TransferDataPacketHeader.SizeRequiredForDataLength)
                 {
                     byte[] receviedHeader = m_buffer.Peek(TransferDataPacketHeader.SizeRequiredForDataLength);
                     ushort headerLength = BitConverter.ToUInt16(receviedHeader, TransferDataPacketHeader.HeaderLengthLocation);
@@ -59,7 +59,7 @@ namespace Gware.Common.Networking.FramedConnection
                 }
             }
 
-            if (m_building && m_buffer.UnreadBytes >= m_requiredTotal)
+            if (m_building && m_buffer.UnreadCount >= m_requiredTotal)
             {
                 byte[] packetBytes = m_buffer.Read(m_requiredTotal);
 

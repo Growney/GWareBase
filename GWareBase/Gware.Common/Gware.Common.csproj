@@ -84,7 +84,7 @@
     <Compile Include="Database\IDBConnection.cs" />
     <Compile Include="Database\MSSQLDBConnection.cs" />
     <Compile Include="Database\StoredProcedure.cs" />
-    <Compile Include="DataStructures\Circularbuffer.cs" />
+    <Compile Include="DataStructures\CircularBuffer.cs" />
     <Compile Include="DataStructures\ExtensionMethods.cs" />
     <Compile Include="DataStructures\HashedDictionary.cs" />
     <Compile Include="DataStructures\IHashedDictionary.cs" />
