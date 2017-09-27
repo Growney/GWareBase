@@ -117,6 +117,7 @@
     <Compile Include="Networking\Connection\TcpNetServer.cs" />
     <Compile Include="Networking\Connection\UdpServer.cs" />
     <Compile Include="Networking\Connection\UdpNetSender.cs" />
+    <Compile Include="Networking\Connection\UdpTrackerClient.cs" />
     <Compile Include="Networking\FramedConnection\ConnectionFramer.cs" />
     <Compile Include="Networking\FramedConnection\FramedClient.cs" />
     <Compile Include="Networking\FramedConnection\FramedServer.cs" />
