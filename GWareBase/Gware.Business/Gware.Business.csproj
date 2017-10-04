@@ -50,6 +50,7 @@
     <Compile Include="Commands\EntityCommandFactory.cs" />
     <Compile Include="Commands\EntityContainerCommandFactory.cs" />
     <Compile Include="Commands\TokenCommandFactory.cs" />
+    <Compile Include="Entity\Attributes\AdapterLoadedFieldAttribute.cs" />
     <Compile Include="Entity\AllowedEntityAssignment.cs" />
     <Compile Include="Entity\Collection\IMultiEntityTypeStorage.cs" />
     <Compile Include="Entity\Collection\StoredMultiEntityTypeCollection.cs" />
@@ -58,7 +59,7 @@
     <Compile Include="Entity\EntityContainer.cs" />
     <Compile Include="Entity\EntityFactory.cs" />
     <Compile Include="Entity\EntityToken.cs" />
-    <Compile Include="Entity\EntityTypeAttribute.cs" />
+    <Compile Include="Entity\Attributes\EntityTypeAttribute.cs" />
     <Compile Include="Entity\ExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gware.Business.Entity
+namespace Gware.Business.Entity.Attributes
 {
     public class EntityTypeAttribute : Attribute
     {
