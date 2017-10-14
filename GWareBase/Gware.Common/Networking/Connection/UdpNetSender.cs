@@ -58,23 +58,15 @@ namespace Gware.Common.Networking.Connection
 
         }
 
-        public bool Send(string address, int port, byte[] data)
+        public virtual bool Send(string address, int port, byte[] data)
         {
            return (m_baseClient.Send(data, data.Length, address, port) == data.Length);
         }
-        public bool Send(IPEndPoint sendTo, byte[] data)
+        public virtual bool Send(IPEndPoint sendTo, byte[] data)
         {
             return (m_baseClient.Send(data, data.Length, sendTo) == data.Length);
         }
-        public virtual bool Send(string address, int port, Packet.TransferDataPacket data)
-        {
-            return Send(address, port, data.ToBytes());
-        }
-
-        public virtual bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
-        {
-            return Send(sendTo, data.ToBytes());
-        }
+        
         
         public async Task<bool> SendAyncAsync(byte[] data)
         {

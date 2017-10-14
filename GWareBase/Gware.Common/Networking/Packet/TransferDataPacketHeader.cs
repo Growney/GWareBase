@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Networking.Packet
 {
-    public class TransferDataPacketHeader
+    public class TransferDataPacketHeader : IComparable<TransferDataPacketHeader>
     {
         public static readonly int SizeRequiredForDataLength = sizeof(ushort) + sizeof(ushort);
         public static readonly int DataLengthLocation = sizeof(ushort);
@@ -18,7 +18,7 @@ namespace Gware.Common.Networking.Packet
         private ushort m_packetNumber;
         private ushort m_packetTotal;
         private ushort m_dataLength;
-
+        
         private ushort m_sequence;
         private uint m_ack;
 
@@ -83,6 +83,7 @@ namespace Gware.Common.Networking.Packet
         {
             HeaderLength = reader.ReadUInt16();//The header length and the data length must remain at the start of the packet header
             DataLength = reader.ReadUInt16();
+
             PacketNumber = reader.ReadUInt16();
             PacketTotal = reader.ReadUInt16();
 
@@ -109,6 +110,7 @@ namespace Gware.Common.Networking.Packet
         {
             writer.WriteInt16(0);//The header length and the data length must remain at the start of the packet header
             writer.WriteInt16(DataLength);
+
             writer.WriteInt16(PacketNumber);
             writer.WriteInt16(PacketTotal);
 
@@ -117,9 +119,8 @@ namespace Gware.Common.Networking.Packet
 
             writer.WriteUInt32(packetCRC);
             writer.WriteUInt32(DataCRC);
-
-            byte[] retVal = writer.GetBuffer();
-            writer.WriteInt16At((short)retVal.Length, 0);
+            
+            writer.WriteInt16At((short)writer.BufferLength, 0);
         }
 
         public void ToBuffer(BufferWriter writer)
@@ -134,6 +135,11 @@ namespace Gware.Common.Networking.Packet
             ToBuffer(writer);
 
             return writer.GetBuffer();
+        }
+
+        public int CompareTo(TransferDataPacketHeader other)
+        {
+            return PacketNumber.CompareTo(other.PacketNumber);
         }
     }
 }

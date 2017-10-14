@@ -46,6 +46,11 @@
   <ItemGroup>
     <Compile Include="Application\GameClientApplicationBase.cs" />
     <Compile Include="LargeVector2.cs" />
+    <Compile Include="Networking\GameClient.cs" />
+    <Compile Include="Networking\GamePacket\IGamePacket.cs" />
+    <Compile Include="Networking\GamePacket\InfoRequestPacket.cs" />
+    <Compile Include="Networking\GamePacket\InfoResponsePacket.cs" />
+    <Compile Include="Networking\GameServer.cs" />
     <Compile Include="Noise\CellularGenerator.cs" />
     <Compile Include="Noise\Enumeration.cs" />
     <Compile Include="Noise\ImplicitAutoCorrect.cs" />

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Gware.Common.DataStructures;
 using Gware.Common.Storage;
+using Gware.Business.Entity.Attributes;
 
 namespace Gware.Business.Entity
 {

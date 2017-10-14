@@ -104,9 +104,6 @@
     <Compile Include="Filter\WithinFilter.cs" />
     <Compile Include="HelperMethods.cs" />
     <Compile Include="Logging\ExceptionLogger.cs" />
-    <Compile Include="Networking\AuthenticatedConnection\AuthenticatedClient.cs" />
-    <Compile Include="Networking\AuthenticatedConnection\AuthenticatedCommand.cs" />
-    <Compile Include="Networking\AuthenticatedConnection\AuthenticationServer.cs" />
     <Compile Include="Networking\Connection\ConnectionTracker.cs" />
     <Compile Include="Networking\Connection\ExtensionMethods.cs" />
     <Compile Include="Networking\Connection\IDataReceiver.cs" />
@@ -115,13 +112,11 @@
     <Compile Include="Networking\Connection\KeyedUdpNetClient.cs" />
     <Compile Include="Networking\Connection\TcpNetClient.cs" />
     <Compile Include="Networking\Connection\TcpNetServer.cs" />
-    <Compile Include="Networking\Connection\UdpServer.cs" />
+    <Compile Include="Networking\Connection\TrackedUdpNetClient.cs" />
+    <Compile Include="Networking\Connection\TransferDataPacketUdpNetClient.cs" />
     <Compile Include="Networking\Connection\UdpNetSender.cs" />
-    <Compile Include="Networking\Connection\UdpTrackerClient.cs" />
-    <Compile Include="Networking\FramedConnection\ConnectionFramer.cs" />
-    <Compile Include="Networking\FramedConnection\FramedClient.cs" />
-    <Compile Include="Networking\FramedConnection\FramedServer.cs" />
-    <Compile Include="Networking\FramedConnection\TransferPacketFramer.cs" />
+    <Compile Include="Networking\Packet\ConnectionDataBuilder.cs" />
+    <Compile Include="Networking\Packet\DataBuilder.cs" />
     <Compile Include="Networking\Packet\TransferDataPacket.cs" />
     <Compile Include="Networking\Packet\TransferDataPacketHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

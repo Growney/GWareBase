@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Networking.Packet
 {
-    public class TransferDataPacket
+    public class TransferDataPacket : IComparable<TransferDataPacket>
     {
         public const int c_maxPacketDataSize = 8192;
 
@@ -147,14 +147,20 @@ namespace Gware.Common.Networking.Packet
             return retVal;
         }
 
-        public static byte[] GetData(IEnumerable<TransferDataPacket> packets,bool useNetworkOrder)
+        public static byte[] GetData(List<TransferDataPacket> packets,bool useNetworkOrder)
         {
             BufferWriter writer = new BufferWriter(useNetworkOrder);
+            packets.Sort();
             foreach(TransferDataPacket dp in packets)
             {
                 writer.WriteBytes(dp.Data);
             }
             return writer.GetBuffer();
+        }
+
+        public int CompareTo(TransferDataPacket other)
+        {
+            return Header.CompareTo(other.Header);
         }
     }
 }

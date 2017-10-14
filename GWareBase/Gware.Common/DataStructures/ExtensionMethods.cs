@@ -97,10 +97,14 @@ namespace Gware.Common.DataStructures
         {
             lock (dic)
             {
-                Value retVal = default(Value);
+                Value retVal;
                 if (dic.ContainsKey(key))
                 {
                     retVal = dic[key];
+                }
+                else
+                {
+                    retVal = default(Value);
                 }
                 return retVal;
             }

@@ -14,6 +14,8 @@ namespace Gware.Common.Networking.Connection
     {
         private readonly int c_key;
 
+        public event Action<IPEndPoint, BufferReader> OnKeyedDataReceived;
+
         public KeyedUdpNetClient()
             :this(0)
         {
@@ -37,13 +39,13 @@ namespace Gware.Common.Networking.Connection
             BufferReader reader = new BufferReader(data);
             if(reader.ReadInt32() == c_key)
             {
-                OnKeyedDataReceived(from, reader);
+                KeyedDataReceived(from, reader);
             }
         }
 
-        protected virtual void OnKeyedDataReceived(IPEndPoint from,BufferReader data)
+        protected virtual void KeyedDataReceived(IPEndPoint from,BufferReader data)
         {
-            
+            OnKeyedDataReceived?.Invoke(from, data);
         }
     }
 }
