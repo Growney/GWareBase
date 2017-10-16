@@ -13,7 +13,7 @@ namespace Gware.Common.Networking.Connection
     {
         private object m_idLock = new object();
         private ushort m_dataID = 0;
-        public event Action<TransferDataPacket> OnPacketReceived;
+        public event Action<IPEndPoint, TransferDataPacket> OnPacketReceived;
 
         public TransferDataPacketUdpNetClient(int port)
             :base(port)

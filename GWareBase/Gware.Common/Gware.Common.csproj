@@ -114,6 +114,7 @@
     <Compile Include="Networking\Connection\TcpNetServer.cs" />
     <Compile Include="Networking\Connection\TrackedUdpNetClient.cs" />
     <Compile Include="Networking\Connection\TransferDataPacketUdpNetClient.cs" />
+    <Compile Include="Networking\Connection\TrackedUdpNetServer.cs" />
     <Compile Include="Networking\Connection\UdpNetSender.cs" />
     <Compile Include="Networking\Packet\ConnectionDataBuilder.cs" />
     <Compile Include="Networking\Packet\DataBuilder.cs" />

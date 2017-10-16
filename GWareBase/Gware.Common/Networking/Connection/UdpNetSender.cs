@@ -84,7 +84,7 @@ namespace Gware.Common.Networking.Connection
             IPEndPoint from = null;
 
             Byte[] rxData = m_baseClient.EndReceive(ar, ref from);
-
+           
             lock (m_packetQueue)
             {
                 m_packetQueue.Enqueue(new KeyValuePair<IPEndPoint, byte[]>(from, rxData));
