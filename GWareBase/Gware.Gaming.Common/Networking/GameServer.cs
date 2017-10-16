@@ -28,13 +28,25 @@ namespace Gware.Gaming.Common.Networking
             m_stopWatch.Start();
         }
 
+        public void Start()
+        {
+            m_listener.StartListening();
+            m_listener.Start();
+        }
+
+        public bool Stop()
+        {
+            m_listener.StopListening();
+            return m_listener.Stop();
+        }
+
         private ConnectionDataBuilder GetBuilder(IPEndPoint from)
         {
             lock (m_builders)
             {
                 if (!m_builders.ContainsKey(from))
                 {
-                    ConnectionDataBuilder builder = new ConnectionDataBuilder();
+                    ConnectionDataBuilder builder = new ConnectionDataBuilder(from);
                     builder.OnDataCompelted += OnDataCompleted;
                     m_builders.Add(from, builder);
                     

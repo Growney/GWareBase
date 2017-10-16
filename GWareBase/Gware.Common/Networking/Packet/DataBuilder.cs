@@ -26,7 +26,7 @@ namespace Gware.Common.Networking.Packet
 
         private void SetCompleteMask(ushort packetCount)
         {
-            ulong shifted = (1UL << packetCount);
+            ulong shifted = (1UL << packetCount - 1);
             m_completeMask = (shifted - 1 | shifted);
         }
 

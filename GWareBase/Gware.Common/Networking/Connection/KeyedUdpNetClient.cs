@@ -37,10 +37,27 @@ namespace Gware.Common.Networking.Connection
         protected override void OnDataReceived(IPEndPoint from, byte[] data)
         {
             BufferReader reader = new BufferReader(data);
-            if(reader.ReadInt32() == c_key)
+            int key = reader.ReadInt32();
+            if (key == c_key)
             {
                 KeyedDataReceived(from, reader);
             }
+        }
+
+        public override bool Send(IPEndPoint sendTo, byte[] data)
+        {
+            BufferWriter writer = new BufferWriter(false);
+            writer.WriteInt32(c_key);
+            writer.WriteBytes(data);
+            return base.Send(sendTo, writer.GetBuffer());
+        }
+
+        public override bool Send(string address, int port, byte[] data)
+        {
+            BufferWriter writer = new BufferWriter(false);
+            writer.WriteInt32(c_key);
+            writer.WriteBytes(data);
+            return base.Send(address, port, writer.GetBuffer());
         }
 
         protected virtual void KeyedDataReceived(IPEndPoint from,BufferReader data)

@@ -70,7 +70,7 @@ namespace Gware.Common.Networking.Packet
         {
             m_header.FromBuffer(reader);
 
-            m_data = reader.ReadBytesAt(m_header.HeaderLength, m_header.DataLength);
+            m_data = reader.ReadBytes(m_header.DataLength);
 
             GenerateLocalCRC();
         }

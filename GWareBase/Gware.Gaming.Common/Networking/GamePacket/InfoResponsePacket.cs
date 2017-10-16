@@ -8,6 +8,10 @@ namespace Gware.Gaming.Common.Networking.GamePacket
 {
     public class InfoResponsePacket : InfoRequestPacket
     {
+        public InfoResponsePacket()
+        {
+
+        }
         public InfoResponsePacket(InfoRequestPacketType type,ushort packetID)
             : base(type, packetID)
         {

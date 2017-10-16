@@ -21,9 +21,9 @@ namespace Gware.Gaming.Common.Networking
         private ConnectionDataBuilder m_builder = new ConnectionDataBuilder();
         private Dictionary<int, IGamePacket> m_packetHistory = new Dictionary<int, IGamePacket>();
          
-        public GameClient(IPEndPoint server,int port)
+        public GameClient(IPEndPoint server)
         {
-            m_listener = new TrackedUdpNetClient(server,port);
+            m_listener = new TrackedUdpNetClient(server,0);
             m_listener.OnPacketReceived += OnPacketReceived;
 
             m_stopWatch = new Stopwatch();
@@ -32,9 +32,27 @@ namespace Gware.Gaming.Common.Networking
             m_builder.OnDataCompelted += OnDataCompelted;
         }
 
+
+        public override void Start()
+        {
+            m_listener.StartListening();
+            m_listener.Start();
+            base.Start();
+        }
+
+        public override bool Stop(int timeout = 500)
+        {
+            m_listener.StopListening();
+            m_listener.Stop();
+            return base.Stop(timeout);
+        }
+
         private void OnDataCompelted(IPEndPoint from,byte[] data)
         {
-            
+            InfoResponsePacket res = new InfoResponsePacket();
+            res.FromBytes(data);
+
+            Console.WriteLine(String.Format("Ping Completed: {0}ms", TimeSpan.FromTicks(m_stopWatch.ElapsedTicks - res.StopWatchTime).TotalMilliseconds));
         }
 
         private void OnPacketReceived(IPEndPoint source, TransferDataPacket data)

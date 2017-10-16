@@ -1,4 +1,6 @@
-﻿using Gware.Gaming.Common.World;
+﻿using Gware.Gaming.Common.Networking;
+using Gware.Gaming.Common.Networking.GamePacket;
+using Gware.Gaming.Common.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,21 +11,59 @@ namespace Gware.Profiling
 {
     class Program
     {
+        private static int c_port = 1337;
         public static void Main(string[] args)
         {
-            WorldGenerator m_generator = new WorldGenerator(22, 16,7000,10000);
-            m_generator.OnChunkCompleted += OnChunkGenerated;
-            m_generator.Start();
-
-            while (m_generator.IsRunning)
+            Gware.Gaming.Common.Networking.GameClient client = null;
+            Gware.Gaming.Common.Networking.GameServer server = null;
+            string input;
+            do
             {
+                Console.WriteLine("Please enter command:");
+                input = Console.ReadLine();
+                switch (input.ToLower())
+                {
+                    case "startserver":
+                        Console.WriteLine("Starting Server");
+                        server = new GameServer(c_port);
+                        server.Start();
+                        Console.WriteLine("Server Started");
+                        break;
+                    case "startclient":
+                        Console.WriteLine("Starting Client");
+                        System.Net.IPAddress addr;
+                        System.Net.IPAddress.TryParse("127.0.0.1", out addr);
+                        client = new GameClient(new System.Net.IPEndPoint(addr, c_port));
+                        client.Start();
+                        Console.WriteLine("Started Client");
+                        break;
+                    case "ping":
+                        if(client != null)
+                        {
+                            Console.WriteLine("Ping started:");
+                            client.Send(new InfoRequestPacket(InfoRequestPacketType.Ping));
+                        }
+                        else
+                        {
+                            Console.WriteLine("No Client Initialised");
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("Unknown command");
+                        break;
+                }
 
-            }
+            } while (input != "Stop");
             
-        }
-        private static void OnChunkGenerated(WorldChunk obj)
-        {
-            Console.WriteLine(String.Format("Chunk Completed at {0:0},{1:0}", obj.Position.X, obj.Position.Y));
+            if(client != null)
+            {
+                client.Stop();
+            }
+
+            if(server != null)
+            {
+                server.Stop();
+            }
         }
     }
 }

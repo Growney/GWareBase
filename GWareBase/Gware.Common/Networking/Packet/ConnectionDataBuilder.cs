@@ -62,12 +62,12 @@ namespace Gware.Common.Networking.Packet
             if(m_freeBuilders.Count > 0)
             {
                 retVal = m_freeBuilders.Dequeue();
-                retVal.SetForID(dataID, packetCount);
             }
             else
             {
                 retVal = new DataBuilder();
             }
+            retVal.SetForID(dataID, packetCount);
             return retVal;
         }
     }
