@@ -61,6 +61,7 @@ namespace Gware.Gaming.Common.Networking
             packet.FromBytes(obj);
 
             InfoResponsePacket res = new InfoResponsePacket(packet.RequestType, packet.PacketID);
+            res.StopWatchTime = packet.StopWatchTime;
             m_listener.Send(from, res.ToBytes());
 
         }

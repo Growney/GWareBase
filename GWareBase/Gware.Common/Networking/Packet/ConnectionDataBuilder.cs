@@ -31,7 +31,6 @@ namespace Gware.Common.Networking.Packet
             if (!m_sequenceBuilder.ContainsKey(packet.Header.Sequence))
             {
                 DataBuilder builder = GetNextBuilder(packet.Header.Sequence, packet.Header.PacketTotal);
-                builder.OnCompleted += OnCompleted;
                 int builderHash = builder.GetHashCode(); 
                 m_builders.Add(builderHash, builder);
                 m_sequenceBuilder.Add(packet.Header.Sequence, builderHash);
@@ -66,6 +65,7 @@ namespace Gware.Common.Networking.Packet
             else
             {
                 retVal = new DataBuilder();
+                retVal.OnCompleted += OnCompleted;
             }
             retVal.SetForID(dataID, packetCount);
             return retVal;
