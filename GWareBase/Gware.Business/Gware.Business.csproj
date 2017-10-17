@@ -57,10 +57,8 @@
     <Compile Include="Entity\EntityAssignment.cs" />
     <Compile Include="Entity\EntityBase.cs" />
     <Compile Include="Entity\EntityContainer.cs" />
-    <Compile Include="Entity\EntityFactory.cs" />
     <Compile Include="Entity\EntityToken.cs" />
     <Compile Include="Entity\Attributes\EntityTypeAttribute.cs" />
-    <Compile Include="Entity\ExtensionMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

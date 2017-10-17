@@ -1,5 +1,7 @@
 ﻿using Gware.Business.Entity;
+using Gware.Business.Entity.Attributes;
 using Gware.Common.Application;
+using Gware.Common.Reflection;
 using Gware.Common.Storage;
 using Gware.Common.Storage.Command;
 using Gware.Common.Storage.Command.Interface;
@@ -15,7 +17,7 @@ namespace Gware.Business.Application
     {
         public EntityCommandControllerApplicationBase(ICommandController controller) : base(controller)
         {
-            EntityFactory.InitialiseEntityTypes();
+            ClassFactory<EntityTypeAttribute,EntityBase>.InitialiseEntityTypes();
         }
         
     }

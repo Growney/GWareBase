@@ -9,11 +9,18 @@ using System.Diagnostics;
 using System.Net;
 using Gware.Common.Networking.Packet;
 using Gware.Gaming.Common.Networking.GamePacket;
+using Gware.Common.Reflection;
+using Gware.Common.Data;
 
 namespace Gware.Gaming.Common.Networking
 {
     public class GameServer
     {
+        static GameServer()
+        {
+            ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes();
+        }
+
         private Stopwatch m_stopWatch;
         private TrackedUdpNetServer m_listener;
 
@@ -30,6 +37,7 @@ namespace Gware.Gaming.Common.Networking
 
         public void Start()
         {
+            
             m_listener.StartListening();
             m_listener.Start();
         }
@@ -57,12 +65,13 @@ namespace Gware.Gaming.Common.Networking
 
         private void OnDataCompleted(IPEndPoint from,byte[] obj)
         {
-            InfoRequestPacket packet = new InfoRequestPacket();
-            packet.FromBytes(obj);
+            BufferReader reader = new BufferReader(obj);
+            int classID = reader.ReadInt32();
+            IGamePacket packet = ClassFactory<GamePacketAttribute, IGamePacket>.CreateClass(classID);
+            packet.FromBuffer(reader);
 
-            InfoResponsePacket res = new InfoResponsePacket(packet.RequestType, packet.PacketID);
-            res.StopWatchTime = packet.StopWatchTime;
-            m_listener.Send(from, res.ToBytes());
+            IGamePacket response = packet.CreateResponse();
+            m_listener.Send(from, response.ToBytes());
 
         }
 

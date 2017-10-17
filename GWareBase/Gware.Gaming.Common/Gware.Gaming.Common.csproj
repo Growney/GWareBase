@@ -47,6 +47,7 @@
     <Compile Include="Application\GameClientApplicationBase.cs" />
     <Compile Include="LargeVector2.cs" />
     <Compile Include="Networking\GameClient.cs" />
+    <Compile Include="Networking\GamePacket\GamePacketAttribute.cs" />
     <Compile Include="Networking\GamePacket\IGamePacket.cs" />
     <Compile Include="Networking\GamePacket\InfoRequestPacket.cs" />
     <Compile Include="Networking\GamePacket\InfoResponsePacket.cs" />

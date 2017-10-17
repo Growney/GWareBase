@@ -1,5 +1,7 @@
-﻿using Gware.Common.Networking.Connection;
+﻿using Gware.Common.Data;
+using Gware.Common.Networking.Connection;
 using Gware.Common.Networking.Packet;
+using Gware.Common.Reflection;
 using Gware.Common.Threading;
 using Gware.Gaming.Common.Networking.GamePacket;
 using System;
@@ -14,6 +16,11 @@ namespace Gware.Gaming.Common.Networking
 {
     public class GameClient : TimerThread
     {
+        static GameClient()
+        {
+            ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes();
+        }
+
         private Stopwatch m_stopWatch;
         private TrackedUdpNetClient m_listener;
         private TimeSpan m_lastSend = TimeSpan.Zero;
@@ -49,10 +56,11 @@ namespace Gware.Gaming.Common.Networking
 
         private void OnDataCompelted(IPEndPoint from,byte[] data)
         {
-            InfoResponsePacket res = new InfoResponsePacket();
-            res.FromBytes(data);
-
-            Console.WriteLine(String.Format("Ping Completed: {0}ms", TimeSpan.FromTicks(m_stopWatch.ElapsedTicks - res.StopWatchTime).TotalMilliseconds));
+            BufferReader reader = new BufferReader(data);
+            int classID = reader.ReadInt32();
+            IGamePacket packet = ClassFactory<GamePacketAttribute, IGamePacket>.CreateClass(classID);
+            packet.FromBuffer(reader);
+            Console.WriteLine(String.Format("Packet Received Round Trip - {0}ms", TimeSpan.FromTicks(m_stopWatch.ElapsedTicks - packet.StopWatchTime).TotalMilliseconds));
         }
 
         private void OnPacketReceived(IPEndPoint source, TransferDataPacket data)

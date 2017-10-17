@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,26 +8,10 @@ using System.Threading.Tasks;
 
 namespace Gware.Business.Entity.Attributes
 {
-    public class EntityTypeAttribute : Attribute
+    public class EntityTypeAttribute : ClassIDAttribute
     {
-        private int m_entityType;
-        public int EntityType
+        public EntityTypeAttribute(int classID) : base(classID)
         {
-            get
-            {
-                return m_entityType;
-            }
-
-            set
-            {
-                m_entityType = value;
-            }
         }
-        public EntityTypeAttribute(int entityType)
-        {
-            m_entityType = entityType;
-        }
-
-
     }
 }

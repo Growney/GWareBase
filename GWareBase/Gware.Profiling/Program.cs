@@ -48,6 +48,23 @@ namespace Gware.Profiling
                             Console.WriteLine("No Client Initialised");
                         }
                         break;
+                    case "stress":
+                        if (client != null)
+                        {
+                            Console.WriteLine("Stress Started");
+                            for (int i = 0; i < 5000; i++)
+                            {
+                                Console.CursorLeft = 0;
+                                Console.WriteLine(String.Format("Ping started: {0}",i+1));
+                                client.Send(new InfoRequestPacket(InfoRequestPacketType.Ping));
+                            }
+                            Console.WriteLine("Stress Complete");
+                        }
+                        else
+                        {
+                            Console.WriteLine("No Client Initialised");
+                        }
+                        break;
                     default:
                         Console.WriteLine("Unknown command");
                         break;

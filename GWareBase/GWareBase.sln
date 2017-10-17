@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gware.Common", "Gware.Common\Gware.Common.csproj", "{83040F8E-89F2-4F12-8C4C-9ADFCA30EF73}"
 EndProject
@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gware.Business", "Gware.Bus
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gware.Gaming.Common", "Gware.Gaming.Common\Gware.Gaming.Common.csproj", "{8439DC6E-68E3-4F91-ACC3-AB44D654C687}"
+	ProjectSection(ProjectDependencies) = postProject
+		{83040F8E-89F2-4F12-8C4C-9ADFCA30EF73} = {83040F8E-89F2-4F12-8C4C-9ADFCA30EF73}
+		{61F289D5-9405-40F2-BD22-CAC04C52C6B4} = {61F289D5-9405-40F2-BD22-CAC04C52C6B4}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gware.Profiling", "Gware.Profiling\Gware.Profiling.csproj", "{EA758F5D-515C-4E49-8597-1DEFF2773966}"
 EndProject

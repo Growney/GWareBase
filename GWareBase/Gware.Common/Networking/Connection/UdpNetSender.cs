@@ -60,12 +60,10 @@ namespace Gware.Common.Networking.Connection
 
         public virtual bool Send(string address, int port, byte[] data)
         {
-            Console.WriteLine("Sending Packets");
            return (m_baseClient.Send(data, data.Length, address, port) == data.Length);
         }
         public virtual bool Send(IPEndPoint sendTo, byte[] data)
         {
-            Console.WriteLine("Sending Packets");
             return (m_baseClient.Send(data, data.Length, sendTo) == data.Length);
         }
         
@@ -89,7 +87,6 @@ namespace Gware.Common.Networking.Connection
            
             lock (m_packetQueue)
             {
-                Console.WriteLine("Data Received");
                 m_packetQueue.Enqueue(new KeyValuePair<IPEndPoint, byte[]>(from, rxData));
                 Resume();
             }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.Networking.Packet;
 using Gware.Common.Data;
+using Gware.Common.Reflection;
 
 namespace Gware.Gaming.Common.Networking.GamePacket
 {
@@ -12,6 +13,7 @@ namespace Gware.Gaming.Common.Networking.GamePacket
     {
         Ping,
     }
+    [GamePacketAttribute(-1)]
     public class InfoRequestPacket : IGamePacket
     {
         private static object m_idLock = new object();
@@ -28,6 +30,7 @@ namespace Gware.Gaming.Common.Networking.GamePacket
         public InfoRequestPacketType RequestType { get; private set; }
         public long StopWatchTime { get; set; }
         public ushort PacketID { get; private set; }
+        public int TypeID { get; private set; }
 
         public byte PacketTypePrefix
         {
@@ -39,6 +42,7 @@ namespace Gware.Gaming.Common.Networking.GamePacket
         public InfoRequestPacket()
         {
 
+            TypeID = GetType().GetClassID<GamePacketAttribute>();
         }
         public InfoRequestPacket(InfoRequestPacketType type)
             :this(type,GetNextID())
@@ -47,26 +51,52 @@ namespace Gware.Gaming.Common.Networking.GamePacket
         }
 
         protected InfoRequestPacket(InfoRequestPacketType type,ushort packetID)
+            :this()
         {
             RequestType = type;
             PacketID = packetID;
         }
 
-        public void FromBytes(byte[] packet)
-        {
-            BufferReader reader = new BufferReader(packet);
-            RequestType = (InfoRequestPacketType)reader.ReadByte();
-            StopWatchTime = reader.ReadInt64();
-            PacketID = reader.ReadUInt16();
-        }
-
         public byte[] ToBytes()
         {
             BufferWriter writer = new BufferWriter(false);
+            ToBuffer(writer);
+            return writer.GetBuffer();
+        }
+
+        public void ToBuffer(BufferWriter writer)
+        {
+            writer.WriteInt32(TypeID);
             writer.WriteByte((byte)RequestType);
             writer.WriteInt64(StopWatchTime);
             writer.WriteInt16(PacketID);
-            return writer.GetBuffer();
+            OnToWriter(writer);
+        }
+
+        public void FromBuffer(BufferReader reader)
+        {
+            RequestType = (InfoRequestPacketType)reader.ReadByte();
+            StopWatchTime = reader.ReadInt64();
+            PacketID = reader.ReadUInt16();
+            OnFromReader(reader);
+        }
+        public virtual void OnFromReader(BufferReader reader)
+        {
+
+        }
+
+        public virtual void OnToWriter(BufferWriter reader)
+        {
+
+        }
+
+        public virtual IGamePacket CreateResponse()
+        {
+            InfoResponsePacket packet = new InfoResponsePacket();
+            packet.PacketID = PacketID;
+            packet.StopWatchTime = StopWatchTime;
+            packet.RequestType = RequestType;
+            return packet;
         }
     }
 }

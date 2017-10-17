@@ -122,6 +122,8 @@
     <Compile Include="Networking\Packet\TransferDataPacketHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructures\Range.cs" />
+    <Compile Include="Reflection\ClassFactory.cs" />
+    <Compile Include="Reflection\ClassIDAttribute.cs" />
     <Compile Include="Reflection\ExtensionMethods.cs" />
     <Compile Include="Security\Authentication\AuthenticationToken.cs" />
     <Compile Include="Security\SecurityHelper.cs" />

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Gaming.Common.Networking.GamePacket
 {
+    [GamePacketAttribute(-2)]
     public class InfoResponsePacket : InfoRequestPacket
     {
         public InfoResponsePacket()

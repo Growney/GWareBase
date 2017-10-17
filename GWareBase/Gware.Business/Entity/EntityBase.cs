@@ -1,7 +1,9 @@
 ﻿using Gware.Business.Application;
 using Gware.Business.Commands;
+using Gware.Business.Entity.Attributes;
 using Gware.Business.Entity.Collection;
 using Gware.Common.Application;
+using Gware.Common.Reflection;
 using Gware.Common.Storage;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Storage.Command;
@@ -47,7 +49,7 @@ namespace Gware.Business.Entity
 
         public EntityBase()
         {
-            m_entityTypeID = GetType().GetEntityTypeID();
+            m_entityTypeID = GetType().GetClassID<EntityTypeAttribute>();
             m_parents = new StoredMultiEntityTypeCollection(this, EntityRelationship.Child);
             m_children = new StoredMultiEntityTypeCollection(this, EntityRelationship.Parent);
         }

@@ -166,5 +166,21 @@ namespace Gware.Common.Reflection
             }
             return string.Empty;
         }
+
+        public static int GetClassID<AttributeType>(this Type type) where AttributeType : ClassIDAttribute
+        {
+            int retVal = -1;
+
+            object[] attributes = type.GetCustomAttributes(false);
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                if (attributes[i] is AttributeType)
+                {
+                    retVal = (int)(attributes[i] as AttributeType).ClassID;
+                    break;
+                }
+            }
+            return retVal;
+        }
     }
 }
