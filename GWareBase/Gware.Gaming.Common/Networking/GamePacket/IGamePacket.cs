@@ -21,5 +21,6 @@ namespace Gware.Gaming.Common.Networking.GamePacket
         void FromBuffer(BufferReader reader);
 
         IGamePacket CreateResponse();
+        
     }
 }

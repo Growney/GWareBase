@@ -58,10 +58,6 @@ namespace Gware.Common.Networking.Connection
 
         }
 
-        public virtual bool Send(string address, int port, byte[] data)
-        {
-           return (m_baseClient.Send(data, data.Length, address, port) == data.Length);
-        }
         public virtual bool Send(IPEndPoint sendTo, byte[] data)
         {
             return (m_baseClient.Send(data, data.Length, sendTo) == data.Length);
@@ -81,18 +77,27 @@ namespace Gware.Common.Networking.Connection
         }
         private void Receive(IAsyncResult ar)
         {
-            IPEndPoint from = null;
-
-            Byte[] rxData = m_baseClient.EndReceive(ar, ref from);
-           
-            lock (m_packetQueue)
+            //TODO Resolve issues with connections closing
+            try
             {
-                m_packetQueue.Enqueue(new KeyValuePair<IPEndPoint, byte[]>(from, rxData));
-                Resume();
-            }
+                IPEndPoint from = null;
 
+                Byte[] rxData = m_baseClient.EndReceive(ar, ref from);
+
+                lock (m_packetQueue)
+                {
+                    m_packetQueue.Enqueue(new KeyValuePair<IPEndPoint, byte[]>(from, rxData));
+                    Resume();
+                }
+
+
+                m_baseClient.BeginReceive(Receive, this);
+            }
+            catch (Exception ex)
+            {
+
+            }
             
-            m_baseClient.BeginReceive(Receive, this);
 
         }
         public void StopListening()
@@ -100,10 +105,5 @@ namespace Gware.Common.Networking.Connection
             m_baseClient.Close();
         }
 
-        
-
-
-
-        
     }
 }

@@ -55,17 +55,6 @@ namespace Gware.Common.Networking.Connection
         {
             OnPacketReceived?.Invoke(from, data);
         }
-        public override bool Send(string address, int port, byte[] data)
-        {
-            bool retVal = true;
-            List<TransferDataPacket> packets = TransferDataPacket.GetPackets(data);
-            for (int i = 0; i < packets.Count; i++)
-            {
-                retVal &= Send(address, port, packets[i]);
-            }
-            return retVal;
-
-        }
         public override bool Send(IPEndPoint sendTo, byte[] data)
         {
             bool retVal = true;
@@ -76,27 +65,12 @@ namespace Gware.Common.Networking.Connection
             }
             return retVal;
         }
-
-        public virtual bool Send(string address, int port, Packet.TransferDataPacket data)
-        {
-            return base.Send(address, port, data.ToBytes());
-        }
-
+        
         public virtual bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
         {
             return base.Send(sendTo, data.ToBytes());
         }
-
-        public virtual bool Send(string address, int port, IList<Packet.TransferDataPacket> packets)
-        {
-            bool retVal = true;
-            for (int i = 0; i < packets.Count; i++)
-            {
-                retVal &= Send(address,port, packets[i]);
-            }
-            return retVal;
-        }
-
+        
         public virtual bool Send(IPEndPoint sendTo, IList<Packet.TransferDataPacket> packets)
         {
             bool retVal = true;

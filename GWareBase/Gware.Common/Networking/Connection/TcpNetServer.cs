@@ -11,24 +11,14 @@ using Gware.Common.DataStructures;
 
 namespace Gware.Common.Networking.Connection
 {
-    public class TcpNetServer : Threading.ThreadBase, INetServer, IDataReceiver, IDisposable
+    public class TcpNetServer : Threading.ThreadBase
     {
         private TcpListener m_listener;
-        private bool m_createConnectionOnSend = false;
 
-        public event SingleResult<IPEndPoint, byte[]> OnDataRecevied;
-        public event SingleResultWithReturn<IPEndPoint, bool> OnClientConnected;
-        private Dictionary<IPEndPoint, TcpNetClient> m_connectedClients = new Dictionary<IPEndPoint, TcpNetClient>();
+        private Queue<TcpClient> m_queuedClients = new Queue<TcpClient>();
 
-        public int ConnectedClients
-        {
-            get { return m_connectedClients.Count; }
-        }
-        public bool CreateConnectionOnSend
-        {
-            get { return m_createConnectionOnSend; }
-            set { m_createConnectionOnSend = value; }
-        }
+        private event Action<TcpNetClient> OnClientConnected;
+
         public TcpNetServer(int port)
         {
             m_listener = new TcpListener(IPAddress.Any, port);
@@ -41,150 +31,60 @@ namespace Gware.Common.Networking.Connection
         {
             m_listener = new TcpListener(endPoint);
         }
-
-        protected override void OnThreadInit()
-        {
-            m_listener.Start();
-        }
+        
         protected override void ExecuteSingleThreadCycle()
         {
-            if (m_listener.Pending())
+            TcpClient client = null;
+            lock (m_queuedClients)
             {
-                TcpClient connectedClient = m_listener.AcceptTcpClient();
-                bool acceptClient = false;
-                if (OnClientConnected != null)
+                if(m_queuedClients.Count > 0)
                 {
-                    OnClientConnected(this,connectedClient.Client.RemoteEndPoint as IPEndPoint,ref acceptClient);
+                    client = m_queuedClients.Dequeue();
                 }
+            }
 
-                if (acceptClient)
+            if (client != null)
+            {
+                ClientConnected(client);
+            }
+
+            lock (m_queuedClients)
+            {
+                if(m_queuedClients.Count == 0)
                 {
-                    TcpNetClient client = new TcpNetClient(connectedClient);
-                    InitialiseClient(client);
-                    m_connectedClients.Set(connectedClient.Client.RemoteEndPoint as IPEndPoint, client);
+                    Pause();
                 }
             }
         }
-        private void InitialiseClient(TcpNetClient client)
-        {
-            client.StartListening();
-            client.OnDataRecevied += client_OnDataRecevied;
-            client.OnDisconnected += client_OnDisconnected;
-  
-        }
-        private void client_OnDisconnected(IPEndPoint sender, TcpNetClient result)
-        {
-            m_connectedClients.Remove(sender);
-        }
 
-        private void client_OnDataRecevied(IPEndPoint sender, byte[] result)
+        protected virtual void ClientConnected(TcpClient client)
         {
-            if (OnDataRecevied != null)
-            {
-                OnDataRecevied(sender, result);
-            }
+            OnClientConnected?.Invoke(new TcpNetClient(client));
         }
 
         public override bool Stop(int timeout)
         {
             m_listener.Stop();
-
             return base.Stop(timeout);
         }
-
-        public void Dispose()
+        public override void Start()
         {
-            try
+            m_listener.Start();
+            m_listener.BeginAcceptTcpClient(BeginAccept, this);
+            base.Start();
+        }
+        private void BeginAccept(IAsyncResult ar)
+        {
+            lock (m_queuedClients)
             {
-                m_listener.Stop();
-                m_listener = null;
+                m_queuedClients.Enqueue(m_listener.EndAcceptTcpClient(ar));
             }
-            catch (Exception)
-            {
 
-            }
-            
+            Resume();
         }
+        
 
-        public bool Send(string address, int port, byte[] data)
-        {
-            IPEndPoint endPoint = GetIPEndPointFromHostName(address, port, false);
-            return Send(endPoint, data);
-            
-            throw new NotImplementedException();
-        }
-
-        public bool Send(IPEndPoint sendTo, byte[] data)
-        {
-            if (m_connectedClients.ContainsKey(sendTo))
-            {
-                TcpNetClient client = m_connectedClients[sendTo];
-                return client.Send(data);
-            }
-            else
-            {
-                if (m_createConnectionOnSend)
-                {
-                    TcpNetClient newClient = new TcpNetClient();
-                    newClient.Connect(sendTo);
-                    return newClient.Send(data);
-                }
-            }
-            return false;
-        }
-        public bool Send(string address, int port, Packet.TransferDataPacket data)
-        {
-            return Send(address, port, data.ToBytes());
-        }
-
-        public bool Send(IPEndPoint sendTo, Packet.TransferDataPacket data)
-        {
-            return Send(sendTo, data.ToBytes());
-        }
-        public int Broadcast(byte[] data)
-        {
-            int retVal = 0;
-            List<IPEndPoint> currentlyConnected = new List<IPEndPoint>(m_connectedClients.Keys);
-
-            for (int i = 0; i < currentlyConnected.Count; i++)
-            {
-                if (Send(currentlyConnected[i], data))
-                {
-                    retVal++;
-                }
-            }
-            return retVal;
-        }
-
-        public void StartListening()
-        {
-            Start();
-        }
-
-        public void StopListening()
-        {
-            Start();
-        }
-
-        public static IPEndPoint GetIPEndPointFromHostName(string hostName, int port, bool throwIfMoreThanOneIP)
-        {
-            var addresses = System.Net.Dns.GetHostAddresses(hostName);
-            if (addresses.Length == 0)
-            {
-                throw new ArgumentException(
-                    "Unable to retrieve address from specified host name.",
-                    "hostName"
-                );
-            }
-            else if (throwIfMoreThanOneIP && addresses.Length > 1)
-            {
-                throw new ArgumentException(
-                    "There is more that one IP address to the specified host.",
-                    "hostName"
-                );
-            }
-            return new IPEndPoint(addresses[0], port); // Port gets validated here.
-        }
+       
 
 
    

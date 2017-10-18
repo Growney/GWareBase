@@ -22,62 +22,67 @@ namespace Gware.Gaming.Common.Networking
         }
 
         private Stopwatch m_stopWatch;
-        private TrackedUdpNetServer m_listener;
-
-        private Dictionary<IPEndPoint, ConnectionDataBuilder> m_builders = new Dictionary<IPEndPoint, ConnectionDataBuilder>();
+        private BuiltUdpNetServer m_udpListener;
+        private BuiltTcpNetServer m_tcpServer;
+        private List<BuiltTcpNetClient> m_tcpClients = new List<BuiltTcpNetClient>();
 
         public GameServer(int port)
         {
-            m_listener = new TrackedUdpNetServer(port);
-            m_listener.OnPacketReceived += OnPacketReceived;
+            m_udpListener = new BuiltUdpNetServer(port);
+            m_udpListener.OnDataCompelted += OnUdpDataCompleted;
+
+            m_tcpServer = new BuiltTcpNetServer(port);
+            m_tcpServer.OnTrackedClientConnected += OnTcpClientConnected;
 
             m_stopWatch = new Stopwatch();
             m_stopWatch.Start();
         }
 
+        protected virtual void OnTcpClientConnected(BuiltTcpNetClient obj)
+        {
+            obj.Start();
+            obj.OnDataCompelted += OnTcpDataCompleted;
+        }
+
+        private void OnTcpDataCompleted(BuiltTcpNetClient sender,byte[] data)
+        {
+            IGamePacket packet = GamePacketHelper.CreateAndLoadPacket(data);
+            if (packet != null)
+            {
+                IGamePacket response = packet.CreateResponse();
+                sender.Send(response.ToBytes());
+            }
+        }
+
+        
+        protected virtual void OnUdpDataCompleted(IPEndPoint from, byte[] data)
+        {
+            IGamePacket packet = GamePacketHelper.CreateAndLoadPacket(data);
+            if(packet != null)
+            {
+                IGamePacket response = packet.CreateResponse();
+                m_udpListener.Send(from, response.ToBytes());
+            }      
+
+        }
+
         public void Start()
         {
             
-            m_listener.StartListening();
-            m_listener.Start();
+            m_udpListener.StartListening();
+            m_udpListener.Start();
+            m_tcpServer.Start();
+
         }
 
         public bool Stop()
         {
-            m_listener.StopListening();
-            return m_listener.Stop();
+            m_udpListener.StopListening();
+            return m_udpListener.Stop();
         }
 
-        private ConnectionDataBuilder GetBuilder(IPEndPoint from)
-        {
-            lock (m_builders)
-            {
-                if (!m_builders.ContainsKey(from))
-                {
-                    ConnectionDataBuilder builder = new ConnectionDataBuilder(from);
-                    builder.OnDataCompelted += OnDataCompleted;
-                    m_builders.Add(from, builder);
-                    
-                }
-                return m_builders[from];
-            }
-        }
 
-        private void OnDataCompleted(IPEndPoint from,byte[] obj)
-        {
-            BufferReader reader = new BufferReader(obj);
-            int classID = reader.ReadInt32();
-            IGamePacket packet = ClassFactory<GamePacketAttribute, IGamePacket>.CreateClass(classID);
-            packet.FromBuffer(reader);
-
-            IGamePacket response = packet.CreateResponse();
-            m_listener.Send(from, response.ToBytes());
-
-        }
-
-        private void OnPacketReceived(IPEndPoint from, TransferDataPacket data)
-        {
-            GetBuilder(from).Add(data);
-        }
+        
+        
     }
 }

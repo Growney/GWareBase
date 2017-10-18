@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Gware.Common.DataStructures;
 
 namespace Gware.Gaming.Common.Networking
 {
@@ -21,53 +22,71 @@ namespace Gware.Gaming.Common.Networking
             ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes();
         }
 
-        private Stopwatch m_stopWatch;
-        private TrackedUdpNetClient m_listener;
-        private TimeSpan m_lastSend = TimeSpan.Zero;
+        private Dictionary<int, Action<GameClient, IGamePacket>> m_insuredPackets = new Dictionary<int, Action<GameClient, IGamePacket>>();
 
-        private ConnectionDataBuilder m_builder = new ConnectionDataBuilder();
-        private Dictionary<int, IGamePacket> m_packetHistory = new Dictionary<int, IGamePacket>();
-         
+        private Stopwatch m_stopWatch;
+        private BuiltUdpNetClient m_udpClient;
+        private BuiltTcpNetClient m_tcpClient;
+
+        public long StopWatchTime
+        {
+            get
+            {
+                return m_stopWatch.ElapsedTicks;
+            }
+        }
+
+        private TimeSpan m_lastSend = TimeSpan.Zero;
+        
         public GameClient(IPEndPoint server)
         {
-            m_listener = new TrackedUdpNetClient(server,0);
-            m_listener.OnPacketReceived += OnPacketReceived;
+            m_udpClient = new BuiltUdpNetClient(server,0);
+            m_udpClient.OnDataCompelted += OnUdpDataCompleted;
+
+            m_tcpClient = new BuiltTcpNetClient(server);
+            m_tcpClient.OnDataCompelted += OnTcpDataCompleted;
 
             m_stopWatch = new Stopwatch();
             m_stopWatch.Start();
-
-            m_builder.OnDataCompelted += OnDataCompelted;
         }
 
+        protected virtual void OnTcpDataCompleted(BuiltTcpNetClient sender, byte[] data)
+        {
+            IGamePacket packet = GamePacketHelper.CreateAndLoadPacket(data);
+            if(packet != null)
+            {
+                if (m_insuredPackets.ContainsKey(packet.PacketID))
+                {
+                    m_insuredPackets[packet.PacketID](this,packet);
+                }
+            }
+        }
+
+        protected virtual void OnUdpDataCompleted(BuiltUdpNetClient sender, byte[] data)
+        {
+            IGamePacket packet = GamePacketHelper.CreateAndLoadPacket(data);
+            if (packet != null)
+            {
+
+            }
+        }
 
         public override void Start()
         {
-            m_listener.StartListening();
-            m_listener.Start();
+            m_udpClient.StartListening();
+            m_udpClient.Start();
+            m_tcpClient.Start();
             base.Start();
         }
 
         public override bool Stop(int timeout = 500)
         {
-            m_listener.StopListening();
-            m_listener.Stop();
+            m_udpClient.StopListening();
+            m_udpClient.Stop();
+            m_tcpClient.Stop();
             return base.Stop(timeout);
         }
-
-        private void OnDataCompelted(IPEndPoint from,byte[] data)
-        {
-            BufferReader reader = new BufferReader(data);
-            int classID = reader.ReadInt32();
-            IGamePacket packet = ClassFactory<GamePacketAttribute, IGamePacket>.CreateClass(classID);
-            packet.FromBuffer(reader);
-            Console.WriteLine(String.Format("Packet Received Round Trip - {0}ms", TimeSpan.FromTicks(m_stopWatch.ElapsedTicks - packet.StopWatchTime).TotalMilliseconds));
-        }
-
-        private void OnPacketReceived(IPEndPoint source, TransferDataPacket data)
-        {
-            m_builder.Add(data);
-        }
-
+        
         protected override void OneSecondPing()
         {
             TimeSpan elapsed = m_stopWatch.Elapsed;
@@ -77,10 +96,18 @@ namespace Gware.Gaming.Common.Networking
             }
         }
 
+        public void SendInsuredPacket(IGamePacket packet,Action<GameClient,IGamePacket> onReply)
+        {
+            packet.StopWatchTime = m_stopWatch.ElapsedTicks;
+            m_insuredPackets.Set(packet.PacketID, onReply);
+            m_tcpClient.Send(packet.ToBytes());
+            
+        }
+
         public void Send(IGamePacket packet)
         {
             packet.StopWatchTime = m_stopWatch.ElapsedTicks;
-            m_listener.Send(packet.ToBytes());
+            m_udpClient.Send(packet.ToBytes());
         }
 
     }

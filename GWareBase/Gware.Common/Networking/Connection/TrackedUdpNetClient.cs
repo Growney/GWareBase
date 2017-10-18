@@ -40,13 +40,7 @@ namespace Gware.Common.Networking.Connection
             data.Header.Sequence = m_tracker.GetNextSequence();
             return base.Send(sendTo, data);
         }
-
-        public override bool Send(string address, int port, TransferDataPacket data)
-        {
-            data.Header.Sequence = m_tracker.GetNextSequence();
-            return base.Send(address, port, data);
-        }
-
+        
         public bool Send(byte[] data)
         {
             return Send(m_server, data);

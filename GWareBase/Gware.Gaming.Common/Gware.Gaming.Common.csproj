@@ -51,6 +51,7 @@
     <Compile Include="Networking\GamePacket\IGamePacket.cs" />
     <Compile Include="Networking\GamePacket\InfoRequestPacket.cs" />
     <Compile Include="Networking\GamePacket\InfoResponsePacket.cs" />
+    <Compile Include="Networking\GamePacket\GamePacketHelper.cs" />
     <Compile Include="Networking\GameServer.cs" />
     <Compile Include="Noise\CellularGenerator.cs" />
     <Compile Include="Noise\Enumeration.cs" />

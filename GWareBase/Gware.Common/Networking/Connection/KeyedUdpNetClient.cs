@@ -51,15 +51,7 @@ namespace Gware.Common.Networking.Connection
             writer.WriteBytes(data);
             return base.Send(sendTo, writer.GetBuffer());
         }
-
-        public override bool Send(string address, int port, byte[] data)
-        {
-            BufferWriter writer = new BufferWriter(false);
-            writer.WriteInt32(c_key);
-            writer.WriteBytes(data);
-            return base.Send(address, port, writer.GetBuffer());
-        }
-
+        
         protected virtual void KeyedDataReceived(IPEndPoint from,BufferReader data)
         {
             OnKeyedDataReceived?.Invoke(from, data);

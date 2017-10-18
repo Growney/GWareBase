@@ -41,7 +41,7 @@ namespace Gware.Profiling
                         if(client != null)
                         {
                             Console.WriteLine("Ping started:");
-                            client.Send(new InfoRequestPacket(InfoRequestPacketType.Ping));
+                            client.SendInsuredPacket(new InfoRequestPacket(InfoRequestPacketType.Ping),OnPingReply);
                         }
                         else
                         {
@@ -82,5 +82,11 @@ namespace Gware.Profiling
                 server.Stop();
             }
         }
+        public static void OnPingReply(GameClient client,IGamePacket packet)
+        {
+            Console.WriteLine(String.Format("Ping Reply: {0}ms", TimeSpan.FromTicks(client.StopWatchTime - packet.StopWatchTime).TotalMilliseconds));
+        }
     }
+
+    
 }

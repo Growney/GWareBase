@@ -27,7 +27,6 @@ namespace Gware.Common.Networking.Connection
             EndPoint = endPoint;
             m_packetLossCallback = onPacketLoss;
         }
-
         public ConnectionTracker(IPEndPoint endPoint,ushort sequenceStart)
             :this(endPoint,null,sequenceStart)
         {
