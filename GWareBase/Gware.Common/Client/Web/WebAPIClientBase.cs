@@ -8,108 +8,76 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Client.Web
 {
-    public abstract class WebAPIClientBase : IClient
+    public class WebAPIClient : HttpClient
     {
-        private string m_apiAddress;
-        public string APIAddress
+        public WebAPIClient(string apiAddress)
         {
-            get
-            {
-                return m_apiAddress;
-            }
-
-            set
-            {
-                m_apiAddress = value;
-            }
+            BaseAddress = new Uri(apiAddress);
         }
-        public WebAPIClientBase(string apiAddress)
-        {
-            m_apiAddress = apiAddress;
-        }
-        protected T APIHttpGet<T>(string uri)
-        {
-            T retVal = default(T);
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(APIAddress);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                // New code:
-                Task<HttpResponseMessage> responseTask = client.GetAsync(string.Format("api/{0}",uri));
-                responseTask.Wait();
-
-                if (responseTask.Result.IsSuccessStatusCode)
-                {
-                    Task<T> deserializeTask = responseTask.Result.Content.ReadAsAsync<T>();
-                    deserializeTask.Wait();
-
-                    retVal = deserializeTask.Result;
-                }
-            }
-            return retVal;
-        }
-        protected T APIHttpPost<T,K>(string uri,K postObj)
-        {
-            T retVal = default(T);
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(APIAddress);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                // New code:
-                Task<HttpResponseMessage> responseTask = client.PostAsync(string.Format("api/{0}", uri), postObj, formatter);
-                responseTask.Wait();
-
-                if (responseTask.Result.IsSuccessStatusCode)
-                {
-                    Task<T> deserializeTask = responseTask.Result.Content.ReadAsAsync<T>();
-                    deserializeTask.Wait();
-
-                    retVal = deserializeTask.Result;
-                }
-            }
-            return retVal;
-        }
-        protected bool APIHttpPost<K>(string uri,K postObj)
-        {
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(APIAddress);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                
-                MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
-                // New code:
-                Task<HttpResponseMessage> responseTask = client.PostAsync(string.Format("api/{0}", uri), postObj, formatter);
-                responseTask.Wait();
-
-                return responseTask.Result.IsSuccessStatusCode;
-            }
-        }
-        public static string BuildUri(string baseUri, params KeyValuePair<string, string>[] parameters)
+        
+        public static string BuildUri(string baseUri, params (string key,object value)[] parameters)
         {
             StringBuilder retVal = new StringBuilder();
             retVal.Append(baseUri);
-            retVal.Append("?");
             for (int i = 0; i < parameters.Length; i++)
             {
                 if (i != 0)
                 {
                     retVal.Append("&");
                 }
-                retVal.Append(parameters[i].Key);
+                else
+                {
+                    retVal.Append("?");
+                }
+                retVal.Append(parameters[i].key);
                 retVal.Append("=");
-                retVal.Append(parameters[i].Value);
+                retVal.Append(parameters[i].value.ToString());
             }
             return retVal.ToString();
         }
-        public abstract bool CanConnect();
-        public abstract ClientConnectionStatus GetConnectionStatus();
 
-    
+        public T APIPostContent<T>(string uri, HttpContent content, AuthenticationHeaderValue authentication)
+        {
+            DefaultRequestHeaders.Accept.Clear();
+            DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            DefaultRequestHeaders.Authorization = authentication;
+
+            return WebAPIClient.ParseResponse<T>(PostAsync(uri, content));
+        }
+        
+
+        public T APIJSONGet<T>(string uri, AuthenticationHeaderValue authentication)
+        {
+            DefaultRequestHeaders.Accept.Clear();
+            DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            DefaultRequestHeaders.Authorization = authentication;
+
+            return WebAPIClient.ParseResponse<T>(GetAsync(uri));
+        }
+
+        public T APIJSONGet<T>(string uri)
+        {
+            return APIJSONGet<T>(uri, null);
+        }
+
+        public static T ParseResponse<T>(Task<System.Net.Http.HttpResponseMessage> response)
+        {
+            T retVal = default(T);
+
+            response.Wait();
+            if (response.Status != TaskStatus.RanToCompletion)
+            {
+                throw new Exception("Error Retreiving Data", response.Exception);
+            }
+
+            Task<T> deserializeTask = response.Result.Content.ReadAsAsync<T>();
+            deserializeTask.Wait();
+
+            retVal = deserializeTask.Result;
+
+            return retVal;
+        }
+
+
     }
 }

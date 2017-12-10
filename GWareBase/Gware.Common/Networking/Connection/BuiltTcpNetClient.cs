@@ -9,11 +9,11 @@ using Gware.Common.Networking.Packet;
 
 namespace Gware.Common.Networking.Connection
 {
-    public class BuiltTcpNetClient : TrackedTcpNetClient
+    public class BuiltTcpNetClient : TrackedTcpNetClient,INetClient
     {
         private ConnectionDataBuilder m_builder = new ConnectionDataBuilder();
 
-        public event Action<BuiltTcpNetClient,byte[]> OnDataCompelted;
+        public event Action<INetClient, byte[]> OnDataCompelted;
 
         public BuiltTcpNetClient(TcpClient client)
             :base(client)
@@ -36,5 +36,9 @@ namespace Gware.Common.Networking.Connection
             m_builder.Add(packet);
         }
 
+        public bool Send(byte[] data)
+        {
+            return base.Send(data);
+        }
     }
 }

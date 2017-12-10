@@ -13,7 +13,13 @@ namespace Gware.Common.Networking.Connection
         private IPEndPoint m_server;
         private ConnectionTracker m_tracker;
         public event Action<IPEndPoint, ushort> OnPacketLoss;
-
+        public IPEndPoint RemoteEndPoint
+        {
+            get
+            {
+                return m_server;
+            }
+        }
         public TrackedUdpNetClient(IPEndPoint server,int port)
             :base(port)
         {

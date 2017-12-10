@@ -111,10 +111,13 @@ namespace Gware.Common.Networking.Connection
 
         public virtual bool Send(byte[] bytes)
         {
-            if (m_stream.CanWrite)
+            lock (m_stream)
             {
-                m_stream.Write(bytes, 0, bytes.Length);
-                return true;
+                if (m_stream.CanWrite)
+                {
+                    m_stream.Write(bytes, 0, bytes.Length);
+                    return true;
+                }
             }
             return false;
         }

@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Networking.Connection
 {
-    public class BuiltUdpNetClient : TrackedUdpNetClient
+    public class BuiltUdpNetClient : TrackedUdpNetClient,INetClient
     {
         private ConnectionDataBuilder m_builder = new ConnectionDataBuilder();
 
-        public event Action<BuiltUdpNetClient,byte[]> OnDataCompelted;
+        
+
+        public event Action<INetClient,byte[]> OnDataCompelted;
 
         public BuiltUdpNetClient(IPEndPoint server, int port)
             :base(server,port)
@@ -29,6 +31,11 @@ namespace Gware.Common.Networking.Connection
         {
             m_builder.Add(data);
             base.PacketReceived(from, data);
+        }
+
+        public bool Send(byte[] data)
+        {
+            return base.Send(data);
         }
     }
 }

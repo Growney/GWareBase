@@ -29,7 +29,7 @@ namespace Gware.Gaming.Common.Networking
         public GameServer(int port)
         {
             m_udpListener = new BuiltUdpNetServer(port);
-            m_udpListener.OnDataCompelted += OnUdpDataCompleted;
+            m_udpListener.OnDataCompelted += PacketReceived;
 
             m_tcpServer = new BuiltTcpNetServer(port);
             m_tcpServer.OnTrackedClientConnected += OnTcpClientConnected;
@@ -37,33 +37,28 @@ namespace Gware.Gaming.Common.Networking
             m_stopWatch = new Stopwatch();
             m_stopWatch.Start();
         }
-
-        protected virtual void OnTcpClientConnected(BuiltTcpNetClient obj)
-        {
-            obj.Start();
-            obj.OnDataCompelted += OnTcpDataCompleted;
-        }
-
-        private void OnTcpDataCompleted(BuiltTcpNetClient sender,byte[] data)
-        {
-            IGamePacket packet = GamePacketHelper.CreateAndLoadPacket(data);
-            if (packet != null)
-            {
-                IGamePacket response = packet.CreateResponse();
-                sender.Send(response.ToBytes());
-            }
-        }
-
-        
-        protected virtual void OnUdpDataCompleted(IPEndPoint from, byte[] data)
+        private void PacketReceived(INetClient client, byte[] data)
         {
             IGamePacket packet = GamePacketHelper.CreateAndLoadPacket(data);
             if(packet != null)
             {
-                IGamePacket response = packet.CreateResponse();
-                m_udpListener.Send(from, response.ToBytes());
-            }      
+                if(packet is IRequiresResponse responseRequired)
+                {
+                    client.Send(responseRequired.CreateReponse().ToBytes());
+                }
+                OnPacketReceived(client, packet);
+            }
+        }
 
+        protected virtual void OnPacketReceived(INetClient client,IGamePacket packet)
+        {
+
+        }
+
+        protected virtual void OnTcpClientConnected(BuiltTcpNetClient obj)
+        {
+            obj.Start();
+            obj.OnDataCompelted += PacketReceived;
         }
 
         public void Start()

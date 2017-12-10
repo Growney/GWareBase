@@ -60,7 +60,11 @@ namespace Gware.Common.Networking.Connection
 
         public virtual bool Send(IPEndPoint sendTo, byte[] data)
         {
-            return (m_baseClient.Send(data, data.Length, sendTo) == data.Length);
+            lock (m_baseClient)
+            {
+                return (m_baseClient.Send(data, data.Length, sendTo) == data.Length);
+            }
+            
         }
         
         
