@@ -60,6 +60,18 @@ namespace Gware.Common.Client.Web
             return APIJSONGet<T>(uri, null);
         }
 
+        public static T ParseResponse<T>(System.Net.Http.HttpResponseMessage response)
+        {
+            T retVal = default(T);
+
+            Task<T> deserializeTask = response.Content.ReadAsAsync<T>();
+            deserializeTask.Wait();
+
+            retVal = deserializeTask.Result;
+
+            return retVal;
+        }
+
         public static T ParseResponse<T>(Task<System.Net.Http.HttpResponseMessage> response)
         {
             T retVal = default(T);

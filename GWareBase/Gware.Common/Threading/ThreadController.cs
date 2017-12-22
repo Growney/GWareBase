@@ -31,6 +31,11 @@ namespace Gware.Common.Threading
         private List<ActionThread> m_garbageThreads = new List<ActionThread>();
         private List<ActionThread> m_activeThreads = new List<ActionThread>();
 
+        public ThreadController(int maxThreads)
+        {
+            m_maxThreads = maxThreads;
+        }
+
         private ActionThread GetNextAvaliableThread()
         {
             ActionThread retVal = null;
@@ -112,6 +117,11 @@ namespace Gware.Common.Threading
         private void ReduceThreads(int reduceTo)
         {
 
+        }
+
+        public void AddAction(IExecuteable executable)
+        {
+            m_jobQueue.Enqueue(executable);
         }
     }
 }

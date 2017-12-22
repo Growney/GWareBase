@@ -43,7 +43,7 @@ namespace Gware.Business.Commands
         {
 
         }
-        public static DataCommand Save(int id, int entityContainerTypeID)
+        public static DataCommand Save(long id, int entityContainerTypeID)
         {
             DataCommand retVal = Factory.CreateCommand("Save",true,false,
                 Load(entityContainerTypeID),
@@ -53,7 +53,7 @@ namespace Gware.Business.Commands
             return retVal;
         }
         
-        public static DataCommand LoadSingle(int id, int entityContainerTypeID)
+        public static DataCommand LoadSingle(long id, int entityContainerTypeID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadSingle");
             retVal.AddParameter("Id", DbType.Int32).Value = id;

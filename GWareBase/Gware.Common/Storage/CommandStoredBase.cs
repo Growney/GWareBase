@@ -12,5 +12,7 @@ namespace Gware.Common.Storage
     {
         public abstract IDataCommand CreateSaveCommand();
         public abstract IDataCommand CreateDeleteCommand();
+
+        public abstract IDataCommand CreateLoadFromPrimaryKey(long primaryKey);
     }
 }

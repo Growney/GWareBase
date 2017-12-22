@@ -1,4 +1,5 @@
 ﻿using Gware.Common.Application;
+using Gware.Common.Reflection;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Storage.Command;
 using Gware.Common.Storage.Command.Interface;
@@ -12,25 +13,21 @@ namespace Gware.Common.Storage
 {
     public abstract class StoredObjectBase : CommandStoredBase
     {
-        private int m_id;
+        public abstract long Id { get; set; }
+        
 
-        public int Id
+        protected virtual string GetIDField()
         {
-            get
-            {
-                return m_id;
-            }
-
-            set
-            {
-                m_id = value;
-            }
+            return "Id";
         }
 
         protected override void LoadFrom(IDataAdapter adapter)
         {
-            m_id = adapter.GetValue("Id", 0);
-            OnLoad(adapter);
+            if(adapter != null)
+            {
+                Id = adapter.GetValue(GetIDField(), 0);
+                OnLoad(adapter);
+            }
         }
 
         protected abstract void OnLoad(IDataAdapter adapter);
@@ -59,9 +56,9 @@ namespace Gware.Common.Storage
             return base.GetIsDirty();
         }
 
-        public virtual int Save()
+        public virtual long Save()
         {
-            int retVal = Id;
+            long retVal = Id;
             if (GetIsDirty())
             {
                 IDataCommand command = CreateSaveCommand();
@@ -81,6 +78,20 @@ namespace Gware.Common.Storage
             command.AddReCacheCommand(GetDeleteReCacheCommands());
             return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
         }
-        
+
+
+        public virtual void Load(long primaryKey)
+        {
+            IDataCommand command = CreateLoadFromPrimaryKey(primaryKey);
+            LoadFrom(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command).First);
+        }
+
+        public static T Get<T>(long primaryKey) where T : StoredObjectBase,new()
+        {
+            T retVal = new T();
+            retVal.Load(primaryKey);
+            return retVal;
+        }
+
     }
 }

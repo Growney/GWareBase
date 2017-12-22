@@ -21,6 +21,19 @@ namespace Gware.Business.Entity
     {
         private DateTime m_lastUpdated;
         private readonly int m_entityTypeID;
+
+        private long m_id;
+        public override long Id
+        {
+            get
+            {
+                return m_id;
+            }
+            set
+            {
+                m_id = value;
+            }
+        }
         public int EntityTypeID
         {
             get
@@ -54,9 +67,9 @@ namespace Gware.Business.Entity
             m_children = new StoredMultiEntityTypeCollection(this, EntityRelationship.Parent);
         }
 
-        internal int GetID()
+        internal long GetID()
         {
-            if(Id == 0)
+            if (Id == 0)
             {
                 Save();
             }
@@ -74,7 +87,7 @@ namespace Gware.Business.Entity
         {
             int entityTypeIDVal = entityTypeID.ToInt32(CultureInfo.CurrentCulture);
 
-            m_parents.Set<T>(entityTypeIDVal,index, item);
+            m_parents.Set<T>(entityTypeIDVal, index, item);
         }
         public void AddParentEntity<T>(IEnumerable<T> items) where T : EntityBase
         {
@@ -94,7 +107,7 @@ namespace Gware.Business.Entity
             return ParentExists<T>(entityTypeID, -1);
         }
 
-        public bool ParentExists<T>(IConvertible entityTypeID,int index) where T : EntityBase, new()
+        public bool ParentExists<T>(IConvertible entityTypeID, int index) where T : EntityBase, new()
         {
             int entityTypeIDVal = entityTypeID.ToInt32(CultureInfo.CurrentCulture);
 
@@ -110,7 +123,7 @@ namespace Gware.Business.Entity
         {
             return GetParentEntity<T>(entityTypeID, -1);
         }
-        
+
         public T GetParentEntity<T>(IConvertible entityTypeID, int index) where T : EntityBase, new()
         {
             int entityTypeIDVal = entityTypeID.ToInt32(CultureInfo.CurrentCulture);
@@ -125,17 +138,17 @@ namespace Gware.Business.Entity
         }
 
         #endregion --- Get Parent ---
-        
+
         #region --- Set Children ---
-        public void SetChildEntity<T>(IConvertible entityTypeID,T item) where T : EntityBase, new()
+        public void SetChildEntity<T>(IConvertible entityTypeID, T item) where T : EntityBase, new()
         {
-            SetChildEntity<T>(entityTypeID,0,item);
+            SetChildEntity<T>(entityTypeID, 0, item);
         }
-        public void SetChildEntity<T>(IConvertible entityTypeID, int index,T item) where T : EntityBase, new()
+        public void SetChildEntity<T>(IConvertible entityTypeID, int index, T item) where T : EntityBase, new()
         {
             int entityTypeIDVal = entityTypeID.ToInt32(CultureInfo.CurrentCulture);
 
-            m_children.Set<T>(entityTypeIDVal,index,item);
+            m_children.Set<T>(entityTypeIDVal, index, item);
         }
 
         #endregion --- SetChildren ---
@@ -156,15 +169,15 @@ namespace Gware.Business.Entity
 
         public T GetChildEntity<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
-            return GetChildEntity<T>(entityTypeID,0);
+            return GetChildEntity<T>(entityTypeID, 0);
         }
-        public T GetChildEntity<T>(IConvertible entityTypeID,int index) where T : EntityBase, new()
+        public T GetChildEntity<T>(IConvertible entityTypeID, int index) where T : EntityBase, new()
         {
             int entityTypeIDVal = entityTypeID.ToInt32(CultureInfo.CurrentCulture);
 
             return m_children.Get<T>(entityTypeIDVal, index);
         }
-        public IReadOnlyList<T> GetChildEntites<T>(IConvertible entityTypeID) where T : EntityBase,new()
+        public IReadOnlyList<T> GetChildEntites<T>(IConvertible entityTypeID) where T : EntityBase, new()
         {
             int entityTypeIDVal = entityTypeID.ToInt32(CultureInfo.CurrentCulture);
 
@@ -186,7 +199,7 @@ namespace Gware.Business.Entity
         {
             return new IDataCommand[] {
                 EntityCommandFactory.LoadEntities(EntityTypeID),
-                EntityCommandFactory.LoadEntity(Id, EntityTypeID)
+                EntityCommandFactory.LoadEntity(EntityTypeID,Id )
             };
         }
 
@@ -199,7 +212,7 @@ namespace Gware.Business.Entity
         {
             return new IDataCommand[] {
                 EntityCommandFactory.LoadEntities(EntityTypeID),
-                EntityCommandFactory.LoadEntity(Id, EntityTypeID)
+                EntityCommandFactory.LoadEntity(EntityTypeID, Id)
             };
         }
         protected override void OnLoad(IDataAdapter adapter)
@@ -217,7 +230,7 @@ namespace Gware.Business.Entity
 
         protected override void OnSave()
         {
-            foreach(EntityBase child in m_children)
+            foreach (EntityBase child in m_children)
             {
                 child.Save();
             }
@@ -245,22 +258,22 @@ namespace Gware.Business.Entity
             return LoadSingle<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(new T().GetLoadSingleCommand(id)));
         }
 
-        public static T LoadChildEntity<T>(int parentEntityTypeID, int parentEntityID, int childEntityTypeID, int index) where T : EntityBase, new()
+        public static T LoadChildEntity<T>(int parentEntityTypeID, long parentEntityID, int childEntityTypeID, int index) where T : EntityBase, new()
         {
             return LoadSingle<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadChildEntity(parentEntityTypeID, parentEntityID, childEntityTypeID, index)));
         }
 
-        public static T LoadParentEntity<T>(int childEntityTypeID, int childEntityID, int parentEntityTypeID, int index) where T : EntityBase, new()
+        public static T LoadParentEntity<T>(int childEntityTypeID, long childEntityID, int parentEntityTypeID, int index) where T : EntityBase, new()
         {
             return LoadSingle<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadParentEntity(childEntityTypeID, childEntityID, parentEntityTypeID, index)));
         }
 
-        public static IList<T> LoadParentEntities<T>(int entityID, int entityTypeID, int parentEntityTypeID) where T : EntityBase, new()
+        public static IList<T> LoadParentEntities<T>(long entityID, int entityTypeID, int parentEntityTypeID) where T : EntityBase, new()
         {
             return Load<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadParentEntites(entityID, entityTypeID, parentEntityTypeID)));
         }
 
-        public static IList<T> LoadChildEntities<T>(int entityID, int entityTypeID, int childEntityTypeID) where T : EntityBase, new()
+        public static IList<T> LoadChildEntities<T>(long entityID, int entityTypeID, int childEntityTypeID) where T : EntityBase, new()
         {
             return Load<T>(EntityCommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(EntityCommandFactory.LoadChildEntites(entityID, entityTypeID, childEntityTypeID)));
         }

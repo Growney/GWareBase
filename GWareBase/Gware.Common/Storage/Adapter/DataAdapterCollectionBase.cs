@@ -21,6 +21,18 @@ namespace Gware.Common.Storage.Adapter
             }
         }
 
+        public IDataAdapter First
+        {
+            get
+            {
+                if(m_adapters != null && m_adapters.Length > 0)
+                {
+                    return m_adapters[0];
+                }
+                return null;
+            }
+        }
+
         public DataAdapterCollectionBase(T loadFrom)
         {
             OnLoadFrom(loadFrom);

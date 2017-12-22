@@ -57,7 +57,7 @@ namespace Gware.Business.Commands
 
         }
 
-        public static DataCommand SaveEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
+        public static DataCommand SaveEntityAssignment(long fromEntityID, int fromEntityTypeID, long toEntityID, int toEntityTypeID, int index)
         {
             DataCommand retVal = Factory.CreateCommand("SaveEntityAssignment", GetWriteAssignmentRecache(fromEntityID, fromEntityTypeID, toEntityID, toEntityTypeID, index));
             retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
@@ -67,7 +67,7 @@ namespace Gware.Business.Commands
             retVal.AddParameter("Index", DbType.Int32).Value = index;
             return retVal;
         }
-        public static DataCommand DeleteEntityAssignment(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
+        public static DataCommand DeleteEntityAssignment(long fromEntityID, int fromEntityTypeID, long toEntityID, int toEntityTypeID, int index)
         {
             DataCommand retVal = Factory.CreateCommand("DeleteEntityAssignment", GetWriteAssignmentRecache(fromEntityID, fromEntityTypeID, toEntityID, toEntityTypeID, index));
             retVal.AddParameter("ParentEntityTypeID", DbType.Int32).Value = fromEntityTypeID;
@@ -78,7 +78,7 @@ namespace Gware.Business.Commands
             return retVal;
         }
 
-        private static IDataCommand[] GetWriteAssignmentRecache(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
+        private static IDataCommand[] GetWriteAssignmentRecache(long fromEntityID, int fromEntityTypeID, long toEntityID, int toEntityTypeID, int index)
         {
             return new IDataCommand[] {
                 EntityCommandFactory.LoadChildEntity(fromEntityID, fromEntityTypeID,toEntityTypeID,index),

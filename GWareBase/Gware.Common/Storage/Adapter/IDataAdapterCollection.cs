@@ -9,5 +9,6 @@ namespace Gware.Common.Storage.Adapter
     public interface IDataAdapterCollection
     {
         IDataAdapter[] Adapters { get; }
+        IDataAdapter First { get; }
     }
 }

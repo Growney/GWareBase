@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.DataStructures;
+using Gware.Common.Storage;
+using Gware.Common.Storage.Adapter;
 
 namespace Gware.Common.Reflection
 {
@@ -91,5 +93,38 @@ namespace Gware.Common.Reflection
 
             return retVal;
         }
+
+        public static StoredClass CreateStoredClass<StoredClassAttribute,StoredClass>(string typeField,IDataAdapter adapter) where StoredClass : StoredObjectBase where StoredClassAttribute : ClassIDAttribute
+        {
+            StoredClass retVal = null;
+            if(adapter != null)
+            {
+                int typeID = adapter.GetValue(typeField, 0);
+                retVal = ClassFactory<StoredClassAttribute, StoredClass>.CreateClass(typeID);
+                if (retVal != null)
+                {
+                    retVal.Load(adapter);
+                }
+            }
+            
+            return retVal;
+        }
+
+        public static IEnumerable<StoredClass> CreateStoredClass<StoredClassAttribute, StoredClass>(string typeField, IDataAdapterCollection adapters) where StoredClass : StoredObjectBase where StoredClassAttribute : ClassIDAttribute
+        {
+            List<StoredClass> retVal = new List<StoredClass>();
+
+            foreach (IDataAdapter adapter in adapters.Adapters)
+            {
+                StoredClass newClass = ClassFactory<StoredClassAttribute, StoredClass>.CreateStoredClass<StoredClassAttribute, StoredClass>(typeField, adapter);
+                if(newClass != null)
+                {
+                    retVal.Add(newClass);
+                }
+            }
+
+            return retVal;
+        }
+
     }
 }

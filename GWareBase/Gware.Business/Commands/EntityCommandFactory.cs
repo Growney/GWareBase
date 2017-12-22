@@ -55,11 +55,11 @@ namespace Gware.Business.Commands
 
         #region ---- Read ----
 
-        public static DataCommand LoadEntity(int entityTypeID, int entityID)
+        public static DataCommand LoadEntity(int entityTypeID, long entityID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadEntity");
             retVal.AddParameter("EntityTypeID", DbType.Int32).Value = entityTypeID;
-            retVal.AddParameter("EntityID", DbType.Int32).Value = entityID;
+            retVal.AddParameter("EntityID", DbType.Int64).Value = entityID;
             return retVal;
         }
 
@@ -70,7 +70,7 @@ namespace Gware.Business.Commands
             return retVal;
         }
 
-        public static DataCommand LoadChildEntity(int parentEntityTypeID, int parentEntityID, int childEntityTypeID, int index)
+        public static DataCommand LoadChildEntity(long parentEntityTypeID, long parentEntityID, int childEntityTypeID, int index)
         {
             DataCommand retVal = Factory.CreateCommand("LoadChildEntity");
             retVal.AddParameter("EntityTypeID", DbType.Int32).Value = parentEntityTypeID;
@@ -79,7 +79,7 @@ namespace Gware.Business.Commands
             retVal.AddParameter("Index", DbType.Int32).Value = index;
             return retVal;
         }
-        public static DataCommand LoadParentEntity(int childEntityTypeID, int childEntityID, int parentEntityTypeID, int index)
+        public static DataCommand LoadParentEntity(long childEntityTypeID, long childEntityID, int parentEntityTypeID, int index)
         {
             DataCommand retVal = Factory.CreateCommand("LoadParentEntity");
             retVal.AddParameter("EntityTypeID", DbType.Int32).Value = childEntityTypeID;
@@ -90,7 +90,7 @@ namespace Gware.Business.Commands
         }
        
 
-        public static DataCommand LoadParentEntites(int entityID, int entityTypeID, int parentEntityTypeID)
+        public static DataCommand LoadParentEntites(long entityID, int entityTypeID, int parentEntityTypeID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadParentEntites");
 
@@ -100,7 +100,7 @@ namespace Gware.Business.Commands
             return retVal;
         }
 
-        public static DataCommand LoadChildEntites(int entityID, int entityTypeID, int childEntityTypeID)
+        public static DataCommand LoadChildEntites(long entityID, int entityTypeID, int childEntityTypeID)
         {
             DataCommand retVal = Factory.CreateCommand("LoadChildEntities");
 
@@ -114,7 +114,7 @@ namespace Gware.Business.Commands
 
         #region ---- Write ----
 
-        public static DataCommand Delete(int entityTypeID, int entityID)
+        public static DataCommand Delete(int entityTypeID, long entityID)
         {
             DataCommand retVal = Factory.CreateCommand("Delete",true,false,
                 LoadEntities(entityTypeID),

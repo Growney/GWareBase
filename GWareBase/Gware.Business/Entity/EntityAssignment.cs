@@ -17,12 +17,24 @@ namespace Gware.Business.Entity
     {
 
         private DateTime m_lastupdate;
-        private int m_parentEntityID;
+        private long m_parentEntityID;
         private int m_parentEntityTypeID;
-        private int m_childEntityID;
+        private long m_childEntityID;
         private int m_childEntityTypeID;
         private int m_index;
+        private long m_id;
 
+        public override long Id
+        {
+            get
+            {
+                return m_id;
+            }
+            set
+            {
+                m_id = value;
+            }
+        }
         public DateTime Lastupdate
         {
             get
@@ -35,7 +47,7 @@ namespace Gware.Business.Entity
                 m_lastupdate = value;
             }
         }
-        public int ParentEntityID
+        public long ParentEntityID
         {
             get
             {
@@ -59,7 +71,7 @@ namespace Gware.Business.Entity
                 m_parentEntityTypeID = value;
             }
         }
-        public int ChildEntityID
+        public long ChildEntityID
         {
             get
             {
@@ -113,15 +125,15 @@ namespace Gware.Business.Entity
 
         public override IDataCommand CreateSaveCommand()
         {
-            return EntityAssignmentCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
+            return EntityAssignmentCommandFactory.SaveEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID, m_index);
         }
 
         public override IDataCommand CreateDeleteCommand()
         {
-            return EntityAssignmentCommandFactory.DeleteEntityAssignment(m_parentEntityID, m_parentEntityTypeID,m_childEntityID, m_childEntityTypeID,m_index);
+            return EntityAssignmentCommandFactory.DeleteEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID, m_index);
         }
 
-        public static int Save(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID,int index)
+        public static long Save(long fromEntityID, int fromEntityTypeID, long toEntityID, int toEntityTypeID, int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
@@ -133,7 +145,7 @@ namespace Gware.Business.Entity
             };
             return val.Save();
         }
-        public static bool Delete(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID,int index)
+        public static bool Delete(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
@@ -146,5 +158,9 @@ namespace Gware.Business.Entity
             return val.Delete();
         }
 
+        public override IDataCommand CreateLoadFromPrimaryKey(long primaryKey)
+        {
+            return null;
+        }
     }
 }

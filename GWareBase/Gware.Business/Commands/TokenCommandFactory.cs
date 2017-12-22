@@ -15,7 +15,7 @@ namespace Gware.Business.Commands
 
         }
 
-        public static DataCommand SaveToken(int id,DateTime expiry,string key,DateTime created)
+        public static DataCommand SaveToken(long id,DateTime expiry,string key,DateTime created)
         {
             DataCommand retVal = new TokenCommandFactory().CreateCommand("Save");
             retVal.AddParameter("Id", System.Data.DbType.Int32).Value = id;
