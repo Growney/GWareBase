@@ -17,28 +17,12 @@ namespace Gware.Common.Threading
             if (m_action != null)
             {
                 m_action.Execute();
+                m_action = null;
             }
-            Pause();
             if (OnThreadComplete != null)
             {
                 OnThreadComplete(this, this);
             }
-        }
-        public override void Resume()
-        {
-            if (m_action != null)
-            {
-                m_action.Resume();
-            }
-            base.Resume();
-        }
-        public override void Pause()
-        {
-            if (m_action != null)
-            {
-                m_action.Pause();
-            }
-            base.Pause();
         }
         public void Cancel()
         {
@@ -50,7 +34,7 @@ namespace Gware.Common.Threading
         public virtual void DoWork(IExecuteable action)
         {
             m_action = action;
-            Resume();
+            Trigger();
         }
 
     }

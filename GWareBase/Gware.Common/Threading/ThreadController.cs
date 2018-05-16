@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Threading
 {
-    public class ThreadController : TimerThread
+    public class ThreadController : ThreadBase
     {
         private int m_maxThreads = 10;
 
@@ -22,6 +22,13 @@ namespace Gware.Common.Threading
                 m_maxThreads = value; 
             }
         }
+        public int QueueCount
+        {
+            get
+            {
+                return m_jobQueue.Count;
+            }
+        }
         private Queue<IExecuteable> m_jobQueue = new Queue<IExecuteable>();
 
         private List<ActionThread> m_allThreads = new List<ActionThread>();
@@ -31,7 +38,10 @@ namespace Gware.Common.Threading
         private List<ActionThread> m_garbageThreads = new List<ActionThread>();
         private List<ActionThread> m_activeThreads = new List<ActionThread>();
 
+        public EventHandler OnQueueEmpty;
+
         public ThreadController(int maxThreads)
+            :base()
         {
             m_maxThreads = maxThreads;
         }
@@ -39,7 +49,7 @@ namespace Gware.Common.Threading
         private ActionThread GetNextAvaliableThread()
         {
             ActionThread retVal = null;
-            for (int i = m_completedThreads.Count - 1; i >= 0; i++)
+            for (int i = m_completedThreads.Count - 1; i >= 0; i--)
             {
                 m_inactiveThreads.Add(m_completedThreads[i]);
                 if (m_activeThreads.Contains(m_completedThreads[i]))
@@ -60,10 +70,9 @@ namespace Gware.Common.Threading
                 retVal = m_inactiveThreads[0];
                 m_inactiveThreads.RemoveAt(0);
             }
-            else
+            else if(m_allThreads.Count < MaxThreads)
             {
-                ActionThread newThread = CreateNewThread();
-                retVal = newThread;
+                retVal = CreateNewThread();
             }
 
 
@@ -73,22 +82,23 @@ namespace Gware.Common.Threading
         {
             ActionThread thread = new ActionThread();
             thread.OnThreadComplete += OnThreadComplete;
+            thread.Start();
             m_allThreads.Add(thread);
             return thread;
         }
 
         private void OnThreadComplete(object sender, ActionThread e)
         {
+            Trigger();
             m_completedThreads.Add(e);
         }
 
-     
-        protected override void OneSecondPing()
+        protected override void ExecuteSingleThreadCycle()
         {
-            ActionThread nextThread = GetNextAvaliableThread();
-            if (nextThread != null)
+            while(m_jobQueue.Count > 0 && !m_stop)
             {
-                if (m_jobQueue.Count > 0)
+                ActionThread nextThread = GetNextAvaliableThread();
+                if (nextThread != null)
                 {
                     m_activeThreads.Add(nextThread);
                     IExecuteable exe = m_jobQueue.Dequeue();
@@ -96,10 +106,12 @@ namespace Gware.Common.Threading
                 }
                 else
                 {
-                    m_inactiveThreads.Add(nextThread);
+                    break;
                 }
             }
+            OnQueueEmpty?.Invoke(this,new EventArgs());
         }
+        
 
         protected override void OnThreadExit()
         {
@@ -122,6 +134,7 @@ namespace Gware.Common.Threading
         public void AddAction(IExecuteable executable)
         {
             m_jobQueue.Enqueue(executable);
+            Trigger();
         }
     }
 }

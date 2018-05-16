@@ -11,10 +11,11 @@ namespace Gware.Common.Storage.Command
     public class DataCommandParameter : IDataCommandParameter
     {
         private string m_name;
+        private string m_dataTypeName;
         private DbType m_dataType;
         private ParameterDirection m_direction;
         private object m_value;
-        private bool m_any;
+        
 
         public DbType DataType
         {
@@ -26,6 +27,17 @@ namespace Gware.Common.Storage.Command
             set
             {
                 m_dataType = value;
+            }
+        }
+        public string DataTypeName
+        {
+            get
+            {
+                return m_dataTypeName;
+            }
+            set
+            {
+                m_dataTypeName = value;
             }
         }
         public ParameterDirection Direction
@@ -64,17 +76,6 @@ namespace Gware.Common.Storage.Command
                 m_value = value;
             }
         }
-        public bool Any
-        {
-            get
-            {
-                return m_any;
-            }
-            set
-            {
-                m_any = value;
-            }
-        }
 
         
         public DataCommandParameter(string name)
@@ -93,17 +94,14 @@ namespace Gware.Common.Storage.Command
         {
 
         }
-        public DataCommandParameter(string name, object value, DbType type, ParameterDirection direction)
-            :this(name,value,type,direction,false)
+        public DataCommandParameter(string name,object value,string dataTypeName)
         {
-
+            m_name = name;
+            m_value = value;
+            m_dataTypeName = dataTypeName;
+            m_dataType = DbType.Object;
         }
-        public DataCommandParameter(string name, object value, DbType type,bool any)
-            :this(name,value,type,ParameterDirection.Input,any)
-        {
-
-        }
-        public DataCommandParameter(string name,object value,DbType type,ParameterDirection direction, bool any)
+        public DataCommandParameter(string name,object value,DbType type,ParameterDirection direction)
         {
             m_name = name;
             m_value = value;

@@ -14,9 +14,9 @@ namespace Gware.Common.Threading
 
         private bool m_running;
         private int m_sleepTime;
-        private bool m_stop;
-        private EventWaitHandle m_pauseEvent;
-        private EventWaitHandle m_stoppedEvent;
+        protected bool m_stop;
+        private ManualResetEvent m_pauseEvent;
+        private ManualResetEvent m_stoppedEvent;
         private DateTime m_lastThreadRun;
 
         public event EventHandler<ThreadBase> OnExecuteSingleThreadCycle;
@@ -68,8 +68,8 @@ namespace Gware.Common.Threading
         {
             m_sleepTime = sleepTime;
             m_stop = false;
-            m_pauseEvent = new EventWaitHandle(true, EventResetMode.ManualReset);
-            m_stoppedEvent = new EventWaitHandle(false, EventResetMode.ManualReset);
+            m_pauseEvent = new ManualResetEvent(true);
+            m_stoppedEvent = new ManualResetEvent(false);
         }
 
         private void DoWork(object threadContext)
@@ -101,15 +101,23 @@ namespace Gware.Common.Threading
         {
             while (!m_stop)
             {
-                m_pauseEvent.WaitOne();
-
-                if (!m_stop) // to ensure that we havent stopped while we were paused
+                if (m_pauseEvent.WaitOne(10000))
                 {
-                    m_lastThreadRun = DateTime.UtcNow;
-                    ExecuteSingleThreadCycle();
-                    Thread.Sleep(m_sleepTime);
+                    m_pauseEvent.Reset();
+                    if (!m_stop) // to ensure that we havent stopped while we were paused
+                    {
+                        m_lastThreadRun = DateTime.UtcNow;
+                        ExecuteSingleThreadCycle();
+                    }
                 }
             }
+        }
+
+        protected bool Wait(int timeout)
+        {
+            bool retVal = m_pauseEvent.WaitOne(timeout);
+            m_pauseEvent.Reset();
+            return retVal;
         }
         protected virtual void OnThreadInit()
         {
@@ -119,24 +127,22 @@ namespace Gware.Common.Threading
         {
 
         }
-        public virtual void Pause()
-        {
-            m_pauseEvent.Reset();
-        }
-        public virtual void Resume()
-        {
-            m_pauseEvent.Set();
-        }
         public virtual void Start()
         {
             m_running = true;
             m_stop = false;
             ThreadPool.QueueUserWorkItem(DoWork);
         }
+
+        protected void Trigger()
+        {
+            m_pauseEvent.Set();
+        }
+
         public virtual bool Stop(int timeout = c_stopTimeout)
         {
             m_stop = true;
-            Resume();
+            m_pauseEvent.Set();
             return m_stoppedEvent.WaitOne(timeout);
         }
     }

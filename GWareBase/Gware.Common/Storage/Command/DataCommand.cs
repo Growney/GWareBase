@@ -147,17 +147,13 @@ namespace Gware.Common.Storage.Command
         {
             return AddParameter(new DataCommandParameter(name,  null, dataType, direction));
         }
-
-        public IDataCommandParameter AddParameter(string name, DbType dataType, ParameterDirection direction, bool anyValueInCache)
+        public IDataCommandParameter AddParameter(string name,string datatypeName)
         {
-            return AddParameter(new DataCommandParameter(name, null, dataType, direction,anyValueInCache));
+            return AddParameter(new DataCommandParameter(name, null, DbType.Object, ParameterDirection.Input));
         }
 
-        public IDataCommandParameter AddParameter(string name, DbType dataType, bool anyValueInCache)
-        {
-            return AddParameter(new DataCommandParameter(name, null, dataType, anyValueInCache));
-        }
-        
+
+
         public object GetParameterValue(string name)
         {
             return GetParameter(name).Value;

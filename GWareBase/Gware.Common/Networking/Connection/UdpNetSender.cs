@@ -30,27 +30,11 @@ namespace Gware.Common.Networking.Connection
 
         protected override void ExecuteSingleThreadCycle()
         {
-            KeyValuePair<IPEndPoint, byte[]>? data = null;
-            lock (m_packetQueue)
+            while(m_packetQueue.Count > 0 && !m_stop)
             {
-                if(m_packetQueue.Count > 0)
-                {
-                    data = m_packetQueue.Dequeue();
-                }
-            }
-
-            if (data != null)
-            {
-                OnDataReceived(data.Value.Key, data.Value.Value);
-            }
-
-            lock (m_packetQueue)
-            {
-                if(m_packetQueue.Count == 0)
-                {
-                    Pause();
-                }
-            }
+                KeyValuePair<IPEndPoint, byte[]> data = m_packetQueue.Dequeue();
+                OnDataReceived(data.Key, data.Value);
+            } 
         }
 
         protected virtual void OnDataReceived(IPEndPoint from, byte[] data)
@@ -91,7 +75,7 @@ namespace Gware.Common.Networking.Connection
                 lock (m_packetQueue)
                 {
                     m_packetQueue.Enqueue(new KeyValuePair<IPEndPoint, byte[]>(from, rxData));
-                    Resume();
+                    Trigger();
                 }
 
 

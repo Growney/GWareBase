@@ -39,25 +39,12 @@ namespace Gware.Common.Networking.Connection
         }
         protected override void ExecuteSingleThreadCycle()
         {
-            byte[] data = null;
-            lock (m_packetQueue)
+            while(m_packetQueue.Count > 0 && !m_stop)
             {
-                if(m_packetQueue.Count > 0)
+                byte[] data = m_packetQueue.Dequeue();
+                if (data != null)
                 {
-                    data = m_packetQueue.Dequeue();
-                }
-            }
-
-            if(data != null)
-            {
-                OnDataRecevied(data);
-            }
-
-            lock (m_packetQueue)
-            {
-                if(m_packetQueue.Count == 0)
-                {
-                    Pause();
+                    OnDataRecevied(data);
                 }
             }
         }
@@ -92,7 +79,7 @@ namespace Gware.Common.Networking.Connection
                        byte[] readBuffer = new byte[receviedBytes];
                        Buffer.BlockCopy(buffer, 0, readBuffer, 0, receviedBytes);
                        m_packetQueue.Enqueue(readBuffer);
-                       Resume();
+                       Trigger();
                        BeginRead();
                    }
                });

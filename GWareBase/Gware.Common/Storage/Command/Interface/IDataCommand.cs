@@ -25,8 +25,7 @@ namespace Gware.Common.Storage.Command.Interface
         IDataCommandParameter AddParameter(IDataCommandParameter param);
         IDataCommandParameter AddParameter(string name, System.Data.DbType dataType, System.Data.ParameterDirection direction);
         IDataCommandParameter AddParameter(string name, System.Data.DbType dataType);
-        IDataCommandParameter AddParameter(string name, System.Data.DbType dataType, System.Data.ParameterDirection direction, bool anyValueInCache);
-        IDataCommandParameter AddParameter(string name, System.Data.DbType dataType,bool anyValueInCache);
+        IDataCommandParameter AddParameter(string name,string dataTypeName);
         void SetParameter(string name, object value);
         object GetParameterValue(string name);
         IDataCommandParameter GetParameter(string name);

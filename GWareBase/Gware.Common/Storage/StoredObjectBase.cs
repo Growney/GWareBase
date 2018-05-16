@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Storage
 {
-    public abstract class StoredObjectBase : CommandStoredBase
+    public abstract class StoredObjectBase : CommandStoredBase, ISaveable,IHasID
     {
         public abstract long Id { get; set; }
         
@@ -64,7 +64,7 @@ namespace Gware.Common.Storage
                 IDataCommand command = CreateSaveCommand();
                 command.AddReCacheCommand(GetSaveReCacheCommands());
                 command.Cache = false;
-                retVal = LoadSingle<LoadedFromAdapterValue<int>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
+                retVal = LoadSingle<LoadedFromAdapterValue<long>>(GetController().ExecuteCollectionCommand(command)).Value;
                 Id = retVal;
             }
 
@@ -76,14 +76,19 @@ namespace Gware.Common.Storage
         {
             IDataCommand command = CreateDeleteCommand();
             command.AddReCacheCommand(GetDeleteReCacheCommands());
-            return LoadSingle<LoadedFromAdapterValue<bool>>(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command)).Value;
+            return LoadSingle<LoadedFromAdapterValue<bool>>(GetController().ExecuteCollectionCommand(command)).Value;
         }
 
 
         public virtual void Load(long primaryKey)
         {
             IDataCommand command = CreateLoadFromPrimaryKey(primaryKey);
-            LoadFrom(CommandControllerApplicationBase.Main.Controller.ExecuteCollectionCommand(command).First);
+            LoadFrom(GetController().ExecuteCollectionCommand(command).First);
+        }
+
+        public virtual ICommandController GetController()
+        {
+            return CommandControllerApplicationBase.Main.Controller;
         }
 
         public static T Get<T>(long primaryKey) where T : StoredObjectBase,new()
@@ -92,6 +97,18 @@ namespace Gware.Common.Storage
             retVal.Load(primaryKey);
             return retVal;
         }
+    }
 
+    public class StoredObjectIDComparer : IEqualityComparer<StoredObjectBase>
+    {
+        public bool Equals(StoredObjectBase x, StoredObjectBase y)
+        {
+            return x.Id == y.Id;
+        }
+
+        public int GetHashCode(StoredObjectBase obj)
+        {
+            return obj.GetHashCode();
+        }
     }
 }

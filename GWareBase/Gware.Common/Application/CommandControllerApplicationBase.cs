@@ -31,6 +31,7 @@ namespace Gware.Common.Application
             lock (m_initLock)
             {
                 m_main = appBase;
+                m_main.OnBaseInitialize();
             }
         }
 
@@ -52,6 +53,10 @@ namespace Gware.Common.Application
             Controller = controller;
         }
 
+        public virtual void OnBaseInitialize()
+        {
+
+        }
         public CommandControllerApplicationBase(T controller)
         {
             Init(controller);

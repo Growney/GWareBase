@@ -90,6 +90,11 @@ namespace Gware.Common.Client.Web
             return retVal;
         }
 
+        public static Task<T> ParseResponseAsync<T>(System.Net.Http.HttpResponseMessage response)
+        {
+            return response.Content.ReadAsAsync<T>();
+        }
+
 
     }
 }

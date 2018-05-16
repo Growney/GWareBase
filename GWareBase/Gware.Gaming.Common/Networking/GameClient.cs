@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.DataStructures;
 using System.Threading;
+using System.Reflection;
 
 namespace Gware.Gaming.Common.Networking
 {
@@ -20,7 +21,7 @@ namespace Gware.Gaming.Common.Networking
     {
         static GameClient()
         {
-            ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes();
+            ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes(new Assembly[] { Assembly.GetAssembly(typeof(IGamePacket)) });
         }
 
         private Queue<AutoResetEvent> m_eventQueue = new Queue<AutoResetEvent>();

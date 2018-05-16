@@ -11,6 +11,7 @@ using Gware.Common.Networking.Packet;
 using Gware.Gaming.Common.Networking.GamePacket;
 using Gware.Common.Reflection;
 using Gware.Common.Data;
+using System.Reflection;
 
 namespace Gware.Gaming.Common.Networking
 {
@@ -18,7 +19,7 @@ namespace Gware.Gaming.Common.Networking
     {
         static GameServer()
         {
-            ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes();
+            ClassFactory<GamePacketAttribute, IGamePacket>.InitialiseEntityTypes(new Assembly[] { Assembly.GetAssembly(typeof(IGamePacket)) });
         }
 
         private Stopwatch m_stopWatch;

@@ -34,25 +34,12 @@ namespace Gware.Common.Networking.Connection
         
         protected override void ExecuteSingleThreadCycle()
         {
-            TcpClient client = null;
-            lock (m_queuedClients)
+            while(m_queuedClients.Count > 0)
             {
-                if(m_queuedClients.Count > 0)
+                TcpClient client = m_queuedClients.Dequeue();
+                if (client != null)
                 {
-                    client = m_queuedClients.Dequeue();
-                }
-            }
-
-            if (client != null)
-            {
-                ClientConnected(client);
-            }
-
-            lock (m_queuedClients)
-            {
-                if(m_queuedClients.Count == 0)
-                {
-                    Pause();
+                    ClientConnected(client);
                 }
             }
         }
@@ -80,7 +67,7 @@ namespace Gware.Common.Networking.Connection
                 m_queuedClients.Enqueue(m_listener.EndAcceptTcpClient(ar));
             }
 
-            Resume();
+            Trigger();
         }
         
 

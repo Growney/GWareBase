@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Gware.Common.DataStructures;
 using Gware.Common.Storage;
@@ -12,22 +13,36 @@ namespace Gware.Common.Reflection
 {
     public static class ClassFactory<AttributeType,ClassType> where AttributeType : ClassIDAttribute
     {
-        private static object m_typeLock = new object();
-        private static Dictionary<int, Type> m_classCache = new Dictionary<int, Type>();
+        private static ManualResetEvent m_event = new ManualResetEvent(true);
+        private static Dictionary<int, Type> m_classCache;
 
-        public static void InitialiseEntityTypes()
+        public static void InitialiseEntityTypes(Assembly[] loaded)
         {
-            m_classCache.Clear();
-
-            Assembly[] loaded = AppDomain.CurrentDomain.GetAssemblies();
-            Task[] loadTasks = new Task[loaded.Length];
-
-            for (int i = 0; i < loaded.Length; i++)
+            try
             {
-                loadTasks[i] = CreateSearchTask(loaded[i]);
-            }
+                m_event.WaitOne();
+                m_event.Reset();
+                
+                if(m_classCache == null)
+                {
+                    m_classCache = new Dictionary<int, Type>();
 
-            Task.WaitAll(loadTasks);
+                    Task[] loadTasks = new Task[loaded.Length];
+
+                    for (int i = 0; i < loaded.Length; i++)
+                    {
+                        loadTasks[i] = CreateSearchTask(loaded[i]);
+                    }
+
+                    Task.WaitAll(loadTasks);
+                }
+                
+            }
+            finally
+            {
+                m_event.Set();
+            }
+            
         }
         private static Task CreateSearchTask(Assembly assembly)
         {
@@ -52,11 +67,8 @@ namespace Gware.Common.Reflection
                                         AttributeType attribute = attributes[j] as AttributeType;
                                         if (attribute != null)
                                         {
-                                            lock (m_typeLock)
-                                            {
-                                                m_classCache.Set(attribute.ClassID, type);
-                                                break;
-                                            }
+                                            m_classCache.Set(attribute.ClassID, type);
+                                            break;
                                         }
                                     }
                                 }
@@ -77,13 +89,8 @@ namespace Gware.Common.Reflection
         }
         public static ClassType CreateClass(int classID)
         {
-            lock (m_typeLock)
-            {
-                if (m_classCache.Count == 0)
-                {
-                    InitialiseEntityTypes();
-                }
-            }
+            InitialiseEntityTypes(new Assembly[] { Assembly.GetAssembly(typeof(ClassType)) });
+            
             ClassType retVal = default(ClassType);
             if (m_classCache.ContainsKey(classID))
             {
@@ -93,11 +100,19 @@ namespace Gware.Common.Reflection
 
             return retVal;
         }
-
+        public static StoredClass CreateStoredClass<StoredClassAttribute, StoredClass>(IDataAdapter adapter) where StoredClass : StoredObjectBase where StoredClassAttribute : ClassIDAttribute
+        {
+            StoredClass retVal = ClassFactory<StoredClassAttribute, StoredClass>.CreateClass(typeof(StoredClass).GetClassID<StoredClassAttribute>());
+            if(retVal != null && adapter != null)
+            {
+                retVal.Load(adapter);
+            }
+            return retVal;
+        }
         public static StoredClass CreateStoredClass<StoredClassAttribute,StoredClass>(string typeField,IDataAdapter adapter) where StoredClass : StoredObjectBase where StoredClassAttribute : ClassIDAttribute
         {
             StoredClass retVal = null;
-            if(adapter != null)
+            if (adapter != null)
             {
                 int typeID = adapter.GetValue(typeField, 0);
                 retVal = ClassFactory<StoredClassAttribute, StoredClass>.CreateClass(typeID);
@@ -106,7 +121,7 @@ namespace Gware.Common.Reflection
                     retVal.Load(adapter);
                 }
             }
-            
+
             return retVal;
         }
 

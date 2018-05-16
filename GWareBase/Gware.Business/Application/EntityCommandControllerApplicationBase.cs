@@ -8,6 +8,7 @@ using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,7 @@ namespace Gware.Business.Application
     {
         public EntityCommandControllerApplicationBase(ICommandController controller) : base(controller)
         {
-            ClassFactory<EntityTypeAttribute,EntityBase>.InitialiseEntityTypes();
+            ClassFactory<EntityTypeAttribute,EntityBase>.InitialiseEntityTypes(new Assembly[] { Assembly.GetAssembly(typeof(EntityBase)) });
         }
         
     }

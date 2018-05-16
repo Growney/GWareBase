@@ -25,7 +25,6 @@ namespace Gware.Common.Storage.Command
         private void DisplayCommandExcuted()
         {
             m_commandsExecuted++;
-            System.Diagnostics.Debug.WriteLine(string.Format("Commands Executed: {0}", m_commandsExecuted));
         }
         public IDataAdapterCollection ExecuteCollectionCommand(IDataCommand command)
         {
@@ -71,7 +70,7 @@ namespace Gware.Common.Storage.Command
         public static void AddParameterToStoredProcedure(StoredProcedure procedure, IDataCommandParameter command)
         {
             string dbCommandName = GetDatabaseParameterName(command.Name);
-            procedure.AddParameter(dbCommandName, ConvertToSqlDBType(command.DataType), command.Direction);
+            procedure.AddParameter(dbCommandName, ConvertToSqlDBType(command.DataType),command.DataTypeName, command.Direction);
             procedure.SetParameterValue(dbCommandName, command.Value);
         }
 
@@ -155,8 +154,10 @@ namespace Gware.Common.Storage.Command
                 case DbType.DateTimeOffset:
                     retVal = SqlDbType.DateTimeOffset;
                     break;
-                case DbType.VarNumeric:
                 case DbType.Object:
+                    retVal = SqlDbType.Structured;
+                    break;
+                case DbType.VarNumeric:
                 default:
                     throw new NotSupportedException();
             }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gware.Common.Threading
@@ -17,27 +19,33 @@ namespace Gware.Common.Threading
 
     public class TimerThread : ThreadBase
     {
+        static TimerThread()
+        {
+            _timeStopwatch = new Stopwatch();
+            _timeStopwatch.Start();
+        }
         private delegate void TimerAction();
         private ThreadTimerEvents _actionEvents;
         private TimerAction _timerActions;
 
-        private DateTime _lastMinutePass;
-        private DateTime _lastSecondPass;
-        private DateTime _lastHourPass;
+        private static Stopwatch _timeStopwatch;
+        private long _lastMinutePass;
+        private long _lastSecondPass;
+        private long _lastHourPass;
 
-        public DateTime LastHourPass
+        public long LastHourPass
         {
             get { return _lastHourPass; }
             set { _lastHourPass = value; }
         }
 
-        public DateTime LastSecondPass
+        public long LastSecondPass
         {
             get { return _lastSecondPass; }
             set { _lastSecondPass = value; }
         }
 
-        public DateTime LastMinutePass
+        public long LastMinutePass
         {
             get { return _lastMinutePass; }
             set { _lastMinutePass = value; }
@@ -89,44 +97,51 @@ namespace Gware.Common.Threading
         {
             base.OnThreadExit();
         }
-        protected override void ExecuteSingleThreadCycle()
+
+        protected override void ExecuteEntireThreadCycle()
         {
-            _timerActions();
+            while (!m_stop)
+            {
+                Thread.Sleep(500);
+                if (!m_stop)
+                {
+                    _timerActions();
+                }
+            }
         }
 
         private void InitiliasePasses()
         {
-            DateTime utcNow = DateTime.UtcNow;
-            _lastMinutePass = utcNow;
-            _lastSecondPass = utcNow;
-            _lastHourPass = utcNow;
+            _lastMinutePass = _timeStopwatch.ElapsedMilliseconds;
+            _lastSecondPass = _timeStopwatch.ElapsedMilliseconds;
+            _lastHourPass = _timeStopwatch.ElapsedMilliseconds;
         }
         private void MinutePing()
         {
-            TimeSpan timeSinceLast = DateTime.UtcNow - _lastMinutePass;
+            TimeSpan timeSinceLast = TimeSpan.FromMilliseconds(_timeStopwatch.ElapsedMilliseconds - _lastMinutePass);
             if (timeSinceLast.TotalMinutes > 1)
             {
                 OneMinutePing();
-                _lastMinutePass = DateTime.UtcNow;
+                _lastMinutePass = _timeStopwatch.ElapsedMilliseconds;
             }
 
         }
         private void SecondPing()
         {
-            TimeSpan timeSinceLast = DateTime.UtcNow - _lastSecondPass;
+            TimeSpan timeSinceLast = TimeSpan.FromMilliseconds(_timeStopwatch.ElapsedMilliseconds - _lastSecondPass);
             if (timeSinceLast.TotalSeconds > 1)
             {
-                OneMinutePing();
-                _lastSecondPass = DateTime.UtcNow;
+                OneSecondPing();
+                _lastSecondPass = _timeStopwatch.ElapsedMilliseconds;
             }
         }
         private void HourPing()
         {
-            TimeSpan timeSinceLast = DateTime.UtcNow - _lastHourPass;
+            TimeSpan timeSinceLast = TimeSpan.FromMilliseconds(_timeStopwatch.ElapsedMilliseconds - _lastHourPass);
             if (timeSinceLast.TotalHours > 1)
             {
-                OneMinutePing();
-                _lastHourPass = DateTime.UtcNow;
+                OneHourPing();
+                _lastHourPass = _timeStopwatch.ElapsedMilliseconds;
             }
         }
         protected virtual void OneMinutePing()
