@@ -1,4 +1,5 @@
 ﻿using Gware.Common.Reflection;
+using Gware.Common.Storage.Command.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,8 @@ namespace Gware.Common.Storage.Adapter
 
         private object m_object; 
 
-        public MemoryDataAdapter(object item)
+        public MemoryDataAdapter(ICommandController controller,object item)
+            :base(controller)
         {
             m_object = item;
         }

@@ -133,7 +133,7 @@ namespace Gware.Business.Entity
             return EntityAssignmentCommandFactory.DeleteEntityAssignment(m_parentEntityID, m_parentEntityTypeID, m_childEntityID, m_childEntityTypeID, m_index);
         }
 
-        public static long Save(long fromEntityID, int fromEntityTypeID, long toEntityID, int toEntityTypeID, int index)
+        public static long Save(ICommandController controller,long fromEntityID, int fromEntityTypeID, long toEntityID, int toEntityTypeID, int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
@@ -143,9 +143,9 @@ namespace Gware.Business.Entity
                 ChildEntityTypeID = toEntityTypeID,
                 Index = index
             };
-            return val.Save();
+            return val.Save(controller);
         }
-        public static bool Delete(int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
+        public static bool Delete(ICommandController controller,int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
@@ -155,7 +155,7 @@ namespace Gware.Business.Entity
                 ChildEntityTypeID = toEntityTypeID,
                 Index = index
             };
-            return val.Delete();
+            return val.Delete(controller);
         }
 
         public override IDataCommand CreateLoadFromPrimaryKey(long primaryKey)

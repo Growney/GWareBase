@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Storage.Command.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,11 +14,11 @@ namespace Gware.Common.Storage
         {
 
         }
-        public long Save()
+        public long Save(ICommandController controller)
         {
             foreach (T val in this)
             {
-                val.Save();
+                val.Save(controller);
             }
             return 0;
         }

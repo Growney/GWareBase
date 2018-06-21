@@ -104,13 +104,13 @@ namespace Gware.Common.Database
             node.Set("Password", Password);
             
         }
-        private string GetApplicationConnectionString()
+        public string GetConnectionString()
         {
-            return string.Format("Server={0};Database={1};User id={2};Password={3};Trusted_Connection=False;Encrypt={5};Connection Timeout={4};", m_serverName, m_databaseName, m_username, m_password,m_timeOut,m_encrypted);
+            return $"Server={m_serverName};Database={m_databaseName};User id={m_username};Password={m_password};Trusted_Connection=False;Encrypt={m_encrypted};Connection Timeout={m_timeOut};";
         }
         public SqlConnection GetConnection()
         {
-            string connectionString = GetApplicationConnectionString();
+            string connectionString = GetConnectionString();
             return new SqlConnection(connectionString);
         }
         public int ExecuteNonQuery(StoredProcedure sp)

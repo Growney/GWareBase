@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Gware.Gaming.Common.Application
 {
-    public class GameClientApplicationBase : CommandControllerApplicationBase
+    public class GameClientApplicationBase : ApplicationBase
     {
-        public GameClientApplicationBase(ICommandController controller) : base(controller)
+        public GameClientApplicationBase()
         {
 
         }

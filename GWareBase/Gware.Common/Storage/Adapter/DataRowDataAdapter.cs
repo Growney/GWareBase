@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.Data;
+using Gware.Common.Storage.Command.Interface;
+
 namespace Gware.Common.Storage.Adapter
 {
     public class DataRowDataAdapter : DataAdapterBase
     {
         private System.Data.DataRow m_row;
 
-        public DataRowDataAdapter(System.Data.DataRow row)
+        public DataRowDataAdapter(ICommandController controller,System.Data.DataRow row)
+            :base(controller)
         {
             m_row = row;
         }

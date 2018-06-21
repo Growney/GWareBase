@@ -16,6 +16,12 @@ namespace Gware.Common.Storage.Command
         private static int m_commandsExecuted = 0;
         private const char c_storedProcedurePrefix = 'p';
         private const char c_parameterPrefix = '@';
+
+        public MSSQLCommandController()
+            :base(string.Empty,string.Empty,string.Empty,string.Empty)
+        {
+
+        }
         public MSSQLCommandController(string serverName, string databaseName, string databaseUsername, string databasePassword)
             : base(serverName, databaseName, databaseUsername, databasePassword)
         {
@@ -29,13 +35,13 @@ namespace Gware.Common.Storage.Command
         public IDataAdapterCollection ExecuteCollectionCommand(IDataCommand command)
         {
             DisplayCommandExcuted();
-            return new DataTableDataAdapter(Connection.ExecuteTableQuery(CreateStoredProcedureFromCommand(command)));
+            return new DataTableDataAdapter(this,Connection.ExecuteTableQuery(CreateStoredProcedureFromCommand(command)));
         }
 
         public IDataAdapterCollectionGroup ExecuteGroupCommand(IDataCommand command)
         {
             DisplayCommandExcuted();
-            return new DataSetDataAdapter(Connection.ExecuteQuery(CreateStoredProcedureFromCommand(command)));
+            return new DataSetDataAdapter(this,Connection.ExecuteQuery(CreateStoredProcedureFromCommand(command)));
         }
 
         public int ExecuteQuery(IDataCommand command)
@@ -107,7 +113,7 @@ namespace Gware.Common.Storage.Command
                     retVal = SqlDbType.Float;
                     break;
                 case DbType.Guid:
-                    retVal = SqlDbType.VarChar;
+                    retVal = SqlDbType.UniqueIdentifier;
                     break;
                 case DbType.Int16:
                     retVal = SqlDbType.SmallInt;
@@ -189,6 +195,101 @@ namespace Gware.Common.Storage.Command
                 }
             }
             return retVal;
+        }
+
+        public string GetInitialisationString()
+        {
+            return $"{Connection.ServerName} {Connection.DatabaseName} {Connection.Username} {Connection.Password}";
+        }
+
+        public void Initialise(string initialisationString)
+        {
+            string[] splits = initialisationString.Split(' ');
+            if(splits.Length > 3)
+            {
+                SetDetails(splits[0], splits[1], splits[2], splits[3]);
+            }
+        }
+
+        public ICommandController Clone()
+        {
+            return new MSSQLCommandController(ServerName, DatabaseName, DatabaseUsername, DatabasePassword);
+        }
+
+        public void SetName(string name)
+        {
+            SetDetails(ServerName, name, DatabaseUsername, DatabasePassword);
+        }
+
+        public Task<bool> DeploySchema(string schemaFile,string dbName)
+        {
+            TaskCompletionSource<bool> source = new TaskCompletionSource<bool>();
+            try
+            {
+
+                var process = new System.Diagnostics.Process();
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                    FileName = @"C:\Program Files (x86)\Microsoft SQL Server\140\DAC\bin\SqlPackage.exe",
+                    Arguments = $"/Action:Publish /SourceFile:\"{schemaFile}\" /TargetConnectionString:\"{Connection.GetConnectionString()}\""
+                };
+                process.StartInfo = startInfo;
+                process.EnableRaisingEvents = true;
+                process.Exited += (x, y) =>
+                {
+                    if (process.ExitCode == 0)
+                    {
+                        source.SetResult(true);
+                    }
+                    else
+                    {
+                        source.SetResult(false);
+                    }
+                };
+                process.Start();
+                if (process.HasExited)
+                {
+                    source.SetResult(false);
+                }
+                #region ---- Awaiting .NET Core 2.0 Support -----
+                //Microsoft.SqlServer.Dac.DacServices dacServices = new Microsoft.SqlServer.Dac.DacServices(Connection.GetConnectionString());
+                //dacServices.ProgressChanged += (x, y) =>
+                //{
+                //    switch (y.Status)
+                //    {
+                //        case Microsoft.SqlServer.Dac.DacOperationStatus.Completed:
+                //            source.SetResult(true);
+                //            break;
+                //        case Microsoft.SqlServer.Dac.DacOperationStatus.Faulted:
+                //        case Microsoft.SqlServer.Dac.DacOperationStatus.Cancelled:
+                //            source.SetResult(false);
+                //            break;
+                //        default:
+                //            break;
+                //    }
+                //};
+
+                //Microsoft.SqlServer.Dac.DacPackage package = Microsoft.SqlServer.Dac.DacPackage.Load(schemaFile);
+
+                //Microsoft.SqlServer.Dac.DacDeployOptions options = new Microsoft.SqlServer.Dac.DacDeployOptions()
+                //{
+                //    SqlCommandVariableValues =
+                //    {
+                //        new KeyValuePair< string, string >( "debug", "false" )
+                //    },
+                //    CreateNewDatabase = true,
+                //    BlockOnPossibleDataLoss = false,
+                //    BlockWhenDriftDetected = false
+                //};
+                //dacServices.Deploy(package, dbName, upgradeExisting: true, options: options);
+                #endregion ---- Awaiting .NET Core 2.0 Support -----
+            }
+            catch (Exception ex)
+            {
+                source.SetException(ex);
+            }
+            return source.Task;
         }
     }
 }

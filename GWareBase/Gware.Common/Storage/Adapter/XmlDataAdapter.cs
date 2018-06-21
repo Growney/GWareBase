@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Gware.Common.XML;
 using System.Xml;
+using Gware.Common.Storage.Command.Interface;
 
 namespace Gware.Common.Storage.Adapter
 {
@@ -12,7 +13,8 @@ namespace Gware.Common.Storage.Adapter
     {
         private System.Xml.XmlNode m_node;
 
-        public XmlDataAdapter(System.Xml.XmlNode node)
+        public XmlDataAdapter(ICommandController controller,System.Xml.XmlNode node)
+            :base(controller)
         {
             m_node = node;
         }

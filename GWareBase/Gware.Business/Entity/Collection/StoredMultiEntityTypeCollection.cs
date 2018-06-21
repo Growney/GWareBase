@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Gware.Common.DataStructures;
+using Gware.Common.Storage.Command.Interface;
 
 namespace Gware.Business.Entity.Collection
 {
@@ -61,54 +62,54 @@ namespace Gware.Business.Entity.Collection
         {
             m_collection.Set(entityTypeID, collection);
         }
-        public void Add<T>(IEnumerable<T> items) where T : EntityBase
+        public void Add<T>(ICommandController controller,IEnumerable<T> items) where T : EntityBase
         {
             foreach(T item in items)
             {
-                Add(item);
+                Add(controller,item);
             }
         }
 
-        public void Add<T>(T item) where T : EntityBase
+        public void Add<T>(ICommandController controller,T item) where T : EntityBase
         {
             GetCollection(item.EntityTypeID).Add(item);
             switch (m_relationship)
             {
                 case EntityRelationship.Parent:
-                    EntityAssignment.Save(m_relation.GetID(), m_relation.EntityTypeID, item.GetID(), item.EntityTypeID, -1);
+                    EntityAssignment.Save(controller,m_relation.GetID(controller), m_relation.EntityTypeID, item.GetID(controller), item.EntityTypeID, -1);
                     break;
                 case EntityRelationship.Child:
-                    EntityAssignment.Save(item.GetID(), item.EntityTypeID, m_relation.GetID(), m_relation.EntityTypeID, -1);
+                    EntityAssignment.Save(controller,item.GetID(controller), item.EntityTypeID, m_relation.GetID(controller), m_relation.EntityTypeID, -1);
                     break;
             }
         }
 
-        public bool Exists<T>(int entityTypeID, int index) where T : EntityBase, new()
+        public bool Exists<T>(ICommandController controller,int entityTypeID, int index) where T : EntityBase, new()
         {
             T retVal = default(T);
             switch (m_relationship)
             {
                 case EntityRelationship.Parent:
-                    retVal = EntityBase.LoadChildEntity<T>(m_relation.EntityTypeID, m_relation.GetID(), entityTypeID, index);
+                    retVal = EntityBase.LoadChildEntity<T>(controller,m_relation.EntityTypeID, m_relation.GetID(controller), entityTypeID, index);
                     break;
                 case EntityRelationship.Child:
-                    retVal = EntityBase.LoadParentEntity<T>(m_relation.EntityTypeID, m_relation.GetID(), entityTypeID, index);
+                    retVal = EntityBase.LoadParentEntity<T>(controller,m_relation.EntityTypeID, m_relation.GetID(controller), entityTypeID, index);
                     break;
             }
 
             return retVal != default(T);
         }
 
-        public T Get<T>(int entityTypeID, int index) where T : EntityBase,new()
+        public T Get<T>(ICommandController controller,int entityTypeID, int index) where T : EntityBase,new()
         {
             T retVal = default(T);
             switch (m_relationship)
             {
                 case EntityRelationship.Parent:
-                    retVal = EntityBase.LoadChildEntity<T>(m_relation.EntityTypeID, m_relation.GetID(), entityTypeID, index);
+                    retVal = EntityBase.LoadChildEntity<T>(controller,m_relation.EntityTypeID, m_relation.GetID(controller), entityTypeID, index);
                     break;
                 case EntityRelationship.Child:
-                    retVal = EntityBase.LoadParentEntity<T>(m_relation.EntityTypeID, m_relation.GetID(), entityTypeID, index);
+                    retVal = EntityBase.LoadParentEntity<T>(controller,m_relation.EntityTypeID, m_relation.GetID(controller), entityTypeID, index);
                     break;
             }
 
@@ -124,17 +125,17 @@ namespace Gware.Business.Entity.Collection
             return retVal;
         }
 
-        public List<T> Get<T>(int entityTypeID) where T : EntityBase,new()
+        public List<T> Get<T>(ICommandController controller,int entityTypeID) where T : EntityBase,new()
         {
             List<T> retVal = new List<T>();
 
             switch (m_relationship)
             {
                 case EntityRelationship.Parent:
-                    retVal.AddRange(EntityBase.LoadChildEntities<T>(m_relation.GetID(), m_relation.EntityTypeID, entityTypeID));
+                    retVal.AddRange(EntityBase.LoadChildEntities<T>(controller,m_relation.GetID(controller), m_relation.EntityTypeID, entityTypeID));
                     break;
                 case EntityRelationship.Child:
-                    retVal.AddRange(EntityBase.LoadParentEntities<T>(m_relation.GetID(), m_relation.EntityTypeID, entityTypeID));
+                    retVal.AddRange(EntityBase.LoadParentEntities<T>(controller,m_relation.GetID(controller), m_relation.EntityTypeID, entityTypeID));
                     break;
             }
 
@@ -144,15 +145,15 @@ namespace Gware.Business.Entity.Collection
             return retVal;
         }
 
-        public void Set<T>(int entityTypeID, int index, T item) where T : EntityBase
+        public void Set<T>(ICommandController controller,int entityTypeID, int index, T item) where T : EntityBase
         {
             switch (m_relationship)
             {
                 case EntityRelationship.Parent:
-                    EntityAssignment.Save(m_relation.GetID(), m_relation.EntityTypeID, item.GetID(), entityTypeID, index);
+                    EntityAssignment.Save(controller,m_relation.GetID(controller), m_relation.EntityTypeID, item.GetID(controller), entityTypeID, index);
                     break;
                 case EntityRelationship.Child:
-                    EntityAssignment.Save(item.GetID(), entityTypeID, m_relation.GetID(), m_relation.EntityTypeID, index);
+                    EntityAssignment.Save(controller,item.GetID(controller), entityTypeID, m_relation.GetID(controller), m_relation.EntityTypeID, index);
                     break;
             }
 

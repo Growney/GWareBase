@@ -1,15 +1,17 @@
 ﻿using Gware.Common.Serialisation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Gware.Common.Reflection
 {
-    public static class ExtensionMethods
+    public static class ReflectionHelper
     {
         public delegate void ReflectionPropertyAction(object performOn, PropertyInfo property);
 
@@ -166,7 +168,15 @@ namespace Gware.Common.Reflection
             }
             return string.Empty;
         }
-
+        public static string GetGuid(this Assembly assembly)
+        {
+            GuidAttribute att = assembly.GetCustomAttribute(typeof(GuidAttribute)) as GuidAttribute;
+            if (att != null)
+            {
+                return att.Value;
+            }
+            return string.Empty;
+        }
         public static int GetClassID<AttributeType>(this Type type) where AttributeType : ClassIDAttribute
         {
             int retVal = -1;

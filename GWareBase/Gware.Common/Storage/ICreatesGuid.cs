@@ -1,5 +1,4 @@
-﻿using Gware.Common.Storage.Command.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Gware.Common.Storage
 {
-    public interface ISaveable
+    public interface ICreatesGuid
     {
-        long Save(ICommandController controller);
+        string GetGuidString();
     }
 }

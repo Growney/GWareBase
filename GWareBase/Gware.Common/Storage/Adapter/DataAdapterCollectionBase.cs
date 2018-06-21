@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Storage.Command.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,6 @@ namespace Gware.Common.Storage.Adapter
                 m_adapters = value;
             }
         }
-
         public IDataAdapter First
         {
             get
@@ -33,8 +33,11 @@ namespace Gware.Common.Storage.Adapter
             }
         }
 
-        public DataAdapterCollectionBase(T loadFrom)
+        public ICommandController Controller { get; private set; }
+
+        public DataAdapterCollectionBase(ICommandController controller,T loadFrom)
         {
+            Controller = controller;
             OnLoadFrom(loadFrom);
         }
 

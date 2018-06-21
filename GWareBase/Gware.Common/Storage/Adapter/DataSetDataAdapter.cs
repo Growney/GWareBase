@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Storage.Command.Interface;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace Gware.Common.Storage.Adapter
 {
     public class DataSetDataAdapter : DataAdapterCollectionGroupBase<System.Data.DataSet>
     {
-        public DataSetDataAdapter(System.Data.DataSet data)
-            :base(data)
+        public DataSetDataAdapter(ICommandController controller,System.Data.DataSet data)
+            :base(controller,data)
         {
         }
 
@@ -23,7 +24,7 @@ namespace Gware.Common.Storage.Adapter
             {
                 for (int i = 0; i < reqCount; i++)
                 {
-                    Collections[i] = new DataTableDataAdapter(loadFrom.Tables[i]);
+                    Collections[i] = new DataTableDataAdapter(Controller,loadFrom.Tables[i]);
                 }
             }
         }

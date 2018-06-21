@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Gware.Business.Application
 {
-    public class EntityCommandControllerApplicationBase : CommandControllerApplicationBase<ICommandController>
+    public class EntityApplicationBase : ApplicationBase
     {
-        public EntityCommandControllerApplicationBase(ICommandController controller) : base(controller)
+        public EntityApplicationBase()
         {
             ClassFactory<EntityTypeAttribute,EntityBase>.InitialiseEntityTypes(new Assembly[] { Assembly.GetAssembly(typeof(EntityBase)) });
         }

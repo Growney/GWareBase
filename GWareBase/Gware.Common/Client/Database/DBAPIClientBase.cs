@@ -56,11 +56,17 @@
         }
         public DBAPIClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword)
         {
+            SetDetails(serverName, databaseName, databaseUsername, databasePassword);
+        }
+
+        public void SetDetails(string serverName, string databaseName, string databaseUsername, string databasePassword)
+        {
             m_serverName = serverName;
             m_databaseName = databaseName;
             m_databaseUsername = databaseUsername;
             m_databasePassword = databasePassword;
         }
+
         public abstract bool CanConnect();
         public abstract ClientConnectionStatus GetConnectionStatus();
     }

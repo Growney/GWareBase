@@ -44,5 +44,15 @@ namespace Gware.Common.Storage
             }
             return retVal;
         }
+
+        public static Guid GetGuid(this ICreatesGuid item)
+        {
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] encoded = System.Text.Encoding.ASCII.GetBytes(item.GetGuidString());
+                byte[] hash = md5.ComputeHash(encoded);
+                return new Guid(hash);
+            }
+        }
     }
 }

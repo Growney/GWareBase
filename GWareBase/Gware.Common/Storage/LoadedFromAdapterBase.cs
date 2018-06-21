@@ -46,7 +46,7 @@ namespace Gware.Common.Storage
                 SetNonDirtyState(Activator.CreateInstance(this.GetType()) as LoadedFromAdapterBase);
             }
             
-            this.IteratePropertiesPerformAction(new Reflection.ExtensionMethods.ReflectionPropertyAction(delegate (object x, PropertyInfo y)
+            this.IteratePropertiesPerformAction(new Reflection.ReflectionHelper.ReflectionPropertyAction(delegate (object x, PropertyInfo y)
             {
                 object nonDirtyPropertyValue = y.GetValue(m_nonDirtyState);
                 object thisPropertyValue = y.GetValue(x);

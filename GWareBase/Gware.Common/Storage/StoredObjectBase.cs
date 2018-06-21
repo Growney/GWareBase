@@ -32,7 +32,7 @@ namespace Gware.Common.Storage
 
         protected abstract void OnLoad(IDataAdapter adapter);
 
-        protected virtual void OnSave()
+        protected virtual void OnSave(ICommandController controller)
         {
 
         }
@@ -56,7 +56,7 @@ namespace Gware.Common.Storage
             return base.GetIsDirty();
         }
 
-        public virtual long Save()
+        public virtual long Save(ICommandController controller)
         {
             long retVal = Id;
             if (GetIsDirty())
@@ -64,37 +64,33 @@ namespace Gware.Common.Storage
                 IDataCommand command = CreateSaveCommand();
                 command.AddReCacheCommand(GetSaveReCacheCommands());
                 command.Cache = false;
-                retVal = LoadSingle<LoadedFromAdapterValue<long>>(GetController().ExecuteCollectionCommand(command)).Value;
+                retVal = LoadSingle<LoadedFromAdapterValue<long>>(controller.ExecuteCollectionCommand(command)).Value;
                 Id = retVal;
             }
 
-            OnSave();
+            OnSave(controller);
             return retVal;
         }
 
-        public virtual bool Delete()
+        public virtual bool Delete(ICommandController controller)
         {
             IDataCommand command = CreateDeleteCommand();
             command.AddReCacheCommand(GetDeleteReCacheCommands());
-            return LoadSingle<LoadedFromAdapterValue<bool>>(GetController().ExecuteCollectionCommand(command)).Value;
+            return LoadSingle<LoadedFromAdapterValue<bool>>(controller.ExecuteCollectionCommand(command)).Value;
         }
 
 
-        public virtual void Load(long primaryKey)
+        public virtual void Load(ICommandController controller,long primaryKey)
         {
             IDataCommand command = CreateLoadFromPrimaryKey(primaryKey);
-            LoadFrom(GetController().ExecuteCollectionCommand(command).First);
+            LoadFrom(controller.ExecuteCollectionCommand(command).First);
         }
 
-        public virtual ICommandController GetController()
-        {
-            return CommandControllerApplicationBase.Main.Controller;
-        }
-
-        public static T Get<T>(long primaryKey) where T : StoredObjectBase,new()
+        
+        public static T Get<T>(ICommandController controller,long primaryKey) where T : StoredObjectBase,new()
         {
             T retVal = new T();
-            retVal.Load(primaryKey);
+            retVal.Load(controller,primaryKey);
             return retVal;
         }
     }
