@@ -24,4 +24,17 @@ namespace Gware.Common.Storage
             m_value = adapter.GetValue("Value", default(T));
         }
     }
+
+    public static class LoadedFromAdapterValueExtension
+    {
+        public static List<T> ToList<T>(this IEnumerable<LoadedFromAdapterValue<T>> list) where T : IConvertible
+        {
+            List<T> retVal = new List<T>();
+            foreach(LoadedFromAdapterValue<T> item in list)
+            {
+                retVal.Add(item.Value);
+            }
+            return retVal;
+        }
+    }
 }

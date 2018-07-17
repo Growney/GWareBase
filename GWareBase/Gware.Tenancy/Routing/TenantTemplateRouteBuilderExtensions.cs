@@ -34,20 +34,22 @@ namespace Gware.Tenancy.Routing
             return routeCollectionBuilder;
         }
 
-        public static IRouteBuilder MapDomainRoutes(this IRouteBuilder routeCollectionBuilder,string[] domains, string routeTemplate, RouteValueDictionary defaults)
+        public static IRouteBuilder MapDomainRoutes(this IRouteBuilder routeCollectionBuilder, string[] domains, string routeTemplate, RouteValueDictionary defaults)
         {
-            for (int i = 0; i < domains.Length; i++)
+            if (domains != null)
             {
-                string domain = domains[i];
+                for (int i = 0; i < domains.Length; i++)
+                {
+                    string domain = domains[i];
 
-                routeCollectionBuilder.MapDomainRoute(
-                    name: $"{domain}TenantRoute",
-                    domainTemplate: "www.{tenant}." + domain,
-                    routeTemplate: routeTemplate,
-                    defaults: defaults
-                    );
+                    routeCollectionBuilder.MapDomainRoute(
+                      name: $"{domain}TenantRoute",
+                      domainTemplate: "{tenant}." + domain,
+                      routeTemplate: routeTemplate,
+                      defaults: defaults
+                      );
+                }
             }
-
             return routeCollectionBuilder;
         }
 

@@ -3,7 +3,9 @@
 	@ID BIGINT = NULL,
 	@Name VARCHAR(100) = NULL,
 	@CreatedDate DATETIME = NULL,
-	@ControllerCreationString  VARCHAR(MAX) = NULL
+	@ControllerCreationString  VARCHAR(MAX) = NULL,
+	@DisplayName VARCHAR(100) = NULL,
+	@ImageSource VARCHAR(MAX) = NULL
 
 AS
 BEGIN
@@ -23,8 +25,8 @@ BEGIN
 	IF NOT EXISTS (SELECT* FROM Tenant WHERE Name = @Name)
 	BEGIN
 
-		INSERT INTO Tenant (Name,ControllerCreationString)
-		VALUES(@Name,@ControllerCreationString)
+		INSERT INTO Tenant (Name,ControllerCreationString,DisplayName,ImageSource)
+		VALUES(@Name,@ControllerCreationString,@Displayname,@ImageSource)
 
 		SELECT @@IDENTITY AS [Value]
 
@@ -32,7 +34,10 @@ BEGIN
 	ELSE
 	BEGIN
 
-		SELECT -1 AS [Value]
+		UPDATE Tenant
+		SET DisplayName = @DisplayName,
+		ImageSource = @ImageSource
+		WHERE [Name] = @Name
 
 	END
 	

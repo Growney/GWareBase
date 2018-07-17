@@ -15,24 +15,28 @@ namespace Gware.Common.Storage
         private LoadedFromAdapterBase m_nonDirtyState;
         private bool m_gotDirty = false;
         private bool m_dirty;
-
+        protected bool DisabledDirtyCheck { get; }
         
-        public LoadedFromAdapterBase()
+        public LoadedFromAdapterBase(bool disableDitryCheck = false)
         {
-            
+            DisabledDirtyCheck = disableDitryCheck;
         }
 
         protected virtual bool GetIsDirty()
         {
             lock (this)
             {
-                if (!m_gotDirty)
+                if (!DisabledDirtyCheck)
                 {
-                    m_gotDirty = true;
-                    m_dirty = ChangedFromDirtyState();
+                    if (!m_gotDirty)
+                    {
+                        m_gotDirty = true;
+                        m_dirty = ChangedFromDirtyState();
 
+                    }
                 }
-                return m_dirty;
+                
+                return DisabledDirtyCheck ||  m_dirty;
             }
             
         }
@@ -41,33 +45,36 @@ namespace Gware.Common.Storage
         {
             bool retVal = false;
 
-            if(m_nonDirtyState == null)
+            if (!DisabledDirtyCheck)
             {
-                SetNonDirtyState(Activator.CreateInstance(this.GetType()) as LoadedFromAdapterBase);
-            }
-            
-            this.IteratePropertiesPerformAction(new Reflection.ReflectionHelper.ReflectionPropertyAction(delegate (object x, PropertyInfo y)
-            {
-                object nonDirtyPropertyValue = y.GetValue(m_nonDirtyState);
-                object thisPropertyValue = y.GetValue(x);
-
-                if(thisPropertyValue != null && nonDirtyPropertyValue != null)
+                if (m_nonDirtyState == null)
                 {
-                    if (!thisPropertyValue.Equals(nonDirtyPropertyValue))
+                    SetNonDirtyState(Activator.CreateInstance(this.GetType()) as LoadedFromAdapterBase);
+                }
+
+                this.IteratePropertiesPerformAction(new Reflection.ReflectionHelper.ReflectionPropertyAction(delegate (object x, PropertyInfo y)
+                {
+                    object nonDirtyPropertyValue = y.GetValue(m_nonDirtyState);
+                    object thisPropertyValue = y.GetValue(x);
+
+                    if (thisPropertyValue != null && nonDirtyPropertyValue != null)
+                    {
+                        if (!thisPropertyValue.Equals(nonDirtyPropertyValue))
+                        {
+                            retVal = true;
+                        }
+                    }
+                    else if (thisPropertyValue == null && nonDirtyPropertyValue != null)
                     {
                         retVal = true;
                     }
-                }
-                else if(thisPropertyValue == null && nonDirtyPropertyValue != null)
-                {
-                    retVal = true;
-                }
-                else if(thisPropertyValue != null && nonDirtyPropertyValue == null)
-                {
-                    retVal = true;
-                }
-                    
-            }));
+                    else if (thisPropertyValue != null && nonDirtyPropertyValue == null)
+                    {
+                        retVal = true;
+                    }
+
+                }));
+            }
             
             return retVal;
         }
@@ -83,7 +90,7 @@ namespace Gware.Common.Storage
         public virtual void Load(IDataAdapter adapter)
         {
             LoadFrom(adapter);
-            if(m_nonDirtyState != null)
+            if(!DisabledDirtyCheck && m_nonDirtyState != null)
             {
                 m_nonDirtyState.Load(adapter);
             }

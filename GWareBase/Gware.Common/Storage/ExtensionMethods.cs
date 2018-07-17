@@ -23,7 +23,23 @@ namespace Gware.Common.Storage
 
             return retVal;
         }
-        
+
+        public static System.Data.DataTable CreateIDList(this IEnumerable<long> ids)
+        {
+            System.Data.DataTable retVal = new System.Data.DataTable();
+
+            retVal.Columns.Add("ID", typeof(long));
+
+            foreach (int id in ids)
+            {
+                System.Data.DataRow row = retVal.NewRow();
+                row["ID"] = id;
+                retVal.Rows.Add(row);
+            }
+
+            return retVal;
+        }
+
         public static long MaxID(this IEnumerable<IHasID> x)
         {
             long retVal = long.MinValue;

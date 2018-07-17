@@ -95,6 +95,12 @@ namespace Gware.Tenancy.Routing
                 requestHost = requestHost.Substring(0, requestHost.IndexOf(":"));
             }
 
+            int firstIndex = requestHost.IndexOf(".");
+            if (firstIndex > 0 && requestHost.Substring(0, firstIndex) == "www")
+            {
+                int spliceIndex = firstIndex + 1;
+                requestHost = requestHost.Substring(spliceIndex, requestHost.Length - spliceIndex);
+            }
             RouteValueDictionary values = new RouteValueDictionary();
             if(requestHost.Length > 0 && requestHost[0] != '/')
             {

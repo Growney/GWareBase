@@ -221,7 +221,7 @@ namespace Gware.Common.Storage.Command
             SetDetails(ServerName, name, DatabaseUsername, DatabasePassword);
         }
 
-        public Task<bool> DeploySchema(string schemaFile,string dbName)
+        public Task<bool> DeploySchema(string schemaFile,string dbName,bool includeComposite = false)
         {
             TaskCompletionSource<bool> source = new TaskCompletionSource<bool>();
             try
@@ -232,7 +232,7 @@ namespace Gware.Common.Storage.Command
                 {
                     WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
                     FileName = @"C:\Program Files (x86)\Microsoft SQL Server\140\DAC\bin\SqlPackage.exe",
-                    Arguments = $"/Action:Publish /SourceFile:\"{schemaFile}\" /TargetConnectionString:\"{Connection.GetConnectionString()}\""
+                    Arguments = $"/Action:Publish  /SourceFile:\"{schemaFile}\" /TargetConnectionString:\"{Connection.GetConnectionString()}\" /Properties:IncludeCompositeObjects={includeComposite}"
                 };
                 process.StartInfo = startInfo;
                 process.EnableRaisingEvents = true;

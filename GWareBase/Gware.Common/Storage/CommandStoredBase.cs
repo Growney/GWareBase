@@ -10,6 +10,11 @@ namespace Gware.Common.Storage
 {
     public abstract class CommandStoredBase : LoadedFromAdapterBase
     {
+        public CommandStoredBase(bool disableDirtyCheck = false)
+            :base(disableDirtyCheck)
+        {
+
+        }
         public abstract IDataCommand CreateSaveCommand();
         public abstract IDataCommand CreateDeleteCommand();
 

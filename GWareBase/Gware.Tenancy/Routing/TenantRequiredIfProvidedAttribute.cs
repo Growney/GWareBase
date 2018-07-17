@@ -1,26 +1,23 @@
-﻿using Gware.Common.Context;
-using Gware.Common.Storage.Command.Interface;
-using Gware.Tenancy.Configuration;
+﻿using Gware.Tenancy.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Gware.Tenancy.Routing
 {
-    public class TenantRequiredAttribute : TypeFilterAttribute
+    public class TenantRequiredIfProvidedAttribute : TypeFilterAttribute
     {
-        public TenantRequiredAttribute() : base(typeof(TenantRequiredAttributeImpl))
+        public TenantRequiredIfProvidedAttribute() : base(typeof(TenantRequiredIfProvidedAttributeImpl))
         {
 
         }
-        private class TenantRequiredAttributeImpl : IActionFilter
+        private class TenantRequiredIfProvidedAttributeImpl : IActionFilter
         {
             private readonly ITenantConfiguration m_configuration;
 
-            public TenantRequiredAttributeImpl(ITenantConfiguration configuration)
+            public TenantRequiredIfProvidedAttributeImpl(ITenantConfiguration configuration)
             {
                 m_configuration = configuration;
             }
@@ -41,13 +38,7 @@ namespace Gware.Tenancy.Routing
                         context.Result = m_configuration.CreateNewResult;
                     }
                 }
-                else
-                {
-                    context.Result = m_configuration.NotFoundResult;
-                }
             }
         }
-
-
     }
 }

@@ -27,7 +27,8 @@ namespace Gware.Tenancy.Configuration
     {
         public static ICommandController CreateController(this IConfiguration configuration,string key)
         {
-            return new MSSQLCommandController(configuration[$"{key}:Server"], configuration[$"{key}:Databasename"], configuration[$"{key}:Username"], configuration[$"{key}:Password"]);
+            return new MSSQLCommandController(configuration[$"Controllers:{key}:Server"], configuration[$"Controllers:{key}:Databasename"], configuration[$"Controllers:{key}:Username"], configuration[$"Controllers:{key}:Password"]);
         }
     }
 }
+

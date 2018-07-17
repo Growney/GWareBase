@@ -14,6 +14,8 @@ namespace Gware.Tenancy
         public string Name { get; set; }
         public DateTime Created { get; set; }
         public string ControllerCreationString { get; set; }
+        public string DisplayName { get; set; }
+        public string ImageSource { get; set; }
         public ICommandController Controller
         {
             get
@@ -42,6 +44,7 @@ namespace Gware.Tenancy
             DataCommand command = new DataCommand("Tenant", "Save");
             command.AddParameter("Name", System.Data.DbType.String).Value = Name;
             command.AddParameter("ControllerCreationString", System.Data.DbType.String).Value = ControllerCreationString;
+            command.AddParameter("DisplayName", System.Data.DbType.String).Value = DisplayName;
             return command;
         }
 
@@ -50,32 +53,60 @@ namespace Gware.Tenancy
             Name = adapter.GetValue("Name", string.Empty);
             Created = adapter.GetValue("Created", DateTime.MinValue);
             ControllerCreationString = adapter.GetValue("ControllerCreationString", string.Empty);
+            DisplayName = adapter.GetValue("DisplayName", string.Empty);
         }
 
-        public static bool Exists(ICommandController controller,string name)
+        internal static bool Exists(ICommandController controller,string name)
         {
             DataCommand command = new DataCommand("Tenant", "Exists");
             command.AddParameter("Name", System.Data.DbType.String).Value = name;
             return LoadSingle<Common.Storage.LoadedFromAdapterValue<int>>(controller.ExecuteCollectionCommand(command)).Value == 1;
         }
-        public static Tenant ForName(ICommandController controller,string name)
+        internal static Tenant ForName(ICommandController controller,string name)
         {
             DataCommand command = new DataCommand("Tenant", "ForName");
             command.AddParameter("Name", System.Data.DbType.String).Value = name;
             return LoadSingle<Tenant>(controller.ExecuteCollectionCommand(command));
         }
-        public static Tenant Create(ICommandController controller,string name,ICommandController useController)
+        internal static Tenant Create(ICommandController controller, ICommandController useController,string name, string displayname,string imagesource)
         {
             Tenant retVal = new Tenant()
             {
                 Name = name,
                 Created = DateTime.UtcNow,
-                ControllerCreationString = CommandControllerFactory.GetCreationString(useController)
+                ControllerCreationString = CommandControllerFactory.GetCreationString(useController),
+                DisplayName = displayname,
+                ImageSource = imagesource
             };
 
             retVal.Save(controller);
 
             return retVal;
+        }
+
+        public static bool IsValidTenantName(string name)
+        {
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (!Char.IsLetterOrDigit(name[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static string MakeValidTenantName(string name)
+        {
+            StringBuilder retVal = new StringBuilder();
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (Char.IsLetterOrDigit(name[i]))
+                {
+                    retVal.Append(name[i].ToString().ToLower());
+                }
+            }
+            return retVal.ToString();
         }
     }
 }

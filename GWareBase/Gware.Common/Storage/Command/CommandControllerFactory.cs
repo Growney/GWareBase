@@ -11,7 +11,7 @@ namespace Gware.Common.Storage.Command
     {
         public static string GetCreationString(ICommandController controller)
         {
-            return $"{controller.GetType().Name}:{controller.GetInitialisationString()}";
+            return $"{controller.GetType().FullName}?{controller.GetInitialisationString()}";
         }
         public static ICommandController CreateController(string initString)
         {

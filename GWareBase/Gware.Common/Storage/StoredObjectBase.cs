@@ -16,6 +16,12 @@ namespace Gware.Common.Storage
         public abstract long Id { get; set; }
         
 
+        public StoredObjectBase(bool disableDirtyCheck = false)
+            :base(disableDirtyCheck)
+        {
+
+        }
+
         protected virtual string GetIDField()
         {
             return "Id";
@@ -59,7 +65,7 @@ namespace Gware.Common.Storage
         public virtual long Save(ICommandController controller)
         {
             long retVal = Id;
-            if (GetIsDirty())
+            if (DisabledDirtyCheck ||  GetIsDirty())
             {
                 IDataCommand command = CreateSaveCommand();
                 command.AddReCacheCommand(GetSaveReCacheCommands());
