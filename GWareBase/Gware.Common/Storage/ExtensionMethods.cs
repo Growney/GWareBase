@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Gware.Common.Storage.Command.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -68,6 +69,14 @@ namespace Gware.Common.Storage
                 byte[] encoded = System.Text.Encoding.ASCII.GetBytes(item.GetGuidString());
                 byte[] hash = md5.ComputeHash(encoded);
                 return new Guid(hash);
+            }
+        }
+
+        public static void Save<T>(this IEnumerable<T> list,ICommandController controller) where T :StoredObjectBase
+        {
+            foreach(T item in list)
+            {
+                item.Save(controller);
             }
         }
     }

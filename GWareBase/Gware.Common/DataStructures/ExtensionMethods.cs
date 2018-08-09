@@ -11,6 +11,62 @@ namespace Gware.Common.DataStructures
 {
     public static class ExtensionMethods
     {
+        public static string ToDelimitedString<T>(this T flag, char limiter = ',') where T : Enum, IConvertible
+        {
+            return ToDelimitedString<T>((long)flag.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture), limiter);
+        }
+        public static string ToDelimitedString<T>(this long flag,char limiter = ',') where T : Enum, IConvertible
+        {
+            StringBuilder retVal = new StringBuilder();
+            int count = 0;
+            foreach (T enumVal in Enum.GetValues(typeof(T)))
+            {
+                long enumLong = enumVal.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture);
+                if ((enumLong & flag) == enumLong)
+                {
+                    if(count > 0)
+                    {
+                        retVal.Append(",");
+                    }
+                    retVal.Append(enumVal.ToString());
+                    count++;
+                }
+            }
+            return retVal.ToString();
+        }
+        public static long ToFlag<T>(this IEnumerable<T> list) where T : Enum,IConvertible
+        {
+            long retVal = 0;
+
+            foreach (T item in list)
+            {
+                retVal |= item.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture);
+            }
+
+            return retVal;
+        }
+
+        public static bool HasFlag<T>(this IEnumerable<T> list, T flag) where T : Enum, IConvertible
+        {
+            long flagLong = flag.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture);
+            return (list.ToFlag() & flagLong) == flagLong;
+        }
+
+        public static IEnumerable<T> ToList<T>(this long flag) where T : Enum,IConvertible
+        {
+            List<T> retVal = new List<T>();
+            foreach(T enumVal in Enum.GetValues(typeof(T)))
+            {
+                long enumLong = enumVal.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture);
+                if((enumLong & flag) == enumLong)
+                {
+                    retVal.Add(enumVal);
+                }
+            }
+        
+            return retVal;
+            
+        }
         public static List<To> Convert<From,To>(this List<From> items) where To : From
         {
             List<To> retVal = new List<To>();

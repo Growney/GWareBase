@@ -13,15 +13,25 @@ namespace Gware.Tenancy.Configuration
         IActionResult CreateNewResult { get; }
         IActionResult NotFoundResult { get; }
         IActionResult TenantHome { get; }
+        IActionResult Upgrading { get; }
         ICommandController Controller { get; }
         String SchemaFile { get; }
         String DBNameFormat { get; }
         String ControllerKey { get; }
         string[] Domains { get; }
 
-        Task<bool> CreateTenant(string name,string displayName,string imagesource,bool includeComposite = false);
+        Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID);
+        Task<bool> UpgradeTenant(Tenant tenant, DateTime check);
         string GetTenantRedirect(string tenantName, string path);
-        bool DoesTenantExists(string name);
+        string GetTenantRedirect(int entityType, long entityID,string path);
+        bool DoesTenantExist(string name);
+        bool DoesTenantExist(int entityType, long entityID);
+
         bool IsValidTenantName(string name);
+
+        DateTime GetSchemaCreated();
+
+        Tenant GetTenant(int entityType, long entityID);
+        
     }
 }

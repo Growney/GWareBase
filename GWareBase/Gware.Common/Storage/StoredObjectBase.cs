@@ -16,7 +16,7 @@ namespace Gware.Common.Storage
         public abstract long Id { get; set; }
         
 
-        public StoredObjectBase(bool disableDirtyCheck = false)
+        public StoredObjectBase(bool disableDirtyCheck = true)
             :base(disableDirtyCheck)
         {
 

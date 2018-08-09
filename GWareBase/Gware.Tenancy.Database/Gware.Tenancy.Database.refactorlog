@@ -14,4 +14,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[ImageSource]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="8d2e499c-b75e-45b8-8ae0-5a48054e46c0" ChangeDateTime="07/22/2018 20:44:05">
+    <Property Name="ElementName" Value="[dbo].[Tenant].[UpdateStatus]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Tenant]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Upgrading" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f3c1dc06-0134-4a04-95ba-7bea29660260" ChangeDateTime="07/22/2018 21:28:19">
+    <Property Name="ElementName" Value="[dbo].[Tenant].[Upgrading]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Tenant]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UpgradeStatus" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="001400cf-27e3-4af5-8549-6134153b75c6" ChangeDateTime="07/22/2018 21:33:50">
+    <Property Name="ElementName" Value="[dbo].[Tenant].[UpdateCheck]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Tenant]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[UpgradeCheck]" />
+  </Operation>
 </Operations>

@@ -11,6 +11,7 @@ namespace Gware.Tenancy.Configuration
 {
     public class TenantConfiguration : ITenantConfiguration
     {
+        public IActionResult Upgrading { get; set; }
         public IActionResult NotFoundResult { get; set; }
         public IActionResult TenantHome { get; set; }
         public IActionResult CreateNewResult { get; set; }
@@ -19,13 +20,15 @@ namespace Gware.Tenancy.Configuration
         public string DBNameFormat { get; set; }
         public string ControllerKey { get; set; }
         public string[] Domains { get; set; }
+        public bool CreateComposite { get; set; }
+
 
         public TenantConfiguration()
         {
             ControllerKey = "tenant";
         }
 
-        public async Task<bool> CreateTenant(string name,string displayName,string imagesource, bool createComposite = false)
+        public async Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID)
         {
             if (Tenant.IsValidTenantName(name))
             {
@@ -33,34 +36,83 @@ namespace Gware.Tenancy.Configuration
                 {
                     ICommandController newTenancyController = Controller.Clone();
                     newTenancyController.SetName(string.Format(DBNameFormat, name));
-                    Tenant.Create(Controller, newTenancyController, name, displayName,imagesource);
+                    Tenant.Create(Controller, newTenancyController, name, displayName,entityType,entityID,GetSchemaCreated());
 
                     MSSQLCommandController controller = Controller as MSSQLCommandController;
                     if (controller != null)
                     {
-                        string dbName = string.Format(DBNameFormat, name);
+                        string dbName = GetDBName(name);
                         MSSQLCommandController newController = controller.Clone() as MSSQLCommandController;
                         newController.SetName(dbName);
-                        return await newController.DeploySchema(SchemaFile, dbName, createComposite);
+                        return await newController.DeploySchema(SchemaFile, dbName, CreateComposite);
 
                     }
                 }
             }
             return false;
         }
-
+        public string GetDBName(string tenantName)
+        {
+            return string.Format(DBNameFormat,tenantName);
+        }
+        public async Task<bool> UpgradeTenant(Tenant tenant,DateTime check)
+        {
+            eUpgradeStatus status = tenant.CheckUpgradeStatus(Controller, check);
+            if(status == eUpgradeStatus.UpgradeRequired)
+            {
+                try
+                {
+                    tenant.SetUpgradeStatus(Controller, eUpgradeStatus.Upgrading);
+                    if(await (tenant.Controller as MSSQLCommandController)?.DeploySchema(SchemaFile, GetDBName(tenant.Name), CreateComposite))
+                    {
+                        tenant.SetCheckDate(Controller, DateTime.UtcNow);
+                    }
+                }
+                finally
+                {
+                    tenant.SetUpgradeStatus(Controller, eUpgradeStatus.Ok);
+                }
+                
+            }
+            return false;
+        }
+        public string GetTenantRedirect(int entityType, long entityID,string path)
+        {
+            Tenant tenant = GetTenant(entityType, entityID);
+            return GetTenantRedirect(tenant.Name, path);
+        }
         public string GetTenantRedirect(string tenantName,string path)
         {
             return $"http://{tenantName}.{Domains[0]}/{path}";
         }
-        public bool DoesTenantExists(string name)
+        public bool DoesTenantExist(string name)
         {
             return Tenant.Exists(Controller, name);
         }
-
+        public bool DoesTenantExist(int entityType, long entityID)
+        {
+            return Tenant.Exists(Controller, entityType, entityID);
+        }
         public bool IsValidTenantName(string name)
         {
             return Tenant.IsValidTenantName(name);
         }
-}
+        public Tenant GetTenant(int entityType, long entityID)
+        {
+            return Tenant.ForEntity(Controller, entityType, entityID);
+        }
+
+        public DateTime GetSchemaCreated()
+        {
+            System.IO.FileInfo info = new System.IO.FileInfo(SchemaFile);
+            if (info != null)
+            {
+                return info.CreationTimeUtc;
+            }
+            else
+            {
+                throw new Exception("file info cannot be null");
+            }
+        }
+    }
 }

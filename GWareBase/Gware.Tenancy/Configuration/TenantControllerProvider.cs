@@ -22,9 +22,14 @@ namespace Gware.Tenancy.Configuration
 
         public ICommandController GetController()
         {
+            return GetController(m_context.HttpContext);
+        }
+
+        public ICommandController GetController(HttpContext context)
+        {
             ICommandController retVal = null;
-            Tenant currentTenant = m_context.HttpContext.Features.Get<Tenant>();
-            if(currentTenant != null)
+            Tenant currentTenant = context.Features.Get<Tenant>();
+            if (currentTenant != null)
             {
                 retVal = currentTenant.Controller;
             }
