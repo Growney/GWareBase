@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[TenantLink]
+(
+	[Id] INT NOT NULL PRIMARY KEY,
+	[TypeID] TINYINT NOT NULL,
+	[TenantID] BIGINT NOT NULL,
+	[Link] VARCHAR(MAX) NOT NULL
+)

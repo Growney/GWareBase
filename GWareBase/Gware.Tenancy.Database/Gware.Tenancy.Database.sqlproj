@@ -63,6 +63,8 @@
   <ItemGroup>
     <Build Include="Tables\Tenant.sql" />
     <Build Include="Stored Procedures\pTenant.sql" />
+    <Build Include="Tables\TenantLink.sql" />
+    <Build Include="Stored Procedures\pTenantLink.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Gware.Tenancy.Database.refactorlog" />

@@ -137,6 +137,36 @@ namespace Gware.Tenancy
             return retVal;
         }
         
+        internal static void CreateLink(ICommandController controller,long tenantID,byte type,string link)
+        {
+            DataCommand command = new DataCommand("TenantLink", "Link");
+
+            command.AddParameter("TenantID", System.Data.DbType.Int64).Value = tenantID;
+            command.AddParameter("TypeID", System.Data.DbType.Byte).Value = type;
+            command.AddParameter("Link", System.Data.DbType.String).Value = link;
+
+            controller.ExecuteQuery(command);
+        }
+
+        internal static void RemoveLink(ICommandController controller,long tenantID,byte type)
+        {
+            DataCommand command = new DataCommand("TenantLink", "Remove");
+
+            command.AddParameter("TenantID", System.Data.DbType.Int64).Value = tenantID;
+            command.AddParameter("TypeID", System.Data.DbType.Byte).Value = type;
+
+            controller.ExecuteQuery(command);
+        }
+
+        internal static Tenant ForLink(ICommandController controller, string link)
+        {
+            DataCommand command = new DataCommand("TenantLink", "SelectTenant");
+
+            command.AddParameter("Link", System.Data.DbType.String).Value = link;
+
+            return LoadSingle<Tenant>(controller.ExecuteCollectionCommand(command));
+        }
+
         public static bool IsValidTenantName(string name)
         {
             for (int i = 0; i < name.Length; i++)

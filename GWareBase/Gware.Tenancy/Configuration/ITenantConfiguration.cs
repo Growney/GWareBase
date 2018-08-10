@@ -32,6 +32,10 @@ namespace Gware.Tenancy.Configuration
         DateTime GetSchemaCreated();
 
         Tenant GetTenant(int entityType, long entityID);
+
+        void CreateTenantLink(long tenantID, byte type, string link);
+        void DeleteTenantLink(long tenantID, byte type);
+        Tenant GetTenantFromLink(string link);
         
     }
 }

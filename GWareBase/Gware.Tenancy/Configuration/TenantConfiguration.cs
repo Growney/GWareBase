@@ -114,5 +114,20 @@ namespace Gware.Tenancy.Configuration
                 throw new Exception("file info cannot be null");
             }
         }
+
+        public void CreateTenantLink(long tenantID, byte type, string link)
+        {
+            Tenant.CreateLink(Controller, tenantID, type, link);
+        }
+
+        public void DeleteTenantLink(long tenantID,byte type)
+        {
+            Tenant.RemoveLink(Controller, tenantID, type);
+        }
+        
+        public Tenant GetTenantFromLink(string link)
+        {
+            return Tenant.ForLink(Controller, link);
+        }
     }
 }
