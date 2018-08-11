@@ -85,11 +85,12 @@ namespace Gware.Tenancy
             UpgradeStatus = (eUpgradeStatus)LoadSingle<LoadedFromAdapterValue<int>>(controller.ExecuteCollectionCommand(command)).Value;
         }
 
-        internal void SetCheckDate(ICommandController controller,DateTime date)
+        internal void SetCheckDate(ICommandController controller,DateTime date, eUpgradeStatus status)
         {
             DataCommand command = new DataCommand("Tenant", "SetCheckDate");
             command.AddParameter("Id", System.Data.DbType.Int64).Value = Id;
             command.AddParameter("UpgradeCheck", System.Data.DbType.DateTime).Value = date;
+            command.AddParameter("UpgradeStatus", System.Data.DbType.Int16).Value = (byte)status;
             controller.ExecuteQuery(command);
         }
 

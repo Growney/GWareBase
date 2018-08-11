@@ -65,7 +65,7 @@ namespace Gware.Tenancy.Configuration
                     tenant.SetUpgradeStatus(Controller, eUpgradeStatus.Upgrading);
                     if(await (tenant.Controller as MSSQLCommandController)?.DeploySchema(SchemaFile, GetDBName(tenant.Name), CreateComposite))
                     {
-                        tenant.SetCheckDate(Controller, DateTime.UtcNow);
+                        tenant.SetCheckDate(Controller, DateTime.UtcNow,eUpgradeStatus.Ok);
                     }
                 }
                 finally

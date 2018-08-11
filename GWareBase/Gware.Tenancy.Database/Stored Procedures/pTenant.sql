@@ -103,8 +103,9 @@ IF @Result = 'SetCheckDate'
 BEGIN
 
 	UPDATE Tenant
-	SET UpgradeCheck = GETUTCDATE()
-	WHERE Id = @Id AND UpgradeStatus <> 0 AND @UpgradeStatus = 0
+	SET UpgradeCheck = GETUTCDATE(),
+	UpgradeStatus = @UpgradeStatus
+	WHERE Id = @Id
 
 END
 
