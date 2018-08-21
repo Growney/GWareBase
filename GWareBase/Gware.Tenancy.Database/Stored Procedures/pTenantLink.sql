@@ -47,3 +47,12 @@ BEGIN
 	)
 
 END
+
+IF @Result = 'GetLink'
+BEGIN
+	
+	SELECT Link AS [Value]
+	FROM TenantLink
+	WHERE TenantID = @TenantID AND TypeID = @TypeID
+
+END

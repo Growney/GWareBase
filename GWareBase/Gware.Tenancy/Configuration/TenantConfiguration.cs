@@ -129,5 +129,10 @@ namespace Gware.Tenancy.Configuration
         {
             return Tenant.ForLink(Controller, link);
         }
+
+        public string GetLink(long tenantID,byte type)
+        {
+            return Tenant.GetLink(Controller, tenantID, type);
+        }
     }
 }

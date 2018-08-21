@@ -36,6 +36,7 @@ namespace Gware.Tenancy.Configuration
         void CreateTenantLink(long tenantID, byte type, string link);
         void DeleteTenantLink(long tenantID, byte type);
         Tenant GetTenantFromLink(string link);
+        string GetLink(long tenantID, byte type);
         
     }
 }

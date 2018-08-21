@@ -171,6 +171,7 @@
     <Compile Include="Storage\ISaveable.cs" />
     <Compile Include="Storage\LoadedFromAdapterBase.cs" />
     <Compile Include="Storage\LoadedFromAdapterValue.cs" />
+    <Compile Include="Storage\OnceLoadedValue.cs" />
     <Compile Include="Storage\StoredList.cs" />
     <Compile Include="Storage\StoredObjectBase.cs" />
     <Compile Include="Threading\ActionThread.cs" />

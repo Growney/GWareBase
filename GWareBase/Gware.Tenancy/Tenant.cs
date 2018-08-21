@@ -168,6 +168,15 @@ namespace Gware.Tenancy
             return LoadSingle<Tenant>(controller.ExecuteCollectionCommand(command));
         }
 
+        internal static string GetLink(ICommandController controller,long tenantID, byte type)
+        {
+            DataCommand command = new DataCommand("TenantLink", "GetLink");
+
+            command.AddParameter("TenantID", System.Data.DbType.Int64).Value = tenantID;
+            command.AddParameter("TypeID", System.Data.DbType.Byte).Value = type;
+
+            return LoadSingle<LoadedFromAdapterValue<string>>(controller.ExecuteCollectionCommand(command))?.Value;
+        }
         public static bool IsValidTenantName(string name)
         {
             for (int i = 0; i < name.Length; i++)
