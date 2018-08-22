@@ -8,6 +8,7 @@ namespace Gware.Common.Storage
 {
     public class OnceLoadedValue<T>
     {
+        private T m_value;
         private object m_getLock = new object();
         private Func<T> m_load;
         public bool Loaded { get; private set; }
@@ -25,19 +26,18 @@ namespace Gware.Common.Storage
         {
             get
             {
-                T value = default(T);
                 if (!Loaded)
                 {
                     lock (m_getLock)
                     {
                         if (!Loaded)
                         {
-                            value = m_load();
+                            m_value = m_load();
                             Loaded = true;
                         }
                     }
                 }
-                return value;
+                return m_value;
             }
         }
         public OnceLoadedValue()
