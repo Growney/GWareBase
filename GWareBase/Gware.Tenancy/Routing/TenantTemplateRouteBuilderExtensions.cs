@@ -34,7 +34,7 @@ namespace Gware.Tenancy.Routing
             return routeCollectionBuilder;
         }
 
-        public static IRouteBuilder MapDomainRoutes(this IRouteBuilder routeCollectionBuilder, string[] domains, string routeTemplate, RouteValueDictionary defaults)
+        public static IRouteBuilder MapDomainRoutes(this IRouteBuilder routeCollectionBuilder, string[] domains, string routeTemplate, RouteValueDictionary defaults,bool ignorePorts = true)
         {
             if (domains != null)
             {
@@ -46,7 +46,8 @@ namespace Gware.Tenancy.Routing
                       name: $"{domain}TenantRoute",
                       domainTemplate: "{tenant}." + domain,
                       routeTemplate: routeTemplate,
-                      defaults: defaults
+                      defaults: defaults,
+                      ignorePort:ignorePorts
                       );
                 }
             }

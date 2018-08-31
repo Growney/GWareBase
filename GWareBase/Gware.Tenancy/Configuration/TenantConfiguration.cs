@@ -21,6 +21,7 @@ namespace Gware.Tenancy.Configuration
         public string ControllerKey { get; set; }
         public string[] Domains { get; set; }
         public bool CreateComposite { get; set; }
+        public bool IgnorePorts { get; set; }
 
 
         public TenantConfiguration()

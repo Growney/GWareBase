@@ -19,6 +19,7 @@ namespace Gware.Tenancy.Configuration
         String DBNameFormat { get; }
         String ControllerKey { get; }
         string[] Domains { get; }
+        bool IgnorePorts { get; }
 
         Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID);
         Task<bool> UpgradeTenant(Tenant tenant, DateTime check);

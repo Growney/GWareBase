@@ -44,6 +44,10 @@ namespace Gware.Common.Storage
         {
         }
 
+        public void Reset()
+        {
+            Loaded = false;
+        }
         
 
     }
