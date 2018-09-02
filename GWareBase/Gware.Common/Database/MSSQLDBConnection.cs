@@ -14,81 +14,32 @@ namespace Gware.Common.Database
 {
     public class MSSQLDBConnection : IDBConnection
     {
-        private string m_connectionName;
-        private string m_databaseName;
-        private string m_password;
-        private string m_username;
-        private string m_serverName;
-        private int m_timeOut = 30;
-        private bool m_encrypted;
-        
-        public string DatabaseName
-        {
-            get { return m_databaseName; }
-            set { m_databaseName = value; }
-        }
-        public string ServerName
-        {
-            get { return m_serverName; }
-            set { m_serverName = value; }
-        }
-        public string Username
-        {
-            get { return m_username; }
-            set { m_username = value; }
-        }
-        public string Password
-        {
-            get { return m_password; }
-            set { m_password = value; }
-        }
+        public string DatabaseName { get; set; }
+        public string ServerName { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string ConnectionName { get; set; }
+        public bool Trusted { get; set; }
 
-        public string ConnectionName
-        {
-            get { return m_connectionName; }
-            set { m_connectionName = value; }
-        }
+        public int TimeOut { get; set; } = 30;
 
-        public int TimeOut
-        {
-            get
-            {
-                return m_timeOut;
-            }
+        public bool Encrypted { get; set; }
 
-            set
-            {
-                m_timeOut = value;
-            }
-        }
-
-        public bool Encrypted
-        {
-            get
-            {
-                return m_encrypted;
-            }
-
-            set
-            {
-                m_encrypted = value;
-            }
-        }
-
-        public MSSQLDBConnection(string connectionName, string serverName, string databaseName, string username, string password)
+        public MSSQLDBConnection(string connectionName, string serverName, string databaseName,bool trusted, string username, string password)
         {
             ConnectionName = connectionName;
             ServerName = serverName;
             DatabaseName = databaseName;
+            Trusted = trusted;
             Username = username;
             Password = password;
-            
         }
 
         public MSSQLDBConnection(XmlNode node)
             : this(node.GetAttributeString("ConnectionName", string.Empty), 
             node.GetString("DatabaseName", string.Empty), 
-            node.GetString("ServerName", string.Empty), 
+            node.GetString("ServerName", string.Empty),
+            node.GetBoolean("Trusted",false),
             node.GetString("Username", string.Empty), 
             node.GetString("Password", string.Empty))
         {
@@ -106,7 +57,15 @@ namespace Gware.Common.Database
         }
         public string GetConnectionString()
         {
-            return $"Server={m_serverName};Database={m_databaseName};User id={m_username};Password={m_password};Trusted_Connection=False;Encrypt={m_encrypted};Connection Timeout={m_timeOut};";
+            if (Trusted)
+            {
+                return $"Server={ServerName};Database={DatabaseName};Trusted_Connection=True;Encrypt={Encrypted};Connection Timeout={TimeOut};";
+            }
+            else
+            {
+                return $"Server={ServerName};Database={DatabaseName};User id={Username};Password={Password};Trusted_Connection=False;Encrypt={Encrypted};Connection Timeout={TimeOut};";
+            }
+            
         }
         public SqlConnection GetConnection()
         {

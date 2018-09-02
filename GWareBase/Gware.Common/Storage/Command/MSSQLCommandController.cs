@@ -27,7 +27,11 @@ namespace Gware.Common.Storage.Command
         {
 
         }
+        public MSSQLCommandController(string serverName, string databaseName)
+            : base(serverName, databaseName)
+        {
 
+        }
         private void DisplayCommandExcuted()
         {
             m_commandsExecuted++;
@@ -199,21 +203,37 @@ namespace Gware.Common.Storage.Command
 
         public string GetInitialisationString()
         {
-            return $"{Connection.ServerName} {Connection.DatabaseName} {Connection.Username} {Connection.Password}";
+            return $"{Connection.ServerName} {Connection.DatabaseName} {Connection.Trusted} {Connection.Username} {Connection.Password}";
         }
 
         public void Initialise(string initialisationString)
         {
             string[] splits = initialisationString.Split(' ');
-            if(splits.Length > 3)
+            if(splits.Length > 4)
             {
-                SetDetails(splits[0], splits[1], splits[2], splits[3]);
+                if(splits[2].ToLower() == "true")
+                {
+                    SetDetails(splits[0], splits[1]);
+                }
+                else
+                {
+                    SetDetails(splits[0], splits[1], splits[3], splits[4]);
+                }
+                
             }
         }
 
         public ICommandController Clone()
         {
-            return new MSSQLCommandController(ServerName, DatabaseName, DatabaseUsername, DatabasePassword);
+            if (Trusted)
+            {
+                return new MSSQLCommandController(ServerName, DatabaseName);
+            }
+            else
+            {
+                return new MSSQLCommandController(ServerName, DatabaseName, DatabaseUsername, DatabasePassword);
+            }
+            
         }
 
         public void SetName(string name)

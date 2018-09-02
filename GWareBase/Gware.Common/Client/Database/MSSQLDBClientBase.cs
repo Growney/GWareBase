@@ -10,14 +10,14 @@ namespace Gware.Common.Client.Database
         {
             get
             {
-                return new MSSQLDBConnection("MSSQLDBClient", ServerName, DatabaseName, DatabaseUsername, DatabasePassword);
+                return new MSSQLDBConnection("MSSQLDBClient", ServerName, DatabaseName,Trusted, DatabaseUsername, DatabasePassword);
             }
         }
         public MSSQLDBConnection MasterConnection
         {
             get
             {
-                return new MSSQLDBConnection("MSSQLDBClient", ServerName, "master", DatabaseUsername, DatabasePassword); ;
+                return new MSSQLDBConnection("MSSQLDBClient", ServerName, "master",Trusted, DatabaseUsername, DatabasePassword); ;
             }
         }
 
@@ -25,6 +25,11 @@ namespace Gware.Common.Client.Database
             : base(serverName, databaseName, databaseUsername, databasePassword)
         {
             
+        }
+        public MSSQLDBClientBase(string serverName, string databaseName)
+            : base(serverName, databaseName)
+        {
+
         }
 
         public override bool CanConnect()

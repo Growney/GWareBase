@@ -27,7 +27,15 @@ namespace Gware.Tenancy.Configuration
     {
         public static ICommandController CreateController(this IConfiguration configuration,string key)
         {
-            return new MSSQLCommandController(configuration[$"Controllers:{key}:Server"], configuration[$"Controllers:{key}:Databasename"], configuration[$"Controllers:{key}:Username"], configuration[$"Controllers:{key}:Password"]);
+            bool isTrusted = configuration[$"Controllers:{key}:Trusted"]?.ToLower().ToString() == "true";
+            if (isTrusted)
+            {
+                return new MSSQLCommandController(configuration[$"Controllers:{key}:Server"], configuration[$"Controllers:{key}:Databasename"]);
+            }
+            else
+            {
+                return new MSSQLCommandController(configuration[$"Controllers:{key}:Server"], configuration[$"Controllers:{key}:Databasename"], configuration[$"Controllers:{key}:Username"], configuration[$"Controllers:{key}:Password"]);
+            }
         }
     }
 }

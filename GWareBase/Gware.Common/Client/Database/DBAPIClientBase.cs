@@ -2,69 +2,34 @@
 {
     public abstract class DBAPIClientBase : IClient
     {
-        private string m_serverName;
-        private string m_databaseName;
-        private string m_databaseUsername;
-        private string m_databasePassword;
-        public string ServerName
-        {
-            get
-            {
-                return m_serverName;
-            }
+        public string ServerName { get; set; }
+        public string DatabaseName { get; set; }
+        public string DatabaseUsername { get; set; }
+        public string DatabasePassword { get; set; }
+        public bool Trusted { get; set; }
 
-            set
-            {
-                m_serverName = value;
-            }
-        }
-        public string DatabaseName
-        {
-            get
-            {
-                return m_databaseName;
-            }
-
-            set
-            {
-                m_databaseName = value;
-            }
-        }
-        public string DatabaseUsername
-        {
-            get
-            {
-                return m_databaseUsername;
-            }
-
-            set
-            {
-                m_databaseUsername = value;
-            }
-        }
-        public string DatabasePassword
-        {
-            get
-            {
-                return m_databasePassword;
-            }
-
-            set
-            {
-                m_databasePassword = value;
-            }
-        }
         public DBAPIClientBase(string serverName, string databaseName, string databaseUsername, string databasePassword)
         {
             SetDetails(serverName, databaseName, databaseUsername, databasePassword);
         }
 
+        public DBAPIClientBase(string serverName, string databaseName)
+        {
+            SetDetails(serverName, databaseName);
+        }
         public void SetDetails(string serverName, string databaseName, string databaseUsername, string databasePassword)
         {
-            m_serverName = serverName;
-            m_databaseName = databaseName;
-            m_databaseUsername = databaseUsername;
-            m_databasePassword = databasePassword;
+            ServerName = serverName;
+            DatabaseName = databaseName;
+            DatabaseUsername = databaseUsername;
+            DatabasePassword = databasePassword;
+        }
+
+        public void SetDetails(string serverName,string databaseName)
+        {
+            ServerName = serverName;
+            DatabaseName = databaseName;
+            Trusted = true;
         }
 
         public abstract bool CanConnect();
