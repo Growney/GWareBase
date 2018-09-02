@@ -11,6 +11,21 @@ namespace Gware.Common.DataStructures
 {
     public static class ExtensionMethods
     {
+        public static Dictionary<K,List<T>> GroupBy<K,T>(IEnumerable<T> items,Func<T,K> groupBy)
+        {
+            Dictionary<K, List<T>> retval = new Dictionary<K, List<T>>();
+
+            foreach(T item in items)
+            {
+                K key = groupBy(item);
+                if (!retval.ContainsKey(key))
+                {
+                    retval.Add(key, new List<T>());
+                }
+                retval[key].Add(item);
+            }
+            return retval;
+        }
         public static string ToDelimitedString<T>(this T flag, char limiter = ',') where T : Enum, IConvertible
         {
             return ToDelimitedString<T>((long)flag.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture), limiter);
