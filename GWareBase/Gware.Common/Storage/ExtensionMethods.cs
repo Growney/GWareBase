@@ -74,8 +74,13 @@ namespace Gware.Common.Storage
 
         public static void Save<T>(this IEnumerable<T> list,ICommandController controller) where T :StoredObjectBase
         {
-            foreach(T item in list)
+            list.Save(controller, null);
+        }
+        public static void Save<T>(this IEnumerable<T> list, ICommandController controller,Action<T> beforeSave = null) where T : StoredObjectBase
+        {
+            foreach (T item in list)
             {
+                beforeSave?.Invoke(item);
                 item.Save(controller);
             }
         }

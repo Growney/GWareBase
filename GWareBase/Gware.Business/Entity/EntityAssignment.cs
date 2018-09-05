@@ -145,7 +145,7 @@ namespace Gware.Business.Entity
             };
             return val.Save(controller);
         }
-        public static bool Delete(ICommandController controller,int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
+        public static void Delete(ICommandController controller,int fromEntityID, int fromEntityTypeID, int toEntityID, int toEntityTypeID, int index)
         {
             EntityAssignment val = new EntityAssignment()
             {
@@ -155,7 +155,7 @@ namespace Gware.Business.Entity
                 ChildEntityTypeID = toEntityTypeID,
                 Index = index
             };
-            return val.Delete(controller);
+            val.Delete(controller);
         }
 
         public override IDataCommand CreateLoadFromPrimaryKey(long primaryKey)

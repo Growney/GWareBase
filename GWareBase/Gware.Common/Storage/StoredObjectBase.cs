@@ -77,14 +77,37 @@ namespace Gware.Common.Storage
             OnSave(controller);
             return retVal;
         }
+        public override IDataCommand CreateSaveCommand()
+        {
+            DataCommand command = new DataCommand(GetType().Name, "Save");
+            command.AddParameter(GetIDField(), System.Data.DbType.Int64).Value = Id;
+            AddParametersToSave(command);
+            return command;
+        }
 
-        public virtual bool Delete(ICommandController controller)
+        protected virtual void AddParametersToSave(IDataCommand command)
+        {
+
+        }
+
+        public virtual void Delete(ICommandController controller)
         {
             IDataCommand command = CreateDeleteCommand();
             command.AddReCacheCommand(GetDeleteReCacheCommands());
-            return LoadSingle<LoadedFromAdapterValue<bool>>(controller.ExecuteCollectionCommand(command)).Value;
+            controller.ExecuteQuery(command);
+            OnDelete(controller);
         }
 
+        public virtual void OnDelete(ICommandController controller)
+        {
+
+        }
+        public override IDataCommand CreateDeleteCommand()
+        {
+            DataCommand command = new DataCommand(GetType().Name, "Delete");
+            command.AddParameter(GetIDField(), System.Data.DbType.Int64).Value = Id;
+            return command;
+        }
 
         public virtual void Load(ICommandController controller,long primaryKey)
         {
@@ -92,7 +115,13 @@ namespace Gware.Common.Storage
             LoadFrom(controller.ExecuteCollectionCommand(command).First);
         }
 
-        
+        public override IDataCommand CreateLoadFromPrimaryKey(long primaryKey)
+        {
+            DataCommand command = new DataCommand(GetType().Name, "Single");
+            command.AddParameter(GetIDField(), System.Data.DbType.Int64).Value = primaryKey;
+            return command;
+        }
+
         public static T Get<T>(ICommandController controller,long primaryKey) where T : StoredObjectBase,new()
         {
             T retVal = new T();
