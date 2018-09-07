@@ -14,10 +14,15 @@ namespace Gware.Core.MSSQL.Storage.Controller
 {
     public class MSSQLCommandController : ICommandController
     {
-        private static int m_commandsExecuted = 0;
         private const char c_storedProcedurePrefix = 'p';
         private const char c_parameterPrefix = '@';
-
+        public string Name
+        {
+            get
+            {
+                return DatabaseName;
+            }
+        }
         public string ServerName { get; private set; }
         public string DatabaseName { get; set; }
         public bool Trusted { get; private set; }
@@ -42,7 +47,7 @@ namespace Gware.Core.MSSQL.Storage.Controller
             ServerName = serverName;
             DatabaseName = databaseName;
         }
-        
+
         public Task<IDataAdapterCollectionGroup> ExecuteGroupCommandAsync(IDataCommand command)
         {
             return Task<IDataAdapterCollectionGroup>.Factory.StartNew(() =>
@@ -78,7 +83,7 @@ namespace Gware.Core.MSSQL.Storage.Controller
         }
 
         public int ExecuteQuery(IDataCommand command)
-        { 
+        {
             return ExecuteNonQuery(CreateStoredProcedureFromCommand(command));
         }
 
@@ -246,7 +251,7 @@ namespace Gware.Core.MSSQL.Storage.Controller
                     DatabaseName = splits[1];
                     Trusted = trusted;
                 }
-                if(splits.Length > 4)
+                if (splits.Length > 4)
                 {
                     ServerName = splits[0];
                     DatabaseName = splits[1];
@@ -255,7 +260,7 @@ namespace Gware.Core.MSSQL.Storage.Controller
                     Password = splits[4];
                 }
             }
-            
+
         }
 
         public ICommandController Clone()
@@ -269,7 +274,7 @@ namespace Gware.Core.MSSQL.Storage.Controller
                 return new MSSQLCommandController(ServerName, DatabaseName, Username, Password);
             }
         }
-        
+
         public Task<bool> DeploySchema(string schemaFile, string dbName, bool includeComposite = false)
         {
             TaskCompletionSource<bool> source = new TaskCompletionSource<bool>();
@@ -462,6 +467,6 @@ namespace Gware.Core.MSSQL.Storage.Controller
             DatabaseName = name;
         }
 
-        
+
     }
 }

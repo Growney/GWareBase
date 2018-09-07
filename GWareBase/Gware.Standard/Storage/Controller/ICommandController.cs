@@ -9,6 +9,8 @@ namespace Gware.Standard.Storage.Controller
 {
     public interface ICommandController
     {
+
+        string Name { get; }
         IDataAdapterCollectionGroup ExecuteGroupCommand(IDataCommand command);
         IDataAdapterCollection ExecuteCollectionCommand(IDataCommand command);
         int ExecuteQuery(IDataCommand command);
