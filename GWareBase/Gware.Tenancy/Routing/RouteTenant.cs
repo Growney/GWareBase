@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Gware.Tenancy.Routing
+﻿namespace Gware.Tenancy.Routing
 {
     public class RouteTenant
     {

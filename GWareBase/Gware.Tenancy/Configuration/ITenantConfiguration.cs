@@ -1,9 +1,6 @@
 ﻿using Gware.Common.Storage.Command.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gware.Tenancy.Configuration
@@ -15,9 +12,9 @@ namespace Gware.Tenancy.Configuration
         IActionResult TenantHome { get; }
         IActionResult Upgrading { get; }
         ICommandController Controller { get; }
-        String SchemaFile { get; }
-        String DBNameFormat { get; }
-        String ControllerKey { get; }
+        string SchemaFile { get; }
+        string DBNameFormat { get; }
+        string ControllerKey { get; }
         string[] Domains { get; }
         bool IgnorePorts { get; }
 

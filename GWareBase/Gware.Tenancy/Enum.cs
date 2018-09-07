@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Gware.Tenancy
+﻿namespace Gware.Tenancy
 {
     public enum eUpgradeStatus
     {

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Gware.Common.Application;
 using Gware.Common.Storage;
 using Gware.Common.Storage.Adapter;
 using Gware.Common.Storage.Command;
@@ -9,7 +7,7 @@ using Gware.Common.Storage.Command.Interface;
 
 namespace Gware.Tenancy
 {
-    public class Tenant : Gware.Common.Storage.StoredObjectBase
+    public class Tenant : StoredObjectBase
     {
         public override long Id { get; set; }
         public string Name { get; set; }
@@ -28,24 +26,8 @@ namespace Gware.Tenancy
             }
 
         }
-
-        public override IDataCommand CreateDeleteCommand()
+        protected override void AddParametersToSave(IDataCommand command)
         {
-            DataCommand command = new DataCommand("Tenant", "Delete");
-            command.AddParameter("Id", System.Data.DbType.Int64).Value = Id;
-            return command;
-        }
-
-        public override IDataCommand CreateLoadFromPrimaryKey(long primaryKey)
-        {
-            DataCommand command = new DataCommand("Tenant", "Single");
-            command.AddParameter("Id", System.Data.DbType.Int64).Value = primaryKey;
-            return command;
-        }
-
-        public override IDataCommand CreateSaveCommand()
-        {
-            DataCommand command = new DataCommand("Tenant", "Save");
             command.AddParameter("Name", System.Data.DbType.String).Value = Name;
             command.AddParameter("ControllerCreationString", System.Data.DbType.String).Value = ControllerCreationString;
             command.AddParameter("DisplayName", System.Data.DbType.String).Value = DisplayName;
@@ -53,7 +35,6 @@ namespace Gware.Tenancy
             command.AddParameter("EntityID", System.Data.DbType.Int64).Value = EntityId;
             command.AddParameter("UpgradeCheck", System.Data.DbType.DateTime).Value = UpgradeCheck;
             command.AddParameter("UpgradeStatus", System.Data.DbType.Int16).Value = (byte)UpgradeStatus;
-            return command;
         }
 
         protected override void OnLoad(IDataAdapter adapter)
@@ -98,14 +79,14 @@ namespace Gware.Tenancy
         {
             DataCommand command = new DataCommand("Tenant", "Exists");
             command.AddParameter("Name", System.Data.DbType.String).Value = name;
-            return LoadSingle<Common.Storage.LoadedFromAdapterValue<int>>(controller.ExecuteCollectionCommand(command)).Value == 1;
+            return LoadSingle<LoadedFromAdapterValue<int>>(controller.ExecuteCollectionCommand(command)).Value == 1;
         }
         internal static bool Exists(ICommandController controller, int entityType, long entityID)
         {
             DataCommand command = new DataCommand("Tenant", "EntityExists");
             command.AddParameter("EntityType", System.Data.DbType.Int32).Value = entityType;
             command.AddParameter("EntityID", System.Data.DbType.Int64).Value = entityID;
-            return LoadSingle<Common.Storage.LoadedFromAdapterValue<int>>(controller.ExecuteCollectionCommand(command)).Value == 1;
+            return LoadSingle<LoadedFromAdapterValue<int>>(controller.ExecuteCollectionCommand(command)).Value == 1;
         }
         internal static Tenant ForName(ICommandController controller,string name)
         {
@@ -188,7 +169,6 @@ namespace Gware.Tenancy
             }
             return true;
         }
-
         public static string MakeValidTenantName(string name)
         {
             StringBuilder retVal = new StringBuilder();

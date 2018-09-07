@@ -3,9 +3,6 @@ using Gware.Tenancy.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gware.Tenancy.Routing
 {

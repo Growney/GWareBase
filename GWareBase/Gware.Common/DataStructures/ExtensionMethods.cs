@@ -11,7 +11,7 @@ namespace Gware.Common.DataStructures
 {
     public static class ExtensionMethods
     {
-        public static Dictionary<K,List<T>> GroupBy<K,T>(IEnumerable<T> items,Func<T,K> groupBy)
+        public static Dictionary<K,List<T>> GroupBy<K,T>(this IEnumerable<T> items,Func<T,K> groupBy)
         {
             Dictionary<K, List<T>> retval = new Dictionary<K, List<T>>();
 
@@ -60,13 +60,11 @@ namespace Gware.Common.DataStructures
 
             return retVal;
         }
-
         public static bool HasFlag<T>(this IEnumerable<T> list, T flag) where T : Enum, IConvertible
         {
             long flagLong = flag.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture);
             return (list.ToFlag() & flagLong) == flagLong;
         }
-
         public static IEnumerable<T> ToList<T>(this long flag) where T : Enum,IConvertible
         {
             List<T> retVal = new List<T>();
