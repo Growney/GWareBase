@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Gware.Standard.Storage;
 using Gware.Standard.Storage.Adapter;
@@ -19,13 +20,9 @@ namespace Gware.Standard.Web.Tenancy
         public long EntityId { get; set; }
         public DateTime UpgradeCheck { get; private set; }
         public eUpgradeStatus UpgradeStatus { get; private set; }
-        public ICommandController Controller
+        public ICommandController GetController(Assembly[] searchIn)
         {
-            get
-            {
-                return CommandControllerFactory.CreateController(ControllerCreationString);
-            }
-
+            return CommandControllerFactory.CreateController(searchIn, ControllerCreationString);
         }
         protected override void AddParametersToSave(IDataCommand command)
         {

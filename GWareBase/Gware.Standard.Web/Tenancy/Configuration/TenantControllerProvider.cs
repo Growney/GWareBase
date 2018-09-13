@@ -24,13 +24,18 @@ namespace Gware.Standard.Web.Tenancy.Configuration
             return GetController(m_context.HttpContext);
         }
 
+        public ICommandController GetDefaultDataController()
+        {
+            return m_defaultProvider?.CreateController(m_tenantConfiguration.ControllerKey);
+        }
+
         public ICommandController GetController(HttpContext context)
         {
             ICommandController retVal = null;
             Tenant currentTenant = context.Features.Get<Tenant>();
             if (currentTenant != null)
             {
-                retVal = currentTenant.Controller;
+                retVal = m_tenantConfiguration.GetTenantController(currentTenant);
             }
             else
             {

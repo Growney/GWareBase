@@ -11,7 +11,8 @@ namespace Gware.Common.Storage.Command
     {
         public static string GetCreationString(ICommandController controller)
         {
-            return $"{controller.GetType().FullName}?{controller.GetInitialisationString()}";
+            Type type = controller.GetType();
+            return $"{type.Assembly.FullName}#{type.Name}?{controller.GetInitialisationString()}";
         }
         public static ICommandController CreateController(string initString)
         {
@@ -20,11 +21,16 @@ namespace Gware.Common.Storage.Command
 
             if(split.Length > 1)
             {
-                retVal = Activator.CreateInstance(Type.GetType(split[0])) as ICommandController;
-                if (retVal != null)
+                string[] typeSplit = split[0].Split('#');
+                if(typeSplit.Length > 1)
                 {
-                    retVal.Initialise(split[1]);
+                    retVal = Activator.CreateInstance(typeSplit[0],typeSplit[1]) as ICommandController;
+                    if (retVal != null)
+                    {
+                        retVal.Initialise(split[1]);
+                    }
                 }
+                
             }
 
             return retVal;

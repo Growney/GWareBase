@@ -121,7 +121,7 @@ namespace Gware.Standard.Web.Tenancy.Routing
                     // delegate further processing to inner route
                     await _innerRoute.RouteAsync(context);
                 }
-                finally
+                catch
                 {
                     // Restore the original values to prevent polluting the route data.
                     if (context.Handler == null)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,11 +23,16 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         public bool CreateComposite { get; set; }
         public bool IgnorePorts { get; set; }
         public Func<ICommandController,Task<bool>> OnDeployTenantSchema { get; set; }
-
+        public Assembly[] SearchIn { get; set; }
 
         public TenantConfiguration()
         {
             ControllerKey = "tenant";
+        }
+
+        public ICommandController GetTenantController(Tenant tenant)
+        {
+            return tenant?.GetController(SearchIn);
         }
 
         public Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID)
@@ -56,7 +62,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
                 try
                 {
                     tenant.SetUpgradeStatus(Controller, eUpgradeStatus.Upgrading);
-                    if(await OnDeployTenantSchema(tenant.Controller))
+                    if(await OnDeployTenantSchema(GetTenantController(tenant)))
                     {
                         tenant.SetCheckDate(Controller, DateTime.UtcNow,eUpgradeStatus.Ok);
                     }

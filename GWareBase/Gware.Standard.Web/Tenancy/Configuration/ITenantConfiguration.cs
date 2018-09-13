@@ -1,6 +1,7 @@
 ﻿using Gware.Standard.Storage.Controller;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Gware.Standard.Web.Tenancy.Configuration
@@ -35,6 +36,8 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         void DeleteTenantLink(long tenantID, byte type);
         Tenant GetTenantFromLink(string link);
         string GetLink(long tenantID, byte type);
-        
+
+        ICommandController GetTenantController(Tenant tenant);
+
     }
 }
