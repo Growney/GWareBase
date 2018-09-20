@@ -1,4 +1,5 @@
 ﻿using Gware.Standard.Storage.Controller;
+using Gware.Standard.Web.Tenancy.Routing;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Reflection;
@@ -16,8 +17,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         string SchemaFile { get; }
         string DBNameFormat { get; }
         string ControllerKey { get; }
-        string[] Domains { get; }
-        bool IgnorePorts { get; }
+        RouteTemplateDomain[] Domains { get; }
 
         Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID);
         Task<bool> UpgradeTenant(Tenant tenant, DateTime check);

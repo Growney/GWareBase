@@ -23,26 +23,30 @@ namespace Gware.Standard.Collections.Generic
             return retval;
         }
 
-        public static string ToDelimitedString<T>(this T flag, char limiter = ',') where T : Enum, IConvertible
+        public static string ToDelimitedString<T>(this T flag, bool suppressZero = false, char limiter = ',') where T : Enum, IConvertible
         {
-            return ToDelimitedString<T>((long)flag.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture), limiter);
+            return ToDelimitedString<T>((long)flag.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture),suppressZero, limiter);
         }
-        public static string ToDelimitedString<T>(this long flag, char limiter = ',') where T : Enum, IConvertible
+        public static string ToDelimitedString<T>(this long flag,bool suppressZero = false, char limiter = ',') where T : Enum, IConvertible
         {
             StringBuilder retVal = new StringBuilder();
             int count = 0;
             foreach (T enumVal in Enum.GetValues(typeof(T)))
             {
                 long enumLong = enumVal.ToInt64(System.Threading.Thread.CurrentThread.CurrentCulture);
-                if ((enumLong & flag) == enumLong)
+                if(enumLong != 0 || !suppressZero)
                 {
-                    if (count > 0)
+                    if ((enumLong & flag) == enumLong)
                     {
-                        retVal.Append(",");
+                        if (count > 0)
+                        {
+                            retVal.Append(",");
+                        }
+                        retVal.Append(enumVal.ToString());
+                        count++;
                     }
-                    retVal.Append(enumVal.ToString());
-                    count++;
                 }
+                
             }
             return retVal.ToString();
         }

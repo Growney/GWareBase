@@ -58,10 +58,20 @@ namespace Gware.Standard.Storage
         }
         public Task DeleteAsync(ICommandController controller)
         {
-            return Task.Factory.StartNew(() =>
+            return controller.ExecuteQueryAsync(CreateDeleteCommand());
+        }
+
+        private static T CreateIdObject<T>(long id) where T : StoredObjectBase, new()
+        {
+            return new T()
             {
-                Delete(controller);
-            });
+                Id = id
+            };
+        }
+
+        public static void Delete<T>(ICommandController controller,long id) where T : StoredObjectBase, new()
+        {
+            CreateIdObject<T>(id).Delete(controller);
         }
 
         public virtual void OnDelete(ICommandController controller)
@@ -95,9 +105,9 @@ namespace Gware.Standard.Storage
             return retVal;
         }
 
-        public Task<long> SaveAsync(ICommandController controller)
+        public async Task<long> SaveAsync(ICommandController controller)
         {
-            throw new NotImplementedException();
+            return LoadSingle<LoadedFromAdapterValue<long>>(await controller.ExecuteCollectionCommandAsync(CreateSaveCommand())).Value;
         }
     }
 }

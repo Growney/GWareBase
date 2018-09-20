@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Gware.Standard.Data
 {
     public static class ExtensionMethods
     {
+        
         public static int[] GetAllOrdinals(this DataTable table, Enum headers)
         {
             Array headerValues = Enum.GetValues(headers.GetType());

@@ -1,4 +1,5 @@
 ﻿using Gware.Standard.Storage.Controller;
+using Gware.Standard.Web.Tenancy.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -19,9 +20,8 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         public string SchemaFile { get; set; }
         public string DBNameFormat { get; set; }
         public string ControllerKey { get; set; }
-        public string[] Domains { get; set; }
+        public RouteTemplateDomain[] Domains { get; set; }
         public bool CreateComposite { get; set; }
-        public bool IgnorePorts { get; set; }
         public Func<ICommandController,Task<bool>> OnDeployTenantSchema { get; set; }
         public Assembly[] SearchIn { get; set; }
 
@@ -82,7 +82,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         }
         public string GetTenantRedirect(string tenantName,string path)
         {
-            return $"http://{tenantName}.{Domains[0]}/{path}";
+            return $"http://{(Domains[0].External?"www.":"")}{tenantName}.{Domains[0].Address}/{path}";
         }
         public bool DoesTenantExist(string name)
         {
