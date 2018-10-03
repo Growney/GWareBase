@@ -7,32 +7,17 @@ namespace Gware.Standard.Storage
 {
     public static class ExtensionMethods
     {
-        public static System.Data.DataTable CreateIDList(this IEnumerable<int> ids)
+
+        public static System.Data.DataTable CreateTableData<T>(this IEnumerable<T> items, string fieldName = "ID")
         {
             System.Data.DataTable retVal = new System.Data.DataTable();
 
-            retVal.Columns.Add("ID", typeof(int));
+            retVal.Columns.Add(fieldName, typeof(T));
 
-            foreach (int id in ids)
+            foreach (T item in items)
             {
                 System.Data.DataRow row = retVal.NewRow();
-                row["ID"] = id;
-                retVal.Rows.Add(row);
-            }
-
-            return retVal;
-        }
-
-        public static System.Data.DataTable CreateIDList(this IEnumerable<long> ids)
-        {
-            System.Data.DataTable retVal = new System.Data.DataTable();
-
-            retVal.Columns.Add("ID", typeof(long));
-
-            foreach (int id in ids)
-            {
-                System.Data.DataRow row = retVal.NewRow();
-                row["ID"] = id;
+                row[fieldName] = item;
                 retVal.Rows.Add(row);
             }
 

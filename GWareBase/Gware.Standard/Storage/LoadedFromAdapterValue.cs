@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Gware.Standard.Storage.Adapter;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Gware.Standard.Storage.Adapter
+namespace Gware.Standard.Storage
 {
     public class LoadedFromAdapterValue<T> : LoadedFromAdapterBase where T : IConvertible
     {
@@ -13,7 +14,7 @@ namespace Gware.Standard.Storage.Adapter
             Value = adapter.GetValue("Value", default(T));
         }
     }
-
+    
     public static class LoadedFromAdapterValueExtension
     {
         public static List<T> ToList<T>(this IEnumerable<LoadedFromAdapterValue<T>> list) where T : IConvertible
