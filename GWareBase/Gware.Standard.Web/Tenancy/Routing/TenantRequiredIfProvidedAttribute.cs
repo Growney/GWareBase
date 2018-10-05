@@ -15,9 +15,9 @@ namespace Gware.Standard.Web.Tenancy.Routing
         }
         private class TenantRequiredIfProvidedAttributeImpl : IActionFilter
         {
-            private readonly ITenantConfiguration m_configuration;
+            private readonly ITenantWebConfiguration m_configuration;
 
-            public TenantRequiredIfProvidedAttributeImpl(ITenantConfiguration configuration)
+            public TenantRequiredIfProvidedAttributeImpl(ITenantWebConfiguration configuration)
             {
                 m_configuration = configuration;
             }

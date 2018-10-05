@@ -9,33 +9,30 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 {
     public interface ITenantConfiguration
     {
-        IActionResult CreateNewResult { get; }
-        IActionResult NotFoundResult { get; }
-        IActionResult TenantHome { get; }
-        IActionResult Upgrading { get; }
-        ICommandController Controller { get; }
-        string SchemaFile { get; }
-        string DBNameFormat { get; }
+        ICommandController Controller { get; set; }
+        string SchemaFile { get; set; }
+        string DBNameFormat { get; set; }
         string ControllerKey { get; }
-        RouteTemplateDomain[] Domains { get; }
+        RouteTemplateDomain[] Domains { get; set; }
+        Assembly[] SearchIn { get; set; }
+        bool CreateComposite { get; set; }
+        Func<ICommandController, Task<bool>> OnDeployTenantSchema { get; set; }
 
-        Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID);
         Task<bool> UpgradeTenant(Tenant tenant, DateTime check);
         string GetTenantRedirect(string tenantName, string path);
         string GetTenantRedirect(int entityType, long entityID,string path);
         bool DoesTenantExist(string name);
         bool DoesTenantExist(int entityType, long entityID);
 
-        bool IsValidTenantName(string name);
-
         DateTime GetSchemaCreated();
 
+        Tenant GetTenant(long tenantID);
         Tenant GetTenant(int entityType, long entityID);
+        string GetLink(long tenantID, byte type);
 
         void CreateTenantLink(long tenantID, byte type, string link);
         void DeleteTenantLink(long tenantID, byte type);
         Tenant GetTenantFromLink(string link);
-        string GetLink(long tenantID, byte type);
 
         ICommandController GetTenantController(Tenant tenant);
 

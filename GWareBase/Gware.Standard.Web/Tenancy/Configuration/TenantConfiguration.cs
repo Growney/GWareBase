@@ -12,10 +12,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 {
     public class TenantConfiguration : ITenantConfiguration
     {
-        public IActionResult Upgrading { get; set; }
-        public IActionResult NotFoundResult { get; set; }
-        public IActionResult TenantHome { get; set; }
-        public IActionResult CreateNewResult { get; set; }
+       
         public ICommandController Controller { get; set; }
         public string SchemaFile { get; set; }
         public string DBNameFormat { get; set; }
@@ -35,21 +32,6 @@ namespace Gware.Standard.Web.Tenancy.Configuration
             return tenant?.GetController(SearchIn);
         }
 
-        public Task<bool> CreateTenant(string name,string displayName, int entityType, long entityID)
-        {
-            if (Tenant.IsValidTenantName(name))
-            {
-                if (!Tenant.Exists(Controller, name))
-                {
-                    ICommandController newTenancyController = Controller.Clone();
-                    newTenancyController.SetName(string.Format(DBNameFormat, name));
-                    Tenant.Create(Controller, newTenancyController, name, displayName,entityType,entityID,GetSchemaCreated());
-
-                    return OnDeployTenantSchema(newTenancyController);
-                }
-            }
-            return Task.FromResult(false);
-        }
         public string GetDBName(string tenantName)
         {
             return string.Format(DBNameFormat,tenantName);
@@ -92,15 +74,14 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         {
             return Tenant.Exists(Controller, entityType, entityID);
         }
-        public bool IsValidTenantName(string name)
-        {
-            return Tenant.IsValidTenantName(name);
-        }
         public Tenant GetTenant(int entityType, long entityID)
         {
             return Tenant.ForEntity(Controller, entityType, entityID);
         }
-
+        public Tenant GetTenant(long tenantID)
+        {
+            return Tenant.Get<Tenant>(Controller, tenantID);
+        }
         public DateTime GetSchemaCreated()
         {
             System.IO.FileInfo info = new System.IO.FileInfo(SchemaFile);

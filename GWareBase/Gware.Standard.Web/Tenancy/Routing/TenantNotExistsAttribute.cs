@@ -15,9 +15,9 @@ namespace Gware.Standard.Web.Tenancy.Routing
         }
         private class TenantNotExistsAttributeImpl : IActionFilter
         {
-            private readonly ITenantConfiguration m_configuration;
+            private readonly ITenantWebConfiguration m_configuration;
 
-            public TenantNotExistsAttributeImpl(ITenantConfiguration configuration)
+            public TenantNotExistsAttributeImpl(ITenantWebConfiguration configuration)
             {
                 m_configuration = configuration;
             }

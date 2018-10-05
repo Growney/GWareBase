@@ -59,7 +59,7 @@ namespace Gware.Standard.Storage
             }
             else
             {
-                retVal = default(T);
+                retVal = default;
             }
 
             return retVal;

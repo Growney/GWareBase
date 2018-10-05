@@ -16,9 +16,9 @@ namespace Gware.Standard.Web.Tenancy.Routing
         }
         private class TenantRequiredAttributeImpl : IActionFilter
         {
-            private readonly ITenantConfiguration m_configuration;
+            private readonly ITenantWebConfiguration m_configuration;
 
-            public TenantRequiredAttributeImpl(ITenantConfiguration configuration)
+            public TenantRequiredAttributeImpl(ITenantWebConfiguration configuration)
             {
                 m_configuration = configuration;
             }

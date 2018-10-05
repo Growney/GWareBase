@@ -4,49 +4,33 @@ using System.Text;
 
 namespace Gware.Standard.Collections.Generic
 {
-    public class ArgumentsStore<T> : IArgumentsStore<T>
+    public class ArgumentsStore<T> : GuidArgumentStore<T>
     {
         private Dictionary<Guid, T> m_store = new Dictionary<Guid, T>();
 
-        public T ReCallArguments(string guid)
+        public override T RecallArguments(Guid guid)
         {
             T retVal = default(T);
-            try
+            if (m_store.ContainsKey(guid))
             {
-                if (Guid.TryParse(guid, out Guid newGuid))
-                {
-                    if (m_store.ContainsKey(newGuid))
-                    {
-                        retVal = m_store[newGuid];
-                    }
-                }
-            }
-            catch (Exception)
-            {
+                retVal = m_store[guid];
             }
             return retVal;
         }
 
-        public string StoreArguments(T parameters)
+        public override void StoreArguments(Guid guid, T arguments)
         {
-            Guid paramGuid = Guid.NewGuid();
-
-            if (!m_store.ContainsKey(paramGuid))
+            if (!m_store.ContainsKey(guid))
             {
-                m_store.Add(paramGuid, parameters);
+                m_store.Add(guid, arguments);
             }
-
-            return paramGuid.ToString();
         }
 
-        public void DiscardArguments(string guid)
+        public override void DiscardArguments(Guid guid)
         {
-            if (Guid.TryParse(guid, out Guid newGuid))
+            if (m_store.ContainsKey(guid))
             {
-                if (m_store.ContainsKey(newGuid))
-                {
-                    m_store.Remove(newGuid);
-                }
+                m_store.Remove(guid);
             }
         }
     }

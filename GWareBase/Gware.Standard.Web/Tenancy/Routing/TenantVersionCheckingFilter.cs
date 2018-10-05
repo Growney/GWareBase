@@ -19,9 +19,9 @@ namespace Gware.Standard.Web.Tenancy.Routing
         private class TenantVersionCheckingFilterImpl : IActionFilter
         {
             private static object upgradeLock = new object();
-            private readonly ITenantConfiguration m_configuration;
+            private readonly ITenantWebConfiguration m_configuration;
 
-            public TenantVersionCheckingFilterImpl(ITenantConfiguration configuration)
+            public TenantVersionCheckingFilterImpl(ITenantWebConfiguration configuration)
             {
                 m_configuration = configuration;
             }

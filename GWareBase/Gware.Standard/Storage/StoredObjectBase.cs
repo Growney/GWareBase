@@ -85,12 +85,6 @@ namespace Gware.Standard.Storage
             return command;
         }
 
-        public virtual void Load(ICommandController controller, long primaryKey)
-        {
-            IDataCommand command = CreateLoadFromPrimaryKey(primaryKey);
-            LoadFrom(controller.ExecuteCollectionCommand(command).First);
-        }
-
         public virtual IDataCommand CreateLoadFromPrimaryKey(long primaryKey)
         {
             DataCommand command = new DataCommand(GetType().Name, "Single");
@@ -100,9 +94,7 @@ namespace Gware.Standard.Storage
 
         public static T Get<T>(ICommandController controller, long primaryKey) where T : StoredObjectBase, new()
         {
-            T retVal = new T();
-            retVal.Load(controller, primaryKey);
-            return retVal;
+            return LoadSingle<T>(controller.ExecuteCollectionCommand(new T().CreateLoadFromPrimaryKey(primaryKey)));
         }
 
         public async Task<long> SaveAsync(ICommandController controller)
