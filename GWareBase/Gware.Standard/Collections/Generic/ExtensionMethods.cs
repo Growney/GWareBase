@@ -7,7 +7,18 @@ namespace Gware.Standard.Collections.Generic
 {
     public static class ExtensionMethods
     {
-        public static Dictionary<K, List<T>> GroupBy<K, T>(this IEnumerable<T> items, Func<T, K> groupBy)
+        public static Dictionary<K,T> Index<K, T>(this IEnumerable<T> items,Func<T,K> indexBy)
+        {
+            Dictionary<K, T> retval = new Dictionary<K, T>();
+
+            foreach (T item in items)
+            {
+                K key = indexBy(item);
+                retval.Set(key,item);
+            }
+            return retval;
+        }
+        public static Dictionary<K, List<T>> GroupWith<K, T>(this IEnumerable<T> items, Func<T, K> groupBy)
         {
             Dictionary<K, List<T>> retval = new Dictionary<K, List<T>>();
 
