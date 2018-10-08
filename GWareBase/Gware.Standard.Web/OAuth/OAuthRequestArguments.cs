@@ -10,6 +10,7 @@ namespace Gware.Standard.Web.OAuth
         public string Host { get; set; }
         public string Tenant { get; set; }
         public string Code { get; set; }
+        public string ReturnUrl { get; set; }
 
         public abstract string GetAuthenticationUrl(IOAuthConfiguration config, string state);
         public string GetRedirectString(string state)

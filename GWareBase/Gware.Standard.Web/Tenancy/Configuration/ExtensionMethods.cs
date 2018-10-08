@@ -15,14 +15,15 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 
     public static class TenantExtensionMethods
     {
-        public static T GetLocalArguments<T>(this Microsoft.AspNetCore.Http.HttpContext context, string redirectPath)
+        public static T GetLocalArguments<T>(this Microsoft.AspNetCore.Http.HttpContext context, string redirectPath,string returnUrl = "")
             where T : OAuthRequestArguments, new()
         {
             return new T()
             {
                 Host = context.Request.Host.ToString(),
                 RedirectPath = redirectPath,
-                Tenant = context.Features.Get<Tenant>()?.Name
+                Tenant = context.Features.Get<Tenant>()?.Name,
+                ReturnUrl = returnUrl
             };
         }
         public static IServiceCollection AddDelegatedControllerProvider(this IServiceCollection services,Func<string,ICommandController> func)
