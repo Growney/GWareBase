@@ -72,7 +72,12 @@ namespace Gware.Standard.Web.Tenancy
             command.AddParameter("UpgradeStatus", System.Data.DbType.Int16).Value = (byte)status;
             controller.ExecuteQuery(command);
         }
-
+        internal static void Delete(ICommandController controller,long id)
+        {
+            DataCommand command = new DataCommand("Tenant", "Delete");
+            command.AddParameter("Id", System.Data.DbType.Int64).Value = id;
+            controller.ExecuteQuery(command);
+        }
         internal static bool Exists(ICommandController controller,string name)
         {
             DataCommand command = new DataCommand("Tenant", "Exists");
