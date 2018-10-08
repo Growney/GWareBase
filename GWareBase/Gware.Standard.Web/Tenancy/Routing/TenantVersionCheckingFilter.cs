@@ -61,7 +61,7 @@ namespace Gware.Standard.Web.Tenancy.Routing
                                         }
                                     }
                                 }
-                                context.Result = m_configuration.Upgrading;
+                                context.Result = m_configuration.Upgrading(context);
                             }
                         }
                     }

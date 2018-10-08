@@ -1,5 +1,6 @@
 ﻿using Gware.Standard.Storage.Controller;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,26 +10,39 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 {
     public class TenantWebConfiguration : TenantConfiguration, ITenantWebConfiguration
     {
-        public IActionResult Upgrading { get; set; }
+        public Func<ActionExecutingContext, IActionResult> Upgrading { get; set; }
         public IActionResult NotFoundResult { get; set; }
         public IActionResult TenantHome { get; set; }
         public IActionResult CreateNewResult { get; set; }
 
 
-        public Task<bool> CreateTenant(string name, string displayName, int entityType, long entityID)
+        public async Task<bool> CreateTenant(string name, string displayName, int entityType, long entityID)
         {
+            bool retVal = false;
             if (Tenant.IsValidTenantName(name))
             {
                 if (!Tenant.Exists(Controller, name))
                 {
                     ICommandController newTenancyController = Controller.Clone();
                     newTenancyController.SetName(string.Format(DBNameFormat, name));
-                    Tenant.Create(Controller, newTenancyController, name, displayName, entityType, entityID, GetSchemaCreated());
+                    long? id = Tenant.Create(Controller, newTenancyController, name, displayName, entityType, entityID, GetSchemaCreated())?.Id;
 
-                    return OnDeployTenantSchema(newTenancyController);
+                    if(id.HasValue)
+                    {
+                        Task<bool> deploy = OnDeployTenantSchema(newTenancyController);
+
+                        if (!await deploy)
+                        {
+                            Tenant.Delete(Controller, id.Value);
+                        }
+                        else
+                        {
+                            retVal = true;
+                        }
+                    } 
                 }
             }
-            return Task.FromResult(false);
+            return retVal;
         }
 
 
