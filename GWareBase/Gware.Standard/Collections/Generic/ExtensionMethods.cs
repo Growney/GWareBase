@@ -7,6 +7,19 @@ namespace Gware.Standard.Collections.Generic
 {
     public static class ExtensionMethods
     {
+        public static HashSet<T> Index<T>(this IEnumerable<T> items)
+        {
+            HashSet<T> retval = new HashSet<T>();
+
+            foreach (T item in items)
+            {
+                if (!retval.Contains(item))
+                {
+                    retval.Add(item);
+                }
+            }
+            return retval;
+        }
         public static Dictionary<K,T> Index<K, T>(this IEnumerable<T> items,Func<T,K> indexBy)
         {
             Dictionary<K, T> retval = new Dictionary<K, T>();

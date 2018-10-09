@@ -7,5 +7,6 @@ namespace Gware.Standard.Storage.Controller
     public interface IControllerProvider
     {
         ICommandController CreateController(string key);
+        ICommandController GetDefaultDataController();
     }
 }

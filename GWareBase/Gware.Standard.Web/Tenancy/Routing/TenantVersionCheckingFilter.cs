@@ -20,10 +20,12 @@ namespace Gware.Standard.Web.Tenancy.Routing
         {
             private static object upgradeLock = new object();
             private readonly ITenantWebConfiguration m_configuration;
+            private readonly ITenantStorage m_storage;
 
-            public TenantVersionCheckingFilterImpl(ITenantWebConfiguration configuration)
+            public TenantVersionCheckingFilterImpl(ITenantWebConfiguration configuration,ITenantStorage storage)
             {
                 m_configuration = configuration;
+                m_storage = storage;
             }
 
             public void OnActionExecuted(ActionExecutedContext context)
@@ -43,7 +45,7 @@ namespace Gware.Standard.Web.Tenancy.Routing
                     }
                     if (!ignore)
                     {
-                        Tenant currentTenant = context.HttpContext.Features.Get<Tenant>();
+                        Tenant currentTenant = m_storage?.Tenant;
                         if (currentTenant != null)
                         {
                             DateTime created = m_configuration.GetSchemaCreated();

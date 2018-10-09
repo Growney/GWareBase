@@ -21,10 +21,12 @@ namespace Gware.Standard.Web.Tenancy.Routing
         {
 
             private readonly ITenantConfiguration m_configuration;
+            private readonly ITenantStorage m_storage;
 
-            public TenantResolverFilterImpl(ITenantConfiguration configuration)
+            public TenantResolverFilterImpl(ITenantConfiguration configuration,ITenantStorage storage)
             {
                 m_configuration = configuration;
+                m_storage = storage;
             }
 
             public void OnActionExecuted(ActionExecutedContext context)
@@ -38,13 +40,13 @@ namespace Gware.Standard.Web.Tenancy.Routing
                 if (data.Values.ContainsKey("tenant"))
                 {
                     RouteTenant tenant = new RouteTenant(data.Values["tenant"].ToString());
-                    context.HttpContext.Features.Set(tenant);
+                    m_storage.RouteTenant = tenant;
                     if (tenant != null)
                     {
                         ICommandController controller = m_configuration.Controller;
                         if (controller != null)
                         {
-                            context.HttpContext.Features.Set<Tenant>(Tenant.ForName(controller, tenant.Name));
+                            m_storage.Tenant = Tenant.ForName(controller, tenant.Name);
                         }
                     }
                 }

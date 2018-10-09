@@ -15,25 +15,23 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 
     public static class TenantExtensionMethods
     {
-        public static T GetLocalArguments<T>(this Microsoft.AspNetCore.Http.HttpContext context, string redirectPath,string returnUrl = "")
+        public static T GetLocalArguments<T>(this Microsoft.AspNetCore.Http.HttpContext context,Tenant currentTenant, string redirectPath,string returnUrl = "")
             where T : OAuthRequestArguments, new()
         {
             return new T()
             {
                 Host = context.Request.Host.ToString(),
                 RedirectPath = redirectPath,
-                Tenant = context.Features.Get<Tenant>()?.Name,
+                Tenant = currentTenant?.Name,
                 ReturnUrl = returnUrl
             };
         }
-        public static IServiceCollection AddDelegatedControllerProvider(this IServiceCollection services,Func<string,ICommandController> func)
+        public static IServiceCollection AddDelegatedControllerProvider(this IServiceCollection services,Func<string,ICommandController> func,string defaultKey = "Default")
         {
-            return services.AddSingleton<IControllerProvider>(new DelegatedControllerProvider(func));
+            return services.AddSingleton<IControllerProvider>(new DelegatedControllerProvider(func, defaultKey));
         }
         public static IMvcBuilder AddTenantMVC(this IServiceCollection services,Action<ITenantConfiguration> tenantConfigurationBuilder, Action<ITenantWebConfiguration> tenantWebConfigBuilder, Action<MvcOptions> mvcConfigBuild)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
             TenantWebConfiguration config = new TenantWebConfiguration();
 
             tenantConfigurationBuilder(config);
@@ -41,7 +39,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 
             services.AddSingleton<ITenantConfiguration>(config);
             services.AddSingleton<ITenantWebConfiguration>(config);
-
+            services.AddScoped<ITenantStorage, TenantStorage>();
             services.AddScoped<ITenantControllerProvider, TenantControllerProvider>();
 
             return services.AddMvc(x =>
@@ -61,6 +59,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 
             services.AddSingleton<ITenantConfiguration>(config);
 
+            services.AddScoped<ITenantStorage, TenantStorage>();
             services.AddScoped<ITenantControllerProvider, TenantControllerProvider>();
             
         }

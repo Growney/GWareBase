@@ -9,8 +9,6 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 {
     public interface ITenantControllerProvider
     {
-        ICommandController GetDefaultDataController();
         ICommandController GetController();
-        ICommandController GetController(HttpContext context);
     }
 }

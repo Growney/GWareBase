@@ -16,10 +16,12 @@ namespace Gware.Standard.Web.Tenancy.Routing
         private class RouteTenantRequiredAttributeImpl : IActionFilter
         {
             private readonly ITenantWebConfiguration m_configuration;
+            private readonly ITenantStorage m_storage;
 
-            public RouteTenantRequiredAttributeImpl(ITenantWebConfiguration configuration)
+            public RouteTenantRequiredAttributeImpl(ITenantWebConfiguration configuration,ITenantStorage storage)
             {
                 m_configuration = configuration;
+                m_storage = storage;
             }
 
             public void OnActionExecuted(ActionExecutedContext context)
@@ -29,8 +31,7 @@ namespace Gware.Standard.Web.Tenancy.Routing
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                RouteTenant routeTenant = context.HttpContext.Features.Get<RouteTenant>();
-                if (routeTenant == null)
+                if (m_storage?.RouteTenant == null)
                 {
                     context.Result = m_configuration.NotFoundResult;
                 }
