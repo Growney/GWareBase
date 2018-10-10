@@ -1,12 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gware.Standard.Collections.Generic
 {
-    public class FixedTimeCache<K,D> : IDisposable
+    
+    public class FixedTimeCache<K,D> : ICache<K, D>
     {
         private object m_accessLock = new object();
         private Dictionary<K, D> m_internalCache = new Dictionary<K, D>();
@@ -14,32 +17,29 @@ namespace Gware.Standard.Collections.Generic
         private Dictionary<K, DateTime> m_readTime = new Dictionary<K, DateTime>();
         private Queue<K> m_timeoutQueue = new Queue<K>();
         
-        private Queue<(K,TaskCompletionSource<D>)> m_readQueue = new Queue<(K, TaskCompletionSource<D>)>();
+        private Queue<(K,TaskCompletionSource<D>,eCacheOptions)> m_readQueue = new Queue<(K, TaskCompletionSource<D>, eCacheOptions)>();
         private Queue<(K, D, DateTime)> m_writeQueue = new Queue<(K, D, DateTime)>();
 
         private System.Threading.Thread m_processThread;
         private bool m_stop;
-        private TimeSpan m_keepFor;
-        private Func<K, Task<D>> m_read;
         private AutoResetEvent m_event = new AutoResetEvent(false);
 
-        public FixedTimeCache(Func<K, Task<D>> read)
-            :this(read,TimeSpan.FromMinutes(1))
-        {
+        public TimeSpan KeepFor { get; set; } = TimeSpan.FromMinutes(1);
+        public Func<K, Task<D>> Read { get; set; }
 
-        }
+        private readonly ILogger<FixedTimeCache<K, D>> m_logger;
 
-        public FixedTimeCache(Func<K, Task<D>> read,TimeSpan keepFor)
+        public FixedTimeCache(ILogger<FixedTimeCache<K,D>> logger)
         {
+            m_logger = logger;
             m_processThread = new System.Threading.Thread(new System.Threading.ThreadStart(Process));
             m_processThread.Start();
-            m_keepFor = keepFor;
-            m_read = read;
 
         }
 
         private void Process()
         {
+            m_logger.LogInformation("Starting fixed time cache process thread");
             while (!m_stop)
             {
                 m_event.WaitOne(1000);
@@ -49,23 +49,28 @@ namespace Gware.Standard.Collections.Generic
                 CheckWriteQueue();
                 CheckReadQueue();
             }
-            FailWaitingReads();
+            int failed = FailWaitingReads();
+
+            m_logger.LogInformation($"Stopping fixed time cache process thread forced to fail {failed} reads");
         }
 
-        private void FailWaitingReads()
+        private int FailWaitingReads()
         {
+            int failedCount = 0;
             while(m_readQueue.Count > 0)
             {
-                (K key, TaskCompletionSource<D> source) = m_readQueue.Dequeue();
+                (K key, TaskCompletionSource<D> source,_) = m_readQueue.Dequeue();
                 source.SetException(new Exception("Cannot read from stopped cache"));
+                failedCount++;
             }
+            return failedCount;
         }
         private void CheckTimeouts()
         {
             if(m_timeoutQueue.Count > 0)
             {
                 K key = m_timeoutQueue.Peek();
-                if((DateTime.UtcNow - m_readTime[key]) > m_keepFor)
+                if((DateTime.UtcNow - m_readTime[key]) > KeepFor)
                 {
                     m_internalCache.Remove(key);
                     m_timeoutQueue.Dequeue();
@@ -77,20 +82,59 @@ namespace Gware.Standard.Collections.Generic
         {
             if(m_readQueue.Count > 0)
             {
-                (K key, TaskCompletionSource<D> source) = m_readQueue.Dequeue();
-                if (m_internalCache.ContainsKey(key))
+                (K key, TaskCompletionSource<D> source,eCacheOptions options) = m_readQueue.Dequeue();
+                switch (options)
                 {
-                    source.SetResult(m_internalCache[key]);
+                    case eCacheOptions.Default:
+                        {
+                            await PerformDefault(key, source);
+                        }
+                        break;
+                    case eCacheOptions.ForceReload:
+                        {
+                            await PerformForce(key, source);
+                        }
+                        break;
+                    case eCacheOptions.OnlyStored:
+                        {
+                            PerformOnlyStored(key, source);
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    D item = await m_read(key);
-                    source.SetResult(item);
-                    m_writeQueue.Enqueue((key, item, DateTime.UtcNow));
-                    m_event.Set();
-                    
-                    
-                }
+                
+            }
+        }
+        protected virtual async Task PerformForce(K key,TaskCompletionSource<D> source)
+        {
+            D item = await Read?.Invoke(key);
+            source.SetResult(item);
+            m_writeQueue.Enqueue((key, item, DateTime.UtcNow));
+            m_event.Set();
+        }
+        private bool PerformOnlyStored(K key, TaskCompletionSource<D> source)
+        {
+            if (m_internalCache.ContainsKey(key))
+            {
+                source.SetResult(m_internalCache[key]);
+                return true;
+            }
+            else
+            {
+                source.SetResult(default);
+                return false;
+            }
+        }
+        private async Task PerformDefault(K key,TaskCompletionSource<D> source)
+        {
+            if (!m_internalCache.ContainsKey(key))
+            {
+                await PerformForce(key, source);
+            }
+            else
+            {
+                PerformOnlyStored(key, source);
             }
         }
         private void CheckWriteQueue()
@@ -103,13 +147,21 @@ namespace Gware.Standard.Collections.Generic
                 m_timeoutQueue.Enqueue(key);
             }
         }
-        public Task<D> GetItem(K key)
-        {
-            TaskCompletionSource<D> task = new TaskCompletionSource<D>();
 
-            m_readQueue.Enqueue((key, task));
+        public async Task<D> GetItem(K key, eCacheOptions options = eCacheOptions.Default)
+        {
+            if(Read == null)
+            {
+                throw new InvalidOperationException("Read must be defined before items can be taken from the cache");
+            }
+            Stopwatch timeToRead = new Stopwatch();
+            timeToRead.Start();
+            TaskCompletionSource<D> task = new TaskCompletionSource<D>();
+            m_readQueue.Enqueue((key, task,options));
             m_event.Set();
-            return task.Task;
+            D retVal = await task.Task;
+            m_logger.LogTrace($"Read cache item for key {key} of type {typeof(K)} for data type {typeof(D)} in {timeToRead.ElapsedMilliseconds}ms");
+            return retVal;
         }
 
         public void Dispose()
