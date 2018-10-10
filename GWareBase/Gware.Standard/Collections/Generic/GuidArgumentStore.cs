@@ -23,7 +23,7 @@ namespace Gware.Standard.Collections.Generic
                     retVal = RecallArguments(newGuid);
                     if(retVal != default)
                     {
-                        Logger.LogInformation($"Recalled GUID arguments {guid}");
+                        Logger.LogTrace($"Recalled GUID arguments {guid}");
                     }
                     else
                     {
@@ -48,7 +48,7 @@ namespace Gware.Standard.Collections.Generic
         {
             Guid paramGuid = Guid.NewGuid();
 
-            Logger.LogInformation($"Storing new arguments {paramGuid}");
+            Logger.LogTrace($"Storing new arguments {paramGuid}");
 
             StoreArguments(paramGuid, parameters);
 
@@ -63,7 +63,7 @@ namespace Gware.Standard.Collections.Generic
             {
                 if (DiscardArguments(newGuid))
                 {
-                    Logger.LogInformation($"Discraded arguments {newGuid}");
+                    Logger.LogTrace($"Discraded arguments {newGuid}");
                 }
                 else
                 {

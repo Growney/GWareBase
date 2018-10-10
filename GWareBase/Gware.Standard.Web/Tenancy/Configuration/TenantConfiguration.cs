@@ -97,22 +97,27 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 
         public void CreateTenantLink(long tenantID, byte type, string link)
         {
-            Tenant.CreateLink(Controller, tenantID, type, link);
+            LinkedTenant.CreateLink(Controller, tenantID, type, link);
         }
 
         public void DeleteTenantLink(long tenantID,byte type)
         {
-            Tenant.RemoveLink(Controller, tenantID, type);
+            LinkedTenant.RemoveLink(Controller, tenantID, type);
         }
         
-        public Tenant GetTenantFromLink(string link)
+        public LinkedTenant GetTenantFromLink(string link)
         {
-            return Tenant.ForLink(Controller, link);
+            return LinkedTenant.ForLink(Controller, link);
         }
 
         public string GetLink(long tenantID,byte type)
         {
-            return Tenant.GetLink(Controller, tenantID, type);
+            return LinkedTenant.GetLink(Controller, tenantID, type);
+        }
+
+        public List<LinkedTenant> AllWithLink(byte type)
+        {
+            return LinkedTenant.All(Controller, type);
         }
     }
 }

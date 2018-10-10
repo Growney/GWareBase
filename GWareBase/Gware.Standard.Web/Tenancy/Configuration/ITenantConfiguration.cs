@@ -2,6 +2,7 @@
 using Gware.Standard.Web.Tenancy.Routing;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -32,7 +33,8 @@ namespace Gware.Standard.Web.Tenancy.Configuration
 
         void CreateTenantLink(long tenantID, byte type, string link);
         void DeleteTenantLink(long tenantID, byte type);
-        Tenant GetTenantFromLink(string link);
+        LinkedTenant GetTenantFromLink(string link);
+        List<LinkedTenant> AllWithLink(byte type);
 
         ICommandController GetTenantController(Tenant tenant);
 

@@ -37,14 +37,10 @@ END
 IF @Result = 'SelectTenant'
 BEGIN
 
-	SELECT*
-	FROM Tenant
-	WHERE Id IN 
-	(
-		SELECT TenantID 
-		FROM TenantLink 
-		WHERE Link = @Link
-	)
+	SELECT T.*,TL.Link,TL.TypeID
+	FROM Tenant T
+	INNER JOIN TenantLink TL ON T.Id = TL.TenantID
+	WHERE TL.Link = @Link
 
 END
 
@@ -54,5 +50,15 @@ BEGIN
 	SELECT Link AS [Value]
 	FROM TenantLink
 	WHERE TenantID = @TenantID AND TypeID = @TypeID
+
+END
+
+IF @Result = 'All'
+BEGIN
+
+	SELECT T.*,TL.Link,TL.TypeID
+	FROM Tenant T
+	INNER JOIN TenantLink TL ON T.Id = TL.TenantID
+	WHERE TL.TypeID = @TypeID
 
 END
