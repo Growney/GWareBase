@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Gware.Standard.Configuration
 {
-    public interface IConfigurationProvider<T> where T : Enum
+    public interface ITypeSafeConfigurationProvider<T> where T : Enum
     {
         bool GetBoolean(T settingID);
         int GetInt(T settingID);
