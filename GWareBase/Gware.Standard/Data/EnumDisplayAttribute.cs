@@ -23,7 +23,6 @@ namespace Gware.Standard.Data
 
                 if (attrs != null && attrs.Length > 0)
                 {
-                    //Pull out the description value
                     return ((EnumDisplayAttribute)attrs[0]).Text;
                 }
             }
