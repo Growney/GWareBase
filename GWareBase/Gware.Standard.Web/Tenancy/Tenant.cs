@@ -20,9 +20,9 @@ namespace Gware.Standard.Web.Tenancy
         public long EntityId { get; set; }
         public DateTime UpgradeCheck { get; private set; }
         public eUpgradeStatus UpgradeStatus { get; private set; }
-        public ICommandController GetController(Assembly[] searchIn)
+        public ICommandController GetController<T>(IServiceProvider provider) where T :ICommandController
         {
-            return CommandControllerFactory.CreateController(searchIn, ControllerCreationString);
+            return CommandControllerFactory.CreateController<T>(provider, ControllerCreationString);
         }
         protected override void AddParametersToSave(IDataCommand command)
         {

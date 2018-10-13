@@ -13,9 +13,7 @@ namespace Gware.Standard.Web.Tenancy.Configuration
         ICommandController Controller { get; set; }
         string SchemaFile { get; set; }
         string DBNameFormat { get; set; }
-        string ControllerKey { get; }
         RouteTemplateDomain[] Domains { get; set; }
-        Assembly[] SearchIn { get; set; }
         bool CreateComposite { get; set; }
         Func<ICommandController, Task<bool>> OnDeployTenantSchema { get; set; }
 

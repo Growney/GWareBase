@@ -73,5 +73,17 @@ namespace Gware.Core.MSSQL.Database
                 param.Value = value;
             }
         }
+
+        public string GetParameterErrorString()
+        {
+            StringBuilder retVal = new StringBuilder();
+
+            foreach(SqlParameter parameter in m_parameters.Values)
+            {
+                retVal.AppendLine($"{parameter.ParameterName} - {parameter.Value}");
+            }
+
+            return retVal.ToString();
+        }
     }
 }

@@ -3,6 +3,8 @@ using Gware.Standard.Storage.Adapter;
 using Gware.Standard.Storage.Adapter.Data;
 using Gware.Standard.Storage.Command;
 using Gware.Standard.Storage.Controller;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -30,18 +32,22 @@ namespace Gware.Core.MSSQL.Storage.Controller
         public string Password { get; private set; }
         public bool Encrypted { get; set; }
         public int TimeOut { get; set; }
-        public MSSQLCommandController()
+        private readonly ILogger<MSSQLCommandController> m_logger;
+        
+        public MSSQLCommandController(ILogger<MSSQLCommandController> logger)
         {
-
+            m_logger = logger;
         }
-        public MSSQLCommandController(string serverName, string databaseName, string databaseUsername, string databasePassword)
+        public MSSQLCommandController(ILogger<MSSQLCommandController> logger,string serverName, string databaseName, string databaseUsername, string databasePassword)
+            :this(logger)
         {
             ServerName = serverName;
             DatabaseName = databaseName;
             Username = databaseUsername;
             Password = databasePassword;
         }
-        public MSSQLCommandController(string serverName, string databaseName)
+        public MSSQLCommandController(ILogger<MSSQLCommandController> logger,string serverName, string databaseName)
+            :this(logger)
         {
             Trusted = true;
             ServerName = serverName;
@@ -267,14 +273,13 @@ namespace Gware.Core.MSSQL.Storage.Controller
         {
             if (Trusted)
             {
-                return new MSSQLCommandController(ServerName, DatabaseName);
+                return new MSSQLCommandController(m_logger,ServerName, DatabaseName);
             }
             else
             {
-                return new MSSQLCommandController(ServerName, DatabaseName, Username, Password);
+                return new MSSQLCommandController(m_logger,ServerName, DatabaseName, Username, Password);
             }
         }
-
         public Task<bool> DeploySchema(string schemaFile, string dbName, bool includeComposite = false)
         {
             TaskCompletionSource<bool> source = new TaskCompletionSource<bool>();
@@ -289,6 +294,14 @@ namespace Gware.Core.MSSQL.Storage.Controller
                 };
                 process.StartInfo = startInfo;
                 process.EnableRaisingEvents = true;
+                process.ErrorDataReceived += (x, y) =>
+                {
+                    m_logger.LogError(y.Data);
+                };
+                process.OutputDataReceived += (x, y) =>
+                {
+                    m_logger.LogTrace(y.Data);
+                };
                 process.Exited += (x, y) =>
                 {
                     if (process.ExitCode == 0)
@@ -300,11 +313,8 @@ namespace Gware.Core.MSSQL.Storage.Controller
                         source.SetResult(false);
                     }
                 };
+                m_logger.LogTrace($"Deploying database using \"{startInfo.FileName} /Action:Publish  /SourceFile:\"{schemaFile}\" /TargetConnectionString:\"{GetLogSafeConnectionString()}\" /Properties:IncludeCompositeObjects={includeComposite}\"");
                 process.Start();
-                if (process.HasExited)
-                {
-                    source.SetResult(false);
-                }
                 #region ---- Awaiting .NET Core 2.0 Support -----
                 //Microsoft.SqlServer.Dac.DacServices dacServices = new Microsoft.SqlServer.Dac.DacServices(Connection.GetConnectionString());
                 //dacServices.ProgressChanged += (x, y) =>
@@ -353,6 +363,7 @@ namespace Gware.Core.MSSQL.Storage.Controller
                 conn.Open();
                 using (SqlCommand comm = conn.CreateCommand())
                 {
+                    m_logger.LogTrace($"Executing non query stored procedure {sp.Name} on db {DatabaseName} on server {ServerName}");
                     comm.CommandType = System.Data.CommandType.StoredProcedure;
                     comm.CommandText = sp.Name;
                     foreach (SqlParameter param in sp.Parameters)
@@ -360,7 +371,16 @@ namespace Gware.Core.MSSQL.Storage.Controller
                         comm.Parameters.Add(param);
                     }
 
-                    return comm.ExecuteNonQuery();
+                    try
+                    {
+                        return comm.ExecuteNonQuery();
+                    }
+                    catch(Exception ex)
+                    {
+                        m_logger.LogError(ex, $"Error executing non query stored procedure {sp.Name} on db {DatabaseName} on server {ServerName}: {sp.GetParameterErrorString()}");
+                        throw ex;
+                    }
+                    
                 }
             }
         }
@@ -370,9 +390,19 @@ namespace Gware.Core.MSSQL.Storage.Controller
             {
                 using (SqlCommand comm = conn.CreateCommand())
                 {
+                    m_logger.LogTrace($"Executing non query string {query} on db {DatabaseName} on server {ServerName}");
                     comm.CommandType = System.Data.CommandType.Text;
                     comm.CommandText = query;
-                    return comm.ExecuteNonQuery();
+                    try
+                    {
+                        return comm.ExecuteNonQuery();
+                    }
+                    catch(Exception ex)
+                    {
+                        m_logger.LogError(ex, $"Error executing non query string {query} on db {DatabaseName} on server {ServerName}");
+                        throw ex;
+                    }
+                    
                 }
             }
         }
@@ -388,11 +418,21 @@ namespace Gware.Core.MSSQL.Storage.Controller
                 conn.Open();
                 using (SqlCommand comm = conn.CreateCommand())
                 {
+                    m_logger.LogTrace($"Executing query {query} on db {DatabaseName} on server {ServerName}");
                     comm.CommandType = CommandType.Text;
                     comm.CommandText = query;
                     using (SqlDataAdapter reader = new SqlDataAdapter(comm))
                     {
-                        reader.Fill(retVal);
+                        try
+                        {
+                            reader.Fill(retVal);
+                        }
+                        catch (Exception ex)
+                        {
+                            m_logger.LogError(ex, $"Error executing query string {query} on db {DatabaseName} on server {ServerName}");
+                            throw ex;
+                        }
+                        
                     }
                 }
             }
@@ -423,9 +463,17 @@ namespace Gware.Core.MSSQL.Storage.Controller
             DataSet retVal = new DataSet();
             using (SqlConnection conn = GetConnection())
             {
-                conn.Open();
+                try
+                {
+                    conn.Open();
+                }
+                catch (Exception ex)
+                {
+                    m_logger.LogError(ex, $"Error opening database connection to {ServerName} {DatabaseName}");
+                }
                 using (SqlCommand comm = conn.CreateCommand())
                 {
+                    m_logger.LogTrace($"Executing query stored procedure {sp.Name} on db {DatabaseName} on server {ServerName}");
                     comm.CommandType = CommandType.StoredProcedure;
                     comm.CommandText = sp.Name;
                     foreach (SqlParameter param in sp.Parameters)
@@ -434,7 +482,16 @@ namespace Gware.Core.MSSQL.Storage.Controller
                     }
                     using (SqlDataAdapter reader = new SqlDataAdapter(comm))
                     {
-                        reader.Fill(retVal);
+                        try
+                        {
+                            reader.Fill(retVal);
+                        }
+                        catch(Exception ex)
+                        {
+                            m_logger.LogError(ex, $"Error executing query stored procedure {sp.Name}: {sp.GetParameterErrorString()}");
+                            throw ex;
+                        }
+
                     }
                 }
             }
@@ -461,7 +518,17 @@ namespace Gware.Core.MSSQL.Storage.Controller
             }
 
         }
-
+        public string GetLogSafeConnectionString()
+        {
+            if (Trusted)
+            {
+                return GetConnectionString();
+            }
+            else
+            {
+                return $"Server={ServerName};Database={DatabaseName};User id=*;Password=*;Trusted_Connection=False;Encrypt={Encrypted};Connection Timeout={TimeOut};";
+            }
+        }
         public void SetName(string name)
         {
             DatabaseName = name;

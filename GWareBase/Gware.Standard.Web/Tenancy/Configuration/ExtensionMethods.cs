@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,19 +27,45 @@ namespace Gware.Standard.Web.Tenancy.Configuration
                 ReturnUrl = returnUrl
             };
         }
-        public static IServiceCollection AddDelegatedControllerProvider(this IServiceCollection services,Func<string,ICommandController> func,string defaultKey = "Default")
+        public static IServiceCollection AddDelegatedControllerProvider<T>(this IServiceCollection services, Func<ILogger<T>, string, T> func, string defaultKey = "Default") where T : ICommandController
         {
-            return services.AddSingleton<IControllerProvider>(new DelegatedControllerProvider(func, defaultKey));
+            return services.AddSingleton<IControllerProvider, DelegatedControllerProvider<T>>(x =>
+            {
+                return new DelegatedControllerProvider<T>(x.GetService<ILogger<T>>(),func, defaultKey);
+            });
         }
-        public static IMvcBuilder AddTenantMVC(this IServiceCollection services,Action<ITenantConfiguration> tenantConfigurationBuilder, Action<ITenantWebConfiguration> tenantWebConfigBuilder, Action<MvcOptions> mvcConfigBuild)
+        public static IServiceCollection AddTenantWebConfiguration<T>(this IServiceCollection services) where T : class, ITenantWebConfiguration
         {
-            TenantWebConfiguration config = new TenantWebConfiguration();
+            return AddTenantWebConfiguration<T>(services, null);
+        }
+        public static IServiceCollection AddTenantWebConfiguration<T>(this IServiceCollection services, Action<T,ITenantConfiguration> configuration) where T : class, ITenantWebConfiguration
+        {
+            services.AddSingleton<ITenantWebConfiguration, T>(x=>
+            {
+                T config = ActivatorUtilities.CreateInstance<T>(x);
+                configuration?.Invoke(config,x.GetService<ITenantConfiguration>());
+                return config;
+            });
 
-            tenantConfigurationBuilder(config);
-            tenantWebConfigBuilder(config);
+            return services;
+        }
+        public static IServiceCollection AddTenantConfiguration<T>(this IServiceCollection services) where T : class, ITenantConfiguration
+        {
+            return AddTenantConfiguration<T>(services, null);
+        }
+        public static IServiceCollection AddTenantConfiguration<T>(this IServiceCollection services, Action<T> configuration) where T : class, ITenantConfiguration
+        {
+            services.AddSingleton<ITenantConfiguration, T>(x =>
+            {
+                T config = ActivatorUtilities.CreateInstance<T>(x);
+                configuration?.Invoke(config);
+                return config;
+            });
 
-            services.AddSingleton<ITenantConfiguration>(config);
-            services.AddSingleton<ITenantWebConfiguration>(config);
+            return services;
+        }
+        public static IMvcBuilder AddTenantMVC(this IServiceCollection services, Action<MvcOptions> mvcConfigBuild)
+        {
             services.AddScoped<ITenantStorage, TenantStorage>();
             services.AddScoped<ITenantControllerProvider, TenantControllerProvider>();
 
@@ -49,19 +76,10 @@ namespace Gware.Standard.Web.Tenancy.Configuration
                 mvcConfigBuild(x);
             });
         }
-        public static void AddTenant(this IServiceCollection services, Action<ITenantConfiguration> tenantConfigurationBuilder)
+        public static void AddTenant(this IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            TenantWebConfiguration config = new TenantWebConfiguration();
-
-            tenantConfigurationBuilder(config);
-
-            services.AddSingleton<ITenantConfiguration>(config);
-
             services.AddScoped<ITenantStorage, TenantStorage>();
             services.AddScoped<ITenantControllerProvider, TenantControllerProvider>();
-            
         }
         public static IApplicationBuilder UseTenantMvc(this IApplicationBuilder builder,RouteTemplateDomain[] domains,RouteValueDictionary defaults,string template = "{controller}/{action}/{id?}")
         {

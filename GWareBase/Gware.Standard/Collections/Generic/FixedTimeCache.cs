@@ -78,7 +78,7 @@ namespace Gware.Standard.Collections.Generic
                 }
             }
         }
-        private async Task CheckReadQueue()
+        private async void CheckReadQueue()
         {
             if(m_readQueue.Count > 0)
             {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Gware.Standard.Web.Tenancy.Configuration
 {
-    public interface ITenantWebConfiguration : ITenantConfiguration
+    public interface ITenantWebConfiguration 
     {
         IActionResult CreateNewResult { get; set; }
         IActionResult NotFoundResult { get; set; }

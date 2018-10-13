@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -9,38 +10,14 @@ namespace Gware.Standard.Storage.Controller
     {
         public static string GetCreationString(ICommandController controller)
         {
-            return $"{controller.GetType().FullName}?{controller.GetInitialisationString()}";
+            return $"{controller.GetInitialisationString()}";
         }
-        public static ICommandController CreateController(Assembly[] searchIn,string  initString)
+        
+        public static ICommandController CreateController<T>(IServiceProvider provider, string initString) where T : ICommandController
         {
-            ICommandController retVal = null;
-            string[] split = initString.Split('?');
-
-            if (split.Length > 1)
-            {
-                Type controllerType = null;
-                for (int i = 0; i < searchIn.Length; i++)
-                {
-                    Assembly assembly = searchIn[i];
-                    controllerType = assembly.GetType(split[0]);
-                    if(controllerType != null)
-                    {
-                        break;
-                    }
-                }
-                if(controllerType != null)
-                {
-                    retVal = Activator.CreateInstance(controllerType) as ICommandController;
-                    if (retVal != null)
-                    {
-                        retVal.Initialise(split[1]);
-                    }
-                }
-                
-            }
-
-            return retVal;
-
+            ICommandController controller = ActivatorUtilities.CreateInstance<T>(provider);
+            controller.Initialise(initString);
+            return controller;
         }
     }
 }
